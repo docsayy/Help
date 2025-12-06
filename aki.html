@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKI Assessment Tool</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #e3f2fd, #e0f7fa);
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #003d66;
+        margin-bottom: 20px;
+        font-size: 26px;
+    }
+
+    .container {
+        max-width: 960px;
+        margin: auto;
+        background: #ffffffee;
+        padding: 25px 30px;
+        border-radius: 15px;
+        box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+        backdrop-filter: blur(4px);
+    }
+
+    .section-title {
+        margin-top: 10px;
+        margin-bottom: 8px;
+        font-weight: 700;
+        color: #004d66;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 16px;
+    }
+
+    label {
+        font-weight: 600;
+        color: #004d66;
+        font-size: 13px;
+    }
+
+    input[type="number"], input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #b0bec5;
+        background: #f1f8ff;
+        box-sizing: border-box;
+    }
+
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 6px;
+    }
+
+    .checkbox-group label {
+        font-weight: 500;
+        font-size: 13px;
+        color: #37474f;
+    }
+
+    button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 14px;
+        background-color: #0288d1;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background-color: #0277bd;
+    }
+
+    .result {
+        margin-top: 20px;
+        padding: 16px;
+        background-color: #e8f5e9;
+        border-left: 6px solid #43a047;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .emr-box {
+        margin-top: 18px;
+        padding: 16px;
+        background-color: #f1f8e9;
+        border-left: 6px solid #558b2f;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .copy-btn {
+        margin-top: 10px;
+        background: #6a1b9a;
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 6px;
+        width: auto;
+    }
+
+    .copy-btn:hover {
+        background: #4a148c;
+    }
+
+    pre {
+        white-space: pre-wrap;
+        font-family: inherit;
+        font-size: 14px;
+    }
+
+    .muted {
+        font-size: 12px;
+        color: #607d8b;
+        margin-top: 6px;
+    }
+
+    .pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #e3f2fd;
+        color: #01579b;
+        margin-right: 6px;
+        margin-top: 4px;
+    }
+
+    /* Floating Home Button */
+    .home-btn {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: #0288d1;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 15px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
+        transition: 0.2s;
+        z-index: 999;
+    }
+
+    .home-btn:hover {
+        background: #0277bd;
+    }
+
+</style>
+</head>
+<body>
+
+<a href="index.html" class="home-btn">Home</a>
+
+<h1>AKI Assessment Tool</h1>
+
+<div class="container">
+    <div class="section-title">Serum Chemistry</div>
+    <div class="grid">
+        <div>
+            <label>Baseline Creatinine (mg/dL)</label>
+            <input type="number" id="scr_baseline" step="0.01" placeholder="optional">
+        </div>
+        <div>
+            <label>Current Creatinine (mg/dL)</label>
+            <input type="number" id="scr_current" step="0.01">
+        </div>
+        <div>
+            <label>BUN (mg/dL)</label>
+            <input type="number" id="bun" step="0.1">
+        </div>
+        <div>
+            <label>Serum Sodium (mEq/L)</label>
+            <input type="number" id="sna" step="0.1">
+        </div>
+        <div>
+            <label>Serum Potassium (mEq/L)</label>
+            <input type="number" id="sk" step="0.1" placeholder="optional">
+        </div>
+        <div>
+            <label>Serum Chloride (mEq/L)</label>
+            <input type="number" id="scl" step="0.1" placeholder="optional">
+        </div>
+        <div>
+            <label>Serum Bicarbonate (mEq/L)</label>
+            <input type="number" id="hco3" step="0.1" placeholder="optional">
+        </div>
+        <div>
+            <label>Serum Osmolality (mOsm/kg)</label>
+            <input type="number" id="sosm" step="0.1" placeholder="optional">
+        </div>
+    </div>
+
+    <div class="section-title">Urine Studies</div>
+    <div class="grid">
+        <div>
+            <label>Urine Sodium (mEq/L)</label>
+            <input type="number" id="una" step="0.1">
+        </div>
+        <div>
+            <label>Urine Creatinine (mg/dL)</label>
+            <input type="number" id="ucr" step="0.1">
+        </div>
+        <div>
+            <label>Urine Urea (mg/dL)</label>
+            <input type="number" id="uurea" step="0.1" placeholder="for FeUrea">
+        </div>
+        <div>
+            <label>Urine Osmolality (mOsm/kg)</label>
+            <input type="number" id="uosm" step="0.1">
+        </div>
+    </div>
+
+    <div class="section-title">Clinical Context</div>
+    <div class="checkbox-group">
+        <label><input type="checkbox" id="diuretics"> On diuretics</label>
+        <label><input type="checkbox" id="hypovolemia"> Suspected volume depletion / hypotension</label>
+        <label><input type="checkbox" id="chf"> CHF / cirrhosis / low effective volume</label>
+        <label><input type="checkbox" id="obstruction"> Suspected post-renal obstruction</label>
+    </div>
+    <div class="muted">
+        This is a simplified educational tool. Interpret in clinical context and follow local protocols.
+    </div>
+
+    <button onclick="assessAKI()">Assess AKI</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <div id="emrBox" class="emr-box" style="display:none;">
+        <h3>Assessment &amp; Plan (Copy-Ready for EMR)</h3>
+        <pre id="emrText"></pre>
+        <button class="copy-btn" onclick="copyEMR()">Copy to Clipboard</button>
+    </div>
+</div>
+
+<script>
+function safeNum(id) {
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? null : v;
+}
+
+function assessAKI() {
+    const scr_baseline = safeNum('scr_baseline');
+    const scr_current = safeNum('scr_current');
+    const bun = safeNum('bun');
+    const sna = safeNum('sna');
+    const sk = safeNum('sk');
+    const scl = safeNum('scl');
+    const hco3 = safeNum('hco3');
+    const sosm = safeNum('sosm');
+
+    const una = safeNum('una');
+    const ucr = safeNum('ucr');
+    const uurea = safeNum('uurea');
+    const uosm = safeNum('uosm');
+
+    const onDiuretics = document.getElementById('diuretics').checked;
+    const hypovolemia = document.getElementById('hypovolemia').checked;
+    const chf = document.getElementById('chf').checked;
+    const obstruction = document.getElementById('obstruction').checked;
+
+    let resultDiv = document.getElementById('result');
+    let emrBox = document.getElementById('emrBox');
+    let emrText = document.getElementById('emrText');
+
+    let out = "";
+    let assessment = [];
+    let plan = [];
+    let warnings = [];
+
+    // --- AKI presence & stage (simplified KDIGO based on creatinine) ---
+    let akiStageText = "AKI staging indeterminate (no baseline creatinine).";
+    if (scr_current != null) {
+        if (scr_baseline != null && scr_baseline > 0) {
+            const ratio = scr_current / scr_baseline;
+            if (ratio >= 3 || scr_current >= 4) {
+                akiStageText = `AKI Stage 3 (Cr ${scr_current.toFixed(2)} mg/dL, baseline ${scr_baseline.toFixed(2)} mg/dL).`;
+            } else if (ratio >= 2) {
+                akiStageText = `AKI Stage 2 (Cr ${scr_current.toFixed(2)} mg/dL, baseline ${scr_baseline.toFixed(2)} mg/dL).`;
+            } else if (ratio >= 1.5 || scr_current - scr_baseline >= 0.3) {
+                akiStageText = `AKI Stage 1 (Cr ${scr_current.toFixed(2)} mg/dL, baseline ${scr_baseline.toFixed(2)} mg/dL).`;
+            } else {
+                akiStageText = `No clear AKI by creatinine criteria (Cr ${scr_current.toFixed(2)} mg/dL, baseline ${scr_baseline.toFixed(2)} mg/dL).`;
+            }
+        } else {
+            if (scr_current >= 1.3) {
+                akiStageText = `Elevated creatinine ${scr_current.toFixed(2)} mg/dL — AKI possible without known baseline.`;
+            }
+        }
+    } else {
+        warnings.push("Current serum creatinine missing.");
+    }
+
+    assessment.push("Acute kidney injury (pattern classification based on labs below).");
+    out += `<div><strong>${akiStageText}</strong></div>`;
+
+    // --- BUN:Cr ---
+    let bunCr = null;
+    if (bun != null && scr_current != null && scr_current > 0) {
+        bunCr = bun / scr_current;
+        out += `<div class="pill">BUN:Cr ≈ ${bunCr.toFixed(1)}</div>`;
+    }
+
+    // --- FeNa ---
+    let fena = null;
+    if (una != null && ucr != null && sna != null && scr_current != null && sna > 0 && ucr > 0) {
+        fena = (una * scr_current) / (sna * ucr) * 100;
+        out += `<div class="pill">FeNa ≈ ${fena.toFixed(1)}%</div>`;
+    }
+
+    // --- FeUrea ---
+    let feu = null;
+    if (uurea != null && bun != null && ucr != null && bun > 0 && ucr > 0) {
+        feu = (uurea * scr_current) / (bun * ucr) * 100;
+        out += `<div class="pill">FeUrea ≈ ${feu.toFixed(1)}%</div>`;
+    }
+
+    // --- Scores for pre-renal vs intrinsic ---
+    let preScore = 0;
+    let intrScore = 0;
+    let patternText = "Pattern indeterminate / mixed.";
+
+    if (bunCr != null) {
+        if (bunCr > 20) preScore += 1;
+        else if (bunCr < 15) intrScore += 1;
+    }
+
+    if (fena != null) {
+        if (fena < 1) {
+            preScore += onDiuretics ? 0.5 : 2;  // less weight if on diuretics
+        } else if (fena > 2) {
+            intrScore += 2;
+        }
+    }
+
+    if (feu != null) {
+        if (feu < 35) preScore += 2;
+        else if (feu > 50) intrScore += 1;
+    }
+
+    if (uosm != null) {
+        if (uosm > 500) preScore += 1;
+        else if (uosm < 350) intrScore += 1;
+    }
+
+    if (hypovolemia || chf) {
+        preScore += 1;
+    }
+
+    // Determine pattern
+    if (preScore >= intrScore + 2 && preScore >= 2) {
+        patternText = "Labs suggest a predominant pre-renal pattern.";
+        assessment.push("AKI most consistent with pre-renal etiology.");
+        plan.push("Assess volume status and hemodynamics; consider IV fluids if hypovolemic, or adjust diuretics/afterload in CHF/cirrhosis.");
+        plan.push("Hold nephrotoxic medications (NSAIDs, ACEi/ARB if appropriate, contrast, etc.).");
+        plan.push("Monitor urine output and repeat chemistry to assess response to optimization of perfusion.");
+    } else if (intrScore >= preScore + 2 && intrScore >= 2) {
+        patternText = "Labs suggest an intrinsic (intra-renal) pattern (e.g., ATN, GN, AIN).";
+        assessment.push("AKI most consistent with intrinsic renal etiology.");
+        plan.push("Obtain urinalysis with microscopy (casts, dysmorphic RBCs, eosinophils).");
+        plan.push("Review medications, contrast exposure, and systemic illnesses (sepsis, rhabdomyolysis, autoimmune disease).");
+        plan.push("Consider renal ultrasound and nephrology consultation, especially if creatinine rising or oliguria.");
+    } else {
+        patternText = "Pattern mixed or not clearly pre-renal vs intrinsic.";
+        assessment.push("AKI etiology indeterminate (mixed / other).");
+        plan.push("Evaluate for combined pre-renal and intrinsic processes (e.g., sepsis, cardiorenal, hepatorenal).");
+    }
+
+    // Post-renal considerations
+    if (obstruction) {
+        assessment.push("Post-renal obstruction suspected.");
+        plan.push("Order renal ultrasound and/or bladder scan; relieve obstruction (Foley catheter, urology consult) if confirmed.");
+    } else {
+        plan.push("Consider post-renal causes in appropriate context — bladder scan and renal ultrasound if concern for obstruction.");
+    }
+
+    // Generic AKI care
+    plan.push("Adjust all renally cleared medications to current kidney function.");
+    plan.push("Monitor strict intake/output and daily weights; assess for electrolyte and acid-base disturbances.");
+    if (sk != null && sk > 5.5) {
+        plan.push(`Hyperkalemia present (K ${sk.toFixed(1)} mEq/L) — manage per hyperkalemia protocol as indicated.`);
+    }
+
+    // Acid-base note
+    if (hco3 != null && hco3 < 18) {
+        plan.push(`Metabolic acidosis suspected (HCO₃ ${hco3.toFixed(1)} mEq/L) — monitor for need of bicarbonate therapy or dialysis depending on severity and symptoms.`);
+    }
+
+    // Transplant / dialysis note (generic)
+    plan.push("Consider nephrology consult for rapidly rising creatinine, refractory electrolyte/volume issues, or concern for dialysis indications.");
+
+    out += `<div style="margin-top:10px;"><strong>Pattern summary:</strong> ${patternText}</div>`;
+
+    if (onDiuretics) {
+        out += `<div class="muted">Note: Patient on diuretics — FeNa may be less reliable; FeUrea and clinical context are more helpful.</div>`;
+    }
+
+    if (warnings.length > 0) {
+        out += "<br><strong>Missing key values:</strong><ul>";
+        warnings.forEach(w => out += `<li>${w}</li>`);
+        out += "</ul>";
+    }
+
+    resultDiv.innerHTML = out;
+    resultDiv.style.display = "block";
+
+    // --- EMR Text (Assessment & Plan) ---
+    let emr = "";
+    emr += "Assessment:\n";
+    assessment.forEach(a => {
+        emr += `• ${a}\n`;
+    });
+    emr += `• ${akiStageText}\n`;
+    if (bunCr != null) emr += `• BUN:Cr ≈ ${bunCr.toFixed(1)}\n`;
+    if (fena != null) emr += `• FeNa ≈ ${fena.toFixed(1)}%\n`;
+    if (feu != null) emr += `• FeUrea ≈ ${feu.toFixed(1)}%\n`;
+    if (uosm != null) emr += `• Urine osmolality ≈ ${uosm.toFixed(0)} mOsm/kg\n`;
+
+    emr += "\nPlan:\n";
+    plan.forEach(p => {
+        emr += `• ${p}\n`;
+    });
+
+    if (warnings.length > 0) {
+        emr += "\nAdditional notes / missing data:\n";
+        warnings.forEach(w => {
+            emr += `• ${w}\n`;
+        });
+    }
+
+    emr += "\n(Use in conjunction with clinical judgment and institutional AKI/dialysis protocols.)\n";
+
+    emrText.textContent = emr;
+    emrBox.style.display = "block";
+}
+
+function copyEMR() {
+    const text = document.getElementById('emrText').textContent;
+    navigator.clipboard.writeText(text).then(function() {
+        alert("Assessment & Plan copied to clipboard.");
+    }, function() {
+        alert("Copy failed — you can select and copy manually.");
+    });
+}
+</script>
+
+</body>
+</html>
