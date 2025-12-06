@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My App</title>
+  <style>
+    /* Reset some basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .link-button {
+      display: block;
+      width: 80%;
+      max-width: 300px;
+      margin: 10px 0;
+      padding: 15px;
+      background-color: #ffffff;
+      color: #333;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, transform 0.2s;
+      font-size: 1.1rem;
+    }
+
+    .link-button:hover {
+      background-color: #e0e0e0;
+      transform: scale(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    My App
+  </header>
+
+  <main>
+    <a href="page1.html" class="link-button">Page 1</a>
+    <a href="page2.html" class="link-button">Page 2</a>
+    <a href="page3.html" class="link-button">Page 3</a>
+    <a href="page4.html" class="link-button">Page 4</a>
+    <!-- Add more links here later -->
+  </main>
+
+  <footer>
+    &copy; 2025 My App
+  </footer>
+
+</body>
+</html>
