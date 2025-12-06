@@ -25,19 +25,19 @@
     }
 
     .container {
-        max-width: 900px;
+        max-width: 1100px;
         margin: 40px auto;
         padding: 10px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 25px;
     }
 
     .card {
         background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        padding: 28px 20px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         text-align: center;
         transition: transform .25s ease, box-shadow .25s ease;
         text-decoration: none;
@@ -45,14 +45,31 @@
     }
 
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        transform: translateY(-6px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.22);
     }
 
-    svg {
-        width: 70px;
-        height: 70px;
+    /* Icon styling for external PNG/SVG files */
+    .icon {
+        width: 64px;     /* desktop size */
+        height: 64px;
         margin-bottom: 15px;
+        object-fit: contain;
+    }
+
+    /* Mobile scaling */
+    @media (max-width: 600px) {
+        .icon {
+            width: 48px;    /* mobile touch-optimized size */
+            height: 48px;
+        }
+        header {
+            font-size: 22px;
+            padding: 18px;
+        }
+        .card {
+            padding: 20px;
+        }
     }
 
     .title {
@@ -76,47 +93,12 @@
 
 <div class="container">
 
-    <!-- ABG / Metabolic -->
+    <!-- ABG / Acid-Base Tool -->
     <a href="abg.html" class="card">
-        <!-- Lungs / Gas Icon -->
-        <svg viewBox="0 0 64 64" fill="#0a4b78">
-            <path d="M32 4c-4 0-7 3-7 7v12c0 2-2 4-4 4-6 0-11 5-11 11v14c0 4 3 7 7 7s7-3 7-7V36c0-2 2-4 4-4h4V11c0-4-3-7-7-7zm0 0c4 0 7 3 7 7v21h4c2 0 4 2 4 4v16c0 4 3 7 7 7s7-3 7-7V38c0-6-5-11-11-11-2 0-4-2-4-4V11c0-4-3-7-7-7z"/>
-        </svg>
-        <div class="title">ABG / Acid–Base</div>
-        <div class="desc">Metabolic acidosis, alkalosis, delta gap, anion gap.</div>
+        <img src="icons/abg.png" class="icon" alt="ABG Icon">
+        <div class="title">ABG / Acid–Base Calculator</div>
+        <div class="desc">AG, delta gap, metabolic acidosis & alkalosis.</div>
     </a>
 
-    <!-- Anemia -->
-    <a href="anemia.html" class="card">
-        <!-- Blood Drop Icon -->
-        <svg viewBox="0 0 64 64" fill="#b30000">
-            <path d="M32 4C22 18 14 28 14 38c0 11 8 22 18 22s18-11 18-22C50 28 42 18 32 4z"/>
-        </svg>
-        <div class="title">Anemia Analyzer</div>
-        <div class="desc">Evaluate anemia type, suggest missing labs, management ideas.</div>
-    </a>
-
-    <!-- AKI -->
-    <a href="aki.html" class="card">
-        <!-- Kidney Icon -->
-        <svg viewBox="0 0 64 64" fill="#7a3b0c">
-            <path d="M22 6c-8 0-14 8-14 18s6 18 14 18c3 0 6-1 8-3V9c-2-2-5-3-8-3zm20 0c-3 0-6 1-8 3v30c2 2 5 3 8 3 8 0 14-8 14-18S50 6 42 6z"/>
-        </svg>
-        <div class="title">AKI Evaluator</div>
-        <div class="desc">Stages, FeNa/FeUrea, prerenal vs intrinsic vs postrenal.</div>
-    </a>
-
-    <!-- Placeholder for Future Tools -->
-    <a href="#" class="card">
-        <svg viewBox="0 0 64 64" fill="#555">
-            <circle cx="32" cy="32" r="28"/>
-            <text x="32" y="38" font-size="28" fill="white" text-anchor="middle">+</text>
-        </svg>
-        <div class="title">More Tools Coming Soon</div>
-        <div class="desc">Add new calculators and decision tools anytime.</div>
-    </a>
-
-</div>
-
-</body>
-</html>
+    <!-- Anemia Tool -->
+    <a href="anemia.html"
