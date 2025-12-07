@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Statin Intensity Selector – Cardiology</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent: #f97316;
+      --accent-soft: rgba(249,115,22,0.16);
+      --muted: #9ca3af;
+      --border: rgba(148,163,184,0.35);
+      --radius: 16px;
+      --pad: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(248,113,22,0.22), transparent 50%),
+        radial-gradient(circle at bottom, #020617, #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 14px;
+    }
+    main {
+      width: 100%;
+      max-width: 980px;
+    }
+    header {
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h1 .icon {
+      font-size: 1.6rem;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .tag {
+      font-size: 0.75rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      background: rgba(15,23,42,0.9);
+    }
+    .layout {
+      display: grid;
+      gap: 14px;
+    }
+    @media (min-width: 880px) {
+      .layout {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      }
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.99));
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: var(--pad);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.75);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,0.22), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #fed7aa;
+      border: 1px solid rgba(248,250,252,0.08);
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    form {
+      display: grid;
+      gap: 8px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.82rem;
+    }
+    label {
+      font-size: 0.8rem;
+    }
+    input[type="number"], select {
+      margin-top: 2px;
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-size: 0.85rem;
+    }
+    .checkbox-group {
+      display: grid;
+      gap: 4px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .helper {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .btn-row {
+      margin-top: 6px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 13px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: radial-gradient(circle at 0 0, #fed7aa, #fb923c 40%, #ea580c 100%);
+      color: #111827;
+      box-shadow: 0 10px 26px rgba(248,113,22,0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 32px rgba(248,113,22,0.7);
+    }
+    button.secondary {
+      background: transparent;
+      color: #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.6);
+      box-shadow: none;
+    }
+    .result {
+      font-size: 0.82rem;
+      display: grid;
+      gap: 8px;
+    }
+    .result-block {
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.45);
+    }
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+      font-size: 0.86rem;
+    }
+    .highlight {
+      font-weight: 600;
+      color: #fed7aa;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .pill {
+      font-size: 0.72rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.45);
+      color: #e5e7eb;
+    }
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .intensity-high { color: #f97373; }
+    .intensity-moderate { color: #facc15; }
+    .intensity-low { color: #4ade80; }
+    footer {
+      margin-top: 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1><span class="icon">💊</span> Statin Intensity Selector</h1>
+      <p>Suggests high, moderate, or low-intensity statin therapy with example agents & doses, based on basic clinical inputs.</p>
+      <div class="tag-row">
+        <span class="tag">Cardiology theme</span>
+        <span class="tag">ACC/AHA-style logic</span>
+        <span class="tag">Educational decision support</span>
+      </div>
+    </header>
+
+    <section class="layout">
+      <!-- Input side -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            Patient & Risk Profile
+            <span class="badge">Inputs</span>
+          </h2>
+          <p class="subtitle">Fill what you know; unknown fields can stay blank or “Not sure”.</p>
+
+          <form id="statin-form">
+            <div class="field">
+              <label for="age">Age (years)</label>
+              <input id="age" type="number" min="16" max="100" value="60">
+            </div>
+
+            <div class="field">
+              <label for="sex">Sex</label>
+              <select id="sex">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other / not specified</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="ldl">LDL-C (mg/dL)</label>
+              <input id="ldl" type="number" min="20" max="400" placeholder="e.g. 145">
+              <div class="helper">If unknown, leave blank.</div>
+            </div>
+
+            <div class="field">
+              <label for="scenario">Clinical scenario</label>
+              <select id="scenario">
+                <option value="secondary">Clinical ASCVD (secondary prevention)</option>
+                <option value="primary">No known ASCVD (primary prevention)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Key conditions</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" id="diabetes"> Diabetes (esp. age 40–75)</label>
+                <label><input type="checkbox" id="very-high-ldl"> Known LDL ≥190 mg/dL or familial hypercholesterolemia</label>
+                <label><input type="checkbox" id="ckd"> CKD (eGFR &lt;60 but not dialysis/transplant)</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="risk-category">10-year ASCVD risk (if primary)</label>
+              <select id="risk-category">
+                <option value="unknown">Not sure / not calculated</option>
+                <option value="low">&lt;5% (low)</option>
+                <option value="borderline">5–7.4% (borderline)</option>
+                <option value="intermediate">7.5–19.9% (intermediate)</option>
+                <option value="high">≥20% (high)</option>
+              </select>
+              <div class="helper">Use the separate ASCVD tool if you want to calculate this precisely.</div>
+            </div>
+
+            <div class="field">
+              <label>Additional risk enhancers</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" id="risk-enhancers">
+                  Multiple risk enhancers (premature ASCVD FHx, high hs-CRP, ABI &lt;0.9, persistently high LDL, etc.)
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Contraindications / caution</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" id="pregnancy"> Pregnancy or trying to conceive</label>
+                <label><input type="checkbox" id="active-liver"> Active liver disease / very high LFTs</label>
+                <label><input type="checkbox" id="intolerance"> Prior statin intolerance / myopathy</label>
+                <label><input type="checkbox" id="dialysis"> Dialysis or kidney transplant</label>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit">
+                <span>Suggest statin intensity</span>
+              </button>
+              <button type="button" class="secondary" id="reset-btn">Reset</button>
+            </div>
+          </form>
+        </div>
+      </article>
+
+      <!-- Output side -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            Suggested Strategy
+            <span class="badge">Output</span>
+          </h2>
+          <p class="subtitle">Intensity, example agents & doses, and monitoring notes.</p>
+
+          <div id="result" class="result">
+            <div class="result-block">
+              <div class="result-title">Start by entering patient details.</div>
+              <div>Then click <span class="highlight">“Suggest statin intensity”</span> to see recommendations.</div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      Educational support only – not a substitute for clinical judgement. Confirm with latest lipid guidelines, patient preferences, and local protocols.
+    </footer>
+  </main>
+
+  <script>
+    function buildScenarioSummary(age, sex, scenario, diabetes, veryHighLDL, riskCat) {
+      const parts = [];
+      if (!isNaN(age) && age > 0) parts.push("Age " + age);
+      if (sex === "M") parts.push("male");
+      else if (sex === "F") parts.push("female");
+
+      if (scenario === "secondary") {
+        parts.push("with clinical ASCVD");
+      } else {
+        parts.push("without known ASCVD");
+      }
+      if (diabetes) parts.push("with diabetes");
+      if (veryHighLDL) parts.push("LDL ≥190 / severe hypercholesterolemia");
+
+      if (scenario === "primary" && riskCat && riskCat !== "unknown") {
+        const labelMap = {
+          low: "low 10-yr risk (<5%)",
+          borderline: "borderline 10-yr risk (5–7.4%)",
+          intermediate: "intermediate 10-yr risk (7.5–19.9%)",
+          high: "high 10-yr risk (≥20%)"
+        };
+        parts.push(labelMap[riskCat]);
+      }
+
+      return parts.length ? parts.join(", ") : "Profile not fully specified";
+    }
+
+    function computeIntensity(inputs) {
+      const {
+        age,
+        scenario,
+        diabetes,
+        veryHighLDL,
+        ldl,
+        riskCat,
+        riskEnhancers,
+        pregnancy,
+        activeLiver,
+        intolerance,
+        dialysis
+      } = inputs;
+
+      // Contraindications
+      if (pregnancy || activeLiver) {
+        return {
+          level: "contra",
+          title: "Statins generally contraindicated",
+          classText: "Avoid routine statin therapy",
+          explanation: "Pregnancy and active, significant liver disease are classic situations where statins are usually avoided. Involve cardiology/obstetrics/hepatology for alternative lipid strategies.",
+          notes: [
+            "Defer statin therapy until after pregnancy/breastfeeding or liver disease is stabilized.",
+            "If ASCVD risk is very high, consider specialist input on non-statin options."
+          ]
+        };
+      }
+
+      // Starting from here, we choose intensity
+      // Secondary prevention (clinical ASCVD)
+      if (scenario === "secondary") {
+        // Age & very high LDL can tilt to high-intensity
+        if (age <= 75 || veryHighLDL || riskCat === "high" || riskEnhancers) {
+          return {
+            level: "high",
+            title: "Secondary prevention – high-intensity preferred",
+            classText: "High-intensity statin recommended if tolerated",
+            explanation: "Clinical ASCVD typically calls for high-intensity statin therapy unless contraindicated or not tolerated.",
+            notes: [
+              "Aim for ≥50% LDL-C reduction and LDL-C <70 mg/dL in very high-risk patients.",
+              "If LDL-C remains ≥70 mg/dL on maximally tolerated statin, consider adding ezetimibe or PCSK9 inhibitor per guidelines."
+            ]
+          };
+        } else {
+          return {
+            level: "moderate",
+            title: "Secondary prevention – at least moderate-intensity",
+            classText: "Moderate- to high-intensity statin reasonable",
+            explanation: "In older or frailer patients with ASCVD, moderate-intensity statin may be appropriate, with shared decision making about higher doses.",
+            notes: [
+              "Aim for substantial LDL-C lowering while balancing frailty, polypharmacy, and adverse effects.",
+              "Discuss potential benefits vs side effects and re-evaluate regularly."
+            ]
+          };
+        }
+      }
+
+      // Primary prevention, LDL ≥190 or severe hypercholesterolemia
+      if (veryHighLDL || (!isNaN(ldl) && ldl >= 190)) {
+        return {
+          level: "high",
+          title: "Severe primary hypercholesterolemia",
+          classText: "High-intensity statin generally recommended",
+          explanation: "LDL-C ≥190 mg/dL (or familial hypercholesterolemia) usually warrants high-intensity statin regardless of calculated 10-year risk.",
+          notes: [
+            "Aim for ≥50% LDL-C reduction.",
+            "Consider adding ezetimibe or other agents if LDL-C remains high despite maximal statin therapy."
+          ]
+        };
+      }
+
+      // Diabetes, age 40–75, LDL 70–189, no ASCVD
+      if (diabetes && age >= 40 && age <= 75 && (isNaN(ldl) || (ldl >= 70 && ldl < 190))) {
+        if (riskCat === "high" || riskEnhancers) {
+          return {
+            level: "high",
+            title: "Diabetes (40–75) with higher overall risk",
+            classText: "High-intensity statin reasonable",
+            explanation: "In diabetics with multiple risk factors or high estimated 10-year risk, a high-intensity statin is often chosen.",
+            notes: [
+              "Aim for ≥50% LDL-C reduction.",
+              "Review for CKD, albuminuria, long duration of diabetes, or other enhancers that support high-intensity therapy."
+            ]
+          };
+        } else {
+          return {
+            level: "moderate",
+            title: "Diabetes (40–75) without clear high-risk features",
+            classText: "Moderate-intensity statin usually recommended",
+            explanation: "Most adults aged 40–75 with diabetes and LDL-C 70–189 mg/dL are treated with at least a moderate-intensity statin.",
+            notes: [
+              "Consider escalation to high-intensity if additional risk enhancers or higher ASCVD risk are identified.",
+              "Lifestyle interventions remain important alongside statin therapy."
+            ]
+          };
+        }
+      }
+
+      // Primary prevention without diabetes or ASCVD, age 40–75, LDL 70–189
+      if (!diabetes && scenario === "primary" && age >= 40 && age <= 75 && (isNaN(ldl) || (ldl >= 70 && ldl < 190))) {
+        switch (riskCat) {
+          case "low":
+            return {
+              level: "none-or-low",
+              title: "Low 10-year ASCVD risk (<5%)",
+              classText: "Emphasize lifestyle; statin usually not needed",
+              explanation: "For low-risk primary prevention patients, aggressive lifestyle measures are first-line and statins are often not routinely used.",
+              notes: [
+                "Consider statin only if strong risk enhancers or very high LDL-C are present.",
+                "Reassess risk every 4–6 years or sooner if clinical situation changes."
+              ]
+            };
+          case "borderline":
+            return {
+              level: "borderline",
+              title: "Borderline 10-year risk (5–7.4%)",
+              classText: "Consider moderate-intensity statin if risk enhancers present",
+              explanation: "In borderline risk, statin decisions depend heavily on risk enhancers and shared decision making.",
+              notes: [
+                "If risk enhancers present (family history of premature ASCVD, CKD, etc.), moderate-intensity statin is reasonable.",
+                "If no risk enhancers, lifestyle alone may be reasonable."
+              ]
+            };
+          case "intermediate":
+            return {
+              level: "moderate",
+              title: "Intermediate 10-year risk (7.5–19.9%)",
+              classText: "Moderate-intensity statin typically recommended",
+              explanation: "Most intermediate-risk patients benefit from moderate-intensity statin therapy.",
+              notes: [
+                "Escalate to high-intensity if multiple risk enhancers or very high LDL-C.",
+                "Coronary artery calcium (CAC) scoring may refine the decision in uncertain cases."
+              ]
+            };
+          case "high":
+            return {
+              level: "high",
+              title: "High 10-year risk (≥20%)",
+              classText: "High-intensity statin generally recommended",
+              explanation: "In high 10-year ASCVD risk, benefits of high-intensity statin typically outweigh risks.",
+              notes: [
+                "Aim for ≥50% LDL-C reduction.",
+                "Monitor for myopathy, new-onset diabetes, and liver enzyme changes."
+              ]
+            };
+          case "unknown":
+          default:
+            return {
+              level: "moderate",
+              title: "Primary prevention – risk not quantified",
+              classText: "Moderate-intensity statin may be reasonable",
+              explanation: "Without a calculated 10-year risk, many adults with multiple risk factors are treated with at least a moderate-intensity statin.",
+              notes: [
+                "Consider calculating 10-year ASCVD risk or using CAC scoring for clarification.",
+                "Lifestyle optimization is recommended in all risk groups."
+              ]
+            };
+        }
+      }
+
+      // Age <40 or >75 primary prevention – more individualized
+      return {
+        level: "individualized",
+        title: "Individualized primary prevention decision",
+        classText: "Statin choice should be individualized",
+        explanation: "For patients outside the classic 40–75-year primary prevention range, statin therapy depends on risk factors, life expectancy, and patient preference.",
+        notes: [
+          "In younger patients with strong risk enhancers or very high LDL-C, moderate- or high-intensity statin can still be considered.",
+          "In older adults, balance ASCVD benefit with comorbidity, frailty, and polypharmacy."
+        ]
+      };
+    }
+
+    function renderResult(summary, intensityInfo, intolerance, dialysis) {
+      const container = document.getElementById("result");
+
+      function intensityLine(info) {
+        switch (info.level) {
+          case "high": return `<span class="intensity-high">High-intensity statin suggested</span>`;
+          case "moderate": return `<span class="intensity-moderate">Moderate-intensity statin suggested</span>`;
+          case "low": return `<span class="intensity-low">Low-intensity statin suggested</span>`;
+          case "none-or-low": return `<span class="intensity-low">Lifestyle focus; usually no statin or at most low-intensity</span>`;
+          case "borderline": return `<span class="intensity-moderate">Consider moderate-intensity if risk enhancers</span>`;
+          case "contra": return `<span class="intensity-high">Avoid routine statins – contraindication</span>`;
+          case "individualized": default: return `<span class="intensity-moderate">Individualized statin decision</span>`;
+        }
+      }
+
+      const highExamples = `
+        <div class="section-title">High-intensity examples (≈≥50% LDL reduction)</div>
+        <ul>
+          <li>Atorvastatin <strong>40–80 mg</strong> once daily</li>
+          <li>Rosuvastatin <strong>20–40 mg</strong> once daily</li>
+        </ul>
+      `;
+      const moderateExamples = `
+        <div class="section-title">Moderate-intensity examples (≈30–49% LDL reduction)</div>
+        <ul>
+          <li>Atorvastatin <strong>10–20 mg</strong> once daily</li>
+          <li>Rosuvastatin <strong>5–10 mg</strong> once daily</li>
+          <li>Simvastatin <strong>20–40 mg</strong> once daily</li>
+          <li>Pravastatin <strong>40–80 mg</strong> once daily</li>
+          <li>Lovastatin <strong>40 mg</strong> once daily</li>
+          <li>Pitavastatin <strong>2–4 mg</strong> once daily</li>
+        </ul>
+      `;
+      const lowExamples = `
+        <div class="section-title">Low-intensity examples (≈&lt;30% LDL reduction)</div>
+        <ul>
+          <li>Simvastatin <strong>10 mg</strong> once daily</li>
+          <li>Pravastatin <strong>10–20 mg</strong> once daily</li>
+          <li>Lovastatin <strong>20 mg</strong> once daily</li>
+          <li>Pitavastatin <strong>1 mg</strong> once daily</li>
+        </ul>
+      `;
+
+      const intoleranceNote = intolerance
+        ? `<div class="result-block">
+             <div class="result-title">Statin intolerance / myopathy history</div>
+             <div>Use the <strong>maximally tolerated dose</strong>, consider alternate-day dosing or switching agent (e.g., pravastatin or rosuvastatin), and evaluate for secondary causes (hypothyroidism, drug interactions, etc.).</div>
+           </div>`
+        : "";
+
+      const dialysisNote = dialysis
+        ? `<div class="result-block">
+             <div class="result-title">Dialysis / transplant caution</div>
+             <div>In dialysis or post-transplant patients, the net benefit of initiating or intensifying statins is less clear. Follow renal and transplant-specific guidelines and involve nephrology.</div>
+           </div>`
+        : "";
+
+      container.innerHTML = `
+        <div class="result-block">
+          <div class="result-title">Clinical summary</div>
+          <div>${summary}</div>
+        </div>
+
+        <div class="result-block">
+          <div class="result-title">Suggested statin strategy</div>
+          <div>${intensityLine(intensityInfo)}</div>
+          <div style="margin-top:4px;">${intensityInfo.explanation}</div>
+          <div class="pill-row">
+            <span class="pill">${intensityInfo.title}</span>
+          </div>
+        </div>
+
+        <div class="result-block">
+          <div class="result-title">Example regimens (adjust to patient & renal function)</div>
+          ${intensityInfo.level === "high" ? highExamples + moderateExamples : ""}
+          ${intensityInfo.level === "moderate" || intensityInfo.level === "borderline" || intensityInfo.level === "individualized" || intensityInfo.level === "none-or-low"
+            ? moderateExamples + lowExamples
+            : ""}
+          ${intensityInfo.level === "contra" ? "" : ""}
+        </div>
+
+        <div class="result-block">
+          <div class="result-title">Monitoring & follow-up</div>
+          <ul>
+            <li>Check fasting lipid panel at baseline and 4–12 weeks after starting or changing dose, then every 3–12 months.</li>
+            <li>Assess for muscle symptoms; check CK only if clinically indicated.</li>
+            <li>Baseline liver enzymes are reasonable; repeat if symptoms suggest hepatotoxicity.</li>
+            <li>Reinforce lifestyle: diet, exercise, weight, tobacco cessation.</li>
+          </ul>
+        </div>
+
+        ${intoleranceNote}
+        ${dialysisNote}
+
+        ${intensityInfo.notes && intensityInfo.notes.length
+          ? `<div class="result-block">
+               <div class="result-title">Additional notes</div>
+               <ul>${intensityInfo.notes.map(n => `<li>${n}</li>`).join("")}</ul>
+             </div>`
+          : ""}
+      `;
+    }
+
+    document.getElementById("statin-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const age = Number(document.getElementById("age").value || 0);
+      const sex = document.getElementById("sex").value;
+      const ldl = Number(document.getElementById("ldl").value || NaN);
+      const scenario = document.getElementById("scenario").value;
+      const diabetes = document.getElementById("diabetes").checked;
+      const veryHighLDL = document.getElementById("very-high-ldl").checked;
+      const riskCat = document.getElementById("risk-category").value;
+      const riskEnhancers = document.getElementById("risk-enhancers").checked;
+      const pregnancy = document.getElementById("pregnancy").checked;
+      const activeLiver = document.getElementById("active-liver").checked;
+      const intolerance = document.getElementById("intolerance").checked;
+      const dialysis = document.getElementById("dialysis").checked;
+
+      const summary = buildScenarioSummary(age, sex, scenario, diabetes, veryHighLDL, riskCat);
+      const intensityInfo = computeIntensity({
+        age,
+        scenario,
+        diabetes,
+        veryHighLDL,
+        ldl,
+        riskCat,
+        riskEnhancers,
+        pregnancy,
+        activeLiver,
+        intolerance,
+        dialysis
+      });
+
+      renderResult(summary, intensityInfo, intolerance, dialysis);
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", function () {
+      document.getElementById("statin-form").reset();
+      document.getElementById("risk-category").value = "unknown";
+      document.getElementById("sex").value = "M";
+      document.getElementById("scenario").value = "secondary";
+      document.getElementById("age").value = "60";
+      document.getElementById("result").innerHTML = `
+        <div class="result-block">
+          <div class="result-title">Start by entering patient details.</div>
+          <div>Then click <span class="highlight">“Suggest statin intensity”</span> to see recommendations.</div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
