@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSBI & Weaning Readiness Tool</title>
+
+<style>
+    :root {
+        --bg: #e0f7fa;
+        --card: #ffffff;
+        --accent: #00838f;
+        --accent-soft: rgba(0,131,143,0.08);
+        --text-main: #0f172a;
+        --muted: #607d8b;
+        --danger: #c62828;
+        --warning: #ef6c00;
+        --success: #2e7d32;
+        --radius: 14px;
+        --shadow: 0 12px 25px rgba(15,23,42,0.12);
+        --pad: 14px;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top left, #e0f7fa 0, #f1f5f9 40%, #e3f2fd 100%);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: 960px;
+        background: rgba(255,255,255,0.9);
+        padding: 18px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        margin: 0;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 1.4rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+
+    .nav-buttons a {
+        text-decoration: none;
+        background: #fff;
+        padding: 6px 12px;
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        color: var(--accent);
+        font-size: 0.85rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: var(--radius);
+        padding: var(--pad);
+        box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+        border: 1px solid rgba(148,163,184,0.2);
+        margin-bottom: 16px;
+    }
+
+    label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 6px;
+        display: block;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 0.9rem;
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.7);
+        background: #f9fafb;
+    }
+
+    input:focus, select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px rgba(0,131,143,0.35);
+        outline: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg,#00acc1,#00838f);
+        padding: 10px 16px;
+        border: none;
+        border-radius: 999px;
+        color: #fff;
+        font-size: 1rem;
+        margin-top: 12px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(0,131,143,0.3);
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        min-height: 140px;
+        border-radius: 12px;
+        border: 1px solid rgba(148,163,184,0.7);
+        background: #f9fafb;
+        font-size: 0.85rem;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        margin: 4px 4px 10px 0;
+    }
+    .badge-good { background: rgba(46,125,50,0.15); color: var(--success); }
+    .badge-warning { background: rgba(239,108,0,0.15); color: var(--warning); }
+    .badge-danger { background: rgba(198,40,40,0.15); color: var(--danger); }
+</style>
+
+</head>
+<body>
+
+<div class="app-container">
+
+<header>
+    <div>
+        <h1>🫁 RSBI & Weaning Readiness Tool</h1>
+        <div class="subtitle">Rapid Shallow Breathing Index + Full Extubation Readiness Criteria</div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="../pulmonary.html">↩ Pulmonary</a>
+        <a href="../index.html">🏠 Home</a>
+    </div>
+</header>
+
+<!-- INPUT CARD -->
+<div class="card">
+    <h3>Inputs</h3>
+
+    <label>Respiratory Rate (breaths/min)</label>
+    <input type="number" id="rr" placeholder="e.g. 20">
+
+    <label>Tidal Volume (mL)</label>
+    <input type="number" id="vt" placeholder="e.g. 350">
+
+    <label>SpO₂ (%)</label>
+    <input type="number" id="spo2" placeholder="e.g. 95">
+
+    <label>FiO₂ (%)</label>
+    <input type="number" id="fio2" placeholder="e.g. 40">
+
+    <label>PEEP (cmH₂O)</label>
+    <input type="number" id="peep" placeholder="e.g. 5">
+
+    <label>Is the patient awake & following commands?</label>
+    <select id="neuro">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Hemodynamically stable?</label>
+    <select id="hemo">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Cough/Gag adequate?</label>
+    <select id="cough">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Secretions manageable?</label>
+    <select id="sec">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Underlying cause improved?</label>
+    <select id="cause">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <button class="btn-primary" onclick="calcRSBI()">Calculate</button>
+
+    <div id="error" style="color:var(--danger); margin-top:6px;"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="card">
+    <h3>Results</h3>
+
+    <div id="badges"></div>
+
+    <p id="rsbi"></p>
+    <p id="oxygen"></p>
+    <p id="readiness"></p>
+
+    <h4>Interpretation</h4>
+    <div id="interp"></div>
+</div>
+
+<!-- A&P -->
+<div class="card">
+    <h3>Assessment & Plan (Copy-ready)</h3>
+    <textarea id="ap"></textarea>
+    <button class="btn-primary" onclick="copyAP()">Copy to Clipboard</button>
+</div>
+
+</div>
+
+<script>
+function calcRSBI() {
+    let rr   = parseFloat(document.getElementById("rr").value);
+    let vt   = parseFloat(document.getElementById("vt").value);
+    let spo2 = parseFloat(document.getElementById("spo2").value);
+    let fio2 = parseFloat(document.getElementById("fio2").value);
+    let peep = parseFloat(document.getElementById("peep").value);
+
+    let neuro = document.getElementById("neuro").value;
+    let hemo  = document.getElementById("hemo").value;
+    let cough = document.getElementById("cough").value;
+    let sec   = document.getElementById("sec").value;
+    let cause = document.getElementById("cause").value;
+
+    const err = document.getElementById("error");
+    err.innerHTML = "";
+
+    if (!rr || !vt) {
+        err.innerHTML = "Enter RR and VT to calculate RSBI.";
+        return;
+    }
+
+    let rsbi = rr / (vt/1000);  // breaths/min / liters
+
+    const badges = document.getElementById("badges");
+    badges.innerHTML = "";
+    function badge(text, type) {
+        let span = document.createElement("span");
+        span.className = "badge " + type;
+        span.innerHTML = text;
+        badges.appendChild(span);
+    }
+
+    if (rsbi < 105) badge("RSBI <105: Good", "badge-good");
+    else badge("RSBI ≥105: High Failure Risk", "badge-danger");
+
+    // Oxygenation readiness
+    let oxygenOK =
+        spo2 >= 90 &&
+        fio2 <= 40 &&
+        peep <= 5;
+
+    if (oxygenOK) badge("Oxygenation OK for SBT", "badge-good");
+    else badge("Does not meet oxygenation criteria", "badge-danger");
+
+    let neuroOK = neuro === "yes";
+    let hemoOK = hemo === "yes";
+    let coughOK = cough === "yes";
+    let secOK = sec === "yes";
+    let causeOK = cause === "yes";
+
+    if (neuroOK && hemoOK && coughOK && secOK && causeOK)
+        badge("Clinical readiness met", "badge-good");
+    else
+        badge("Clinical readiness NOT fully met", "badge-warning");
+
+    // Details
+    document.getElementById("rsbi").innerHTML =
+        `RSBI = <strong>${rsbi.toFixed(1)}</strong> (RR / VT[L])`;
+
+    document.getElementById("oxygen").innerHTML =
+        `SpO₂ ${spo2}% on FiO₂ ${fio2}% / PEEP ${peep} cmH₂O`;
+
+    // Readiness summary
+    let ready =
+        rsbi < 105 &&
+        oxygenOK &&
+        neuroOK &&
+        hemoOK &&
+        coughOK &&
+        secOK &&
+        causeOK;
+
+    if (ready)
+        document.getElementById("readiness").innerHTML =
+            `<strong>Ready for SBT / Extubation Trial</strong>`;
+    else
+        document.getElementById("readiness").innerHTML =
+            `<strong>Not yet ready for extubation</strong>`;
+
+    // Interpretation text
+    document.getElementById("interp").innerHTML = `
+        <ul>
+            <li>RSBI < 105 is associated with higher likelihood of extubation success.</li>
+            <li>Weaning oxygenation targets: FiO₂ ≤40%, PEEP ≤5, SpO₂ ≥90%.</li>
+            <li>Must have adequate mental status, cough, secretion clearance, and hemodynamic stability.</li>
+            <li>Ensure underlying cause of respiratory failure has improved.</li>
+            <li>Always perform a Spontaneous Breathing Trial (SBT) before extubation unless contraindicated.</li>
+        </ul>
+    `;
+
+    // Build A&P
+    let ap = [];
+    ap.push("Weaning/Extubation Evaluation:");
+    ap.push(`- RR ${rr}/min, VT ${vt} mL → RSBI ≈ ${rsbi.toFixed(1)}.`);
+    ap.push(`- Oxygenation: SpO₂ ${spo2}% on FiO₂ ${fio2}% and PEEP ${peep}.`);
+    ap.push(`- Neuro: ${neuro}, Hemodynamics: ${hemo}, Cough: ${cough}, Secretions: ${sec}.`);
+    ap.push(`- Underlying cause improved: ${cause}.`);
+    ap.push("");
+    if (ready)
+        ap.push("Interpretation: Patient meets readiness criteria for SBT/extubation trial.");
+    else
+        ap.push("Interpretation: Patient does NOT meet full readiness criteria.");
+    ap.push("");
+    ap.push("Plan:");
+    ap.push("- Perform SBT (e.g., pressure support 5/5 or T-piece).");
+    ap.push("- Monitor RR, VT, RSBI, SpO₂, HR, BP, and WOB during SBT.");
+    ap.push("- Extubate if SBT tolerated and clinical picture appropriate.");
+    ap.push("- If not tolerated, identify reversible causes (fluid overload, bronchospasm, secretions, weakness).");
+
+    document.getElementById("ap").value = ap.join("\n");
+}
+
+function copyAP() {
+    let text = document.getElementById("ap").value;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+}
+</script>
+
+</body>
+</html>
