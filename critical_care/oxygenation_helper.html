@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oxygenation Helper – Critical Care</title>
+
+<style>
+:root {
+    --bg:#e0f7fa;
+    --card:#ffffff;
+    --accent:#00838f;
+    --accent-soft:#b2ebf2;
+    --muted:#546e7a;
+    --radius:14px;
+}
+body {
+    margin:0;
+    font-family:system-ui,sans-serif;
+    background:radial-gradient(circle at top,#b2ebf2 0,#e0f7fa 40%,#e0f2f1 100%);
+}
+header {
+    background:linear-gradient(90deg,#00acc1,#00838f);
+    color:white;
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+}
+header h1 { margin:0;font-size:1.25rem; }
+.nav-buttons a {
+    color:white;
+    text-decoration:none;
+    padding:6px 10px;
+    border:1px solid rgba(255,255,255,0.8);
+    border-radius:999px;
+    margin-left:6px;
+}
+main { max-width:900px;margin:20px auto;padding:0 12px; }
+
+.card {
+    background:var(--card);
+    padding:18px;
+    border-radius:var(--radius);
+    margin-bottom:18px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.1);
+}
+h2 {
+    margin:0 0 6px;
+    color:#004d5a;
+}
+.subtitle { color:var(--muted);margin-bottom:14px; }
+
+label { display:block;margin-bottom:6px;color:#37474f; }
+input {
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #cfd8dc;
+}
+.grid-2 {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
+}
+
+.btn-primary {
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:999px;
+    background:var(--accent);
+    color:white;
+    font-weight:600;
+    margin-top:12px;
+    cursor:pointer;
+}
+.plan-box {
+    background:#f1ffff;
+    border:1px dashed var(--accent);
+    padding:14px;
+    border-radius:12px;
+    white-space:pre-line;
+}
+.copy-btn {
+    background:#eceff1;
+    padding:10px 16px;
+    border-radius:999px;
+    border:none;
+    margin-top:10px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>🌬️ Oxygenation Helper</h1>
+    <div class="nav-buttons">
+        <a href="../home.html">🏠 Home</a>
+        <a href="../critical_care.html">⬅ Critical Care</a>
+    </div>
+</header>
+
+<main>
+
+<div class="card">
+    <h2>Inputs</h2>
+    <p class="subtitle">Quick oxygenation assessment for FiO₂ + PEEP + P/F ratio.</p>
+
+    <div class="grid-2">
+        <div>
+            <label>PaO₂ (mmHg)</label>
+            <input type="number" id="pao2" placeholder="e.g. 60">
+        </div>
+        <div>
+            <label>FiO₂ (%)</label>
+            <input type="number" id="fio2" placeholder="e.g. 80">
+        </div>
+        <div>
+            <label>PEEP (cmH₂O)</label>
+            <input type="number" id="peep" placeholder="e.g. 10">
+        </div>
+    </div>
+
+    <button class="btn-primary" onclick="calc()">Assess Oxygenation</button>
+</div>
+
+<div class="card" id="results" style="display:none;">
+    <h2>Results</h2>
+    <div class="plan-box" id="plan"></div>
+    <button class="copy-btn" onclick="copyPlan()">📋 Copy</button>
+</div>
+
+</main>
+
+<script>
+let lastPlan="";
+
+function calc() {
+    const pao2=parseFloat(document.getElementById("pao2").value);
+    const fio2=parseFloat(document.getElementById("fio2").value);
+    const peep=parseFloat(document.getElementById("peep").value);
+
+    if(isNaN(pao2)||isNaN(fio2)||isNaN(peep)){
+        show("Please enter PaO₂, FiO₂, and PEEP.");
+        return;
+    }
+
+    let pfr=pao2/(fio2/100);
+    let out="P/F Ratio: "+pfr.toFixed(0)+"\n\n";
+
+    // ARDS severity
+    if(peep<5){
+        out+="PEEP <5 — ARDS criteria not met.\n\n";
+    } else {
+        if(pfr<=100) out+="Severity: ⭐⭐⭐ SEVERE ARDS\n\n";
+        else if(pfr<=200) out+="Severity: ⭐⭐ MODERATE ARDS\n\n";
+        else if(pfr<=300) out+="Severity: ⭐ MILD ARDS\n\n";
+        else out+="No ARDS by P/F criteria\n\n";
+    }
+
+    // Oxygenation logic
+    out+="RECOMMENDATIONS\n";
+
+    if(pfr<150 && peep>=10 && fio2>=60){
+        out+="• Strongly consider PRONE positioning.\n";
+    }
+    if(pfr<120 && fio2>=80){
+        out+="• Consider short course neuromuscular blockade.\n";
+    }
+    if(pfr<80){
+        out+="• Evaluate for ECMO if available.\n";
+    }
+
+    // FiO2/PEEP logic
+    if(pfr<200){
+        out+="• Increase FiO₂ to 80–100% as needed.\n";
+        if(peep<12) out+="• Increase PEEP to 10–12+ cmH₂O.\n";
+    } else if(pfr>=300 && fio2>60){
+        out+="• Wean FiO₂ down to <60%.\n";
+    }
+
+    lastPlan=out;
+    show(out);
+}
+
+function show(x){
+    document.getElementById("plan").innerText=x;
+    document.getElementById("results").style.display="block";
+}
+
+function copyPlan(){
+    navigator.clipboard.writeText(lastPlan)
+    .then(()=>alert("Copied!"))
+    .catch(()=>alert("Copy failed."));
+}
+</script>
+
+</body>
+</html>
