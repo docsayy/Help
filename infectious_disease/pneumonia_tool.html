@@ -1,1 +1,1624 @@
-infectious_disease/pneumonia_tool.html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pneumonia Severity & Antibiotic Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --accent: #06b6d4; /* teal */
+      --accent-soft: #e0f7fa;
+      --accent-strong: #0284c7;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --border-subtle: #d1d5db;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 12px 28px rgba(6, 182, 212, 0.18);
+      --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top left, #e0f7fa 0, #f3f4f6 40%, #ffffff 100%);
+      color: var(--text-main);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 20px 12px 32px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1180px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 20px 60px rgba(6, 182, 212, 0.2);
+      backdrop-filter: blur(16px);
+      padding: 20px 18px 26px;
+    }
+
+    @media (min-width: 768px) {
+      .app-shell {
+        padding: 24px 28px 32px;
+      }
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 16px;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .title-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .system-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 20px;
+      background: radial-gradient(circle at 25% 20%, #ffffff 0, #a5f3fc 40%, #06b6d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 12px 28px rgba(6, 182, 212, 0.4);
+      flex-shrink: 0;
+    }
+
+    .title-text h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .title-text p {
+      margin: 6px 0 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: #f9fafb;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-subtle);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+      background: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+      box-shadow: 0 14px 32px rgba(14, 165, 233, 0.4);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 980px) {
+      .section-row.two-col {
+        grid-template-columns: 1.1fr 1.1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-header p {
+      margin: 4px 0 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: #e0f2fe;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      border: 1px solid #bfdbfe;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px 12px;
+    }
+
+    @media (min-width: 640px) {
+      .form-grid.two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .form-grid.three-col {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 3px;
+      color: #0f172a;
+    }
+
+    .field {
+      margin-bottom: 6px;
+    }
+
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #f9fafb;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.3);
+      background: #ffffff;
+    }
+
+    .checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-top: 4px;
+    }
+
+    .check-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #f9fafb;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .check-pill input {
+      margin: 0;
+    }
+
+    .check-pill:hover {
+      background: #ecfeff;
+      border-color: #7dd3fc;
+      box-shadow: 0 3px 8px rgba(56, 189, 248, 0.35);
+    }
+
+    .subtle-note {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 6px 0 6px;
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-run {
+      padding: 9px 18px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(6, 182, 212, 0.4);
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    }
+
+    .btn-secondary {
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      border: 1px solid #bae6fd;
+      background: #ecfeff;
+      color: #0369a1;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(6, 182, 212, 0.16);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(6, 182, 212, 0.25);
+      background: #e0f7fa;
+    }
+
+    .results-card {
+      margin-top: 6px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 980px) {
+      .results-grid {
+        grid-template-columns: 1.1fr 1.1fr;
+      }
+    }
+
+    .results-section h3 {
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .results-section h4 {
+      margin: 6px 0 2px;
+      font-size: 0.9rem;
+    }
+
+    .results-section p,
+    .results-section li {
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      font-size: 0.75rem;
+    }
+
+    ul {
+      padding-left: 18px;
+      margin: 4px 0 4px;
+    }
+
+    footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      max-width: 680px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+      border: 1px solid #d1d5db;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .modal-header button {
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .modal-body {
+      margin-bottom: 8px;
+    }
+
+    .modal-body textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.8rem;
+      padding: 8px;
+      resize: vertical;
+      min-height: 220px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #f9fafb;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="title-block">
+        <div class="system-icon" aria-hidden="true">🫁</div>
+        <div class="title-text">
+          <h1>Pneumonia Severity &amp; Antibiotic Helper</h1>
+          <div class="badge">
+            CAP severity • Disposition • NEJM + ATS/IDSA-guided regimen
+          </div>
+          <p>
+            Uses CURB-65, PSI (Pneumonia Severity Index), comorbidities, and MRSA/Pseudomonas risk factors to suggest site-of-care and an antibiotic plan, including allergy-aware options and brief reasoning.
+          </p>
+        </div>
+      </div>
+      <nav class="nav-buttons" aria-label="Page navigation">
+        <a href="../index.html" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 3.172 3 10.5V20a1 1 0 0 0 1 1h6v-5h4v5h6a1 1 0 0 0 1-1v-9.5L12 3.172Z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="../infectious_disease.html" class="btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 5.5 5.5 12l1.4 1.4L11 9.3V19h2V9.3l4.1 4.1 1.4-1.4L12 5.5Z"/>
+          </svg>
+          <span>Back to Infectious Disease</span>
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Top: demographics, vitals, labs -->
+      <div class="section-row two-col">
+        <!-- Demographics & comorbidities -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Patient basics &amp; comorbidities</h2>
+            <p>Needed for CURB-65, PSI, disposition, and outpatient regimen selection.</p>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="field">
+              <label for="age">Age (years)</label>
+              <input type="number" id="age" min="0" max="120" />
+            </div>
+            <div class="field">
+              <label for="sex">Sex</label>
+              <select id="sex">
+                <option value="">Select…</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other / not specified</option>
+              </select>
+              <div class="subtle-note">PSI scoring slightly differs by sex (age points).</div>
+            </div>
+
+            <div class="field">
+              <label>Living situation</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="nursing-home" />
+                  <span>Nursing home / facility resident</span>
+                </label>
+              </div>
+              <div class="subtle-note">
+                Guideline uses risk factors, not “HCAP” label, but PSI gives extra points for nursing home.
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Comorbidities (for PSI &amp; outpatient regimen)</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="com-heart" />
+                  <span>Chronic heart disease</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-lung" />
+                  <span>Chronic lung disease / COPD</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-liver" />
+                  <span>Chronic liver disease</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-renal" />
+                  <span>Chronic kidney disease</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-diabetes" />
+                  <span>Diabetes</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-alcohol" />
+                  <span>Alcohol dependence</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-malignancy" />
+                  <span>Malignancy</span>
+                </label>
+                <label class="check-pill">
+                  <input type="checkbox" id="com-asplenia" />
+                  <span>Asplenia</span>
+                </label>
+              </div>
+              <div class="subtle-note">
+                These drive “outpatient with comorbidities” regimen and higher PSI class.
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Recent antibiotics</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="recent-abx" />
+                  <span>PO/IV antibiotics in last 90 days</span>
+                </label>
+              </div>
+              <div class="subtle-note">
+                Important for outpatient selection &amp; resistant pathogen risk.
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="field">
+            <label for="allergy">Antibiotic allergy (beta-lactam)</label>
+            <select id="allergy">
+              <option value="none">No known beta-lactam allergy</option>
+              <option value="nonsevere">Non-severe (e.g., mild rash, GI upset)</option>
+              <option value="severe">Severe (anaphylaxis, SJS/TEN, organ injury)</option>
+            </select>
+            <div class="subtle-note">
+              Regimen suggestions will try to avoid beta-lactams in severe allergy and note that explicitly.
+            </div>
+          </div>
+        </section>
+
+        <!-- Vitals & labs for CURB-65 & PSI -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Severity inputs (CURB-65 &amp; PSI)</h2>
+            <p>Incomplete data is okay; tool will still give a best-effort classification.</p>
+          </div>
+
+          <div class="form-grid two-col">
+            <div class="field">
+              <label>Confusion</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="confusion" />
+                  <span>New confusion / disorientation</span>
+                </label>
+              </div>
+              <div class="subtle-note">
+                CURB-65 C; PSI neurologic points if present.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="bun">BUN (mg/dL)</label>
+              <input type="number" id="bun" step="0.1" />
+              <div class="subtle-note">
+                CURB-65 U; PSI adds points if ≥30 mg/dL.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="rr">Respiratory rate (breaths/min)</label>
+              <input type="number" id="rr" />
+              <div class="subtle-note">
+                CURB-65 R ≥30; PSI uses ≥30 as well.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="sbp">Systolic BP (mmHg)</label>
+              <input type="number" id="sbp" />
+              <div class="subtle-note">
+                CURB-65 B: SBP &lt;90 or DBP ≤60.</div>
+            </div>
+
+            <div class="field">
+              <label for="dbp">Diastolic BP (mmHg)</label>
+              <input type="number" id="dbp" />
+            </div>
+
+            <div class="field">
+              <label for="temp">Temperature (°C)</label>
+              <input type="number" step="0.1" id="temp" />
+            </div>
+
+            <div class="field">
+              <label for="hr">Heart rate (bpm)</label>
+              <input type="number" id="hr" />
+            </div>
+
+            <div class="field">
+              <label for="spo2">SpO₂ (%)</label>
+              <input type="number" id="spo2" min="0" max="100" />
+              <div class="subtle-note">
+                Used as a surrogate for PaO₂ if blood gas not available.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="ph">Arterial pH (if available)</label>
+              <input type="number" step="0.01" id="ph" />
+              <div class="subtle-note">
+                PSI adds points if &lt;7.35.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="na">Serum sodium (mEq/L)</label>
+              <input type="number" id="na" />
+            </div>
+
+            <div class="field">
+              <label for="glucose">Serum glucose (mg/dL)</label>
+              <input type="number" id="glucose" />
+            </div>
+
+            <div class="field">
+              <label for="hct">Hematocrit (%)</label>
+              <input type="number" step="0.1" id="hct" />
+            </div>
+
+            <div class="field">
+              <label for="pao2">PaO₂ (mmHg, if available)</label>
+              <input type="number" id="pao2" />
+            </div>
+
+            <div class="field">
+              <label>Pleural effusion on imaging</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="pleural-effusion" />
+                  <span>Pleural effusion present</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="field">
+            <label>Oxygen &amp; aspiration</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="on-oxygen" />
+                <span>Requires supplemental O₂</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="aspiration-risk" />
+                <span>Strong aspiration risk / classic aspiration event</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Guidelines generally avoid routine anaerobic coverage unless abscess/empyema or classic aspiration with poor dentition.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Second row: MRSA/Pseudo risk etc -->
+      <div class="section-row two-col">
+        <!-- MRSA & Pseudomonas risk -->
+        <section class="card">
+          <div class="card-header">
+            <h2>MRSA &amp; Pseudomonas risk stratification</h2>
+            <p>Uses “strong” vs “weak” risk factors rather than old HCAP category.</p>
+          </div>
+
+          <div class="field">
+            <label>MRSA risk factors</label>
+            <div class="checkbox-row">
+              <span class="pill">Strong risk</span>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-prior" />
+                <span>Prior MRSA respiratory isolation</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-gram" />
+                <span>Gram stain: GPC in clusters</span>
+              </label>
+            </div>
+            <div class="checkbox-row" style="margin-top:6px;">
+              <span class="pill">Weak risk</span>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-iv90" />
+                <span>IV antibiotics in last 90 days</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-postflu" />
+                <span>Recent influenza-like illness</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-cavitary" />
+                <span>Cavitary infiltrate or empyema</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="mrsa-esrd" />
+                <span>End-stage renal disease</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Strong risk → usually add empiric MRSA coverage; weak risk → individualize based on severity and local data.
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="field">
+            <label>Pseudomonas risk factors</label>
+            <div class="checkbox-row">
+              <span class="pill">Strong risk</span>
+              <label class="check-pill">
+                <input type="checkbox" id="pseudo-prior" />
+                <span>Prior Pseudomonas respiratory isolation</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="pseudo-gram" />
+                <span>Gram stain: GNB concerning for Pseudomonas</span>
+              </label>
+            </div>
+            <div class="checkbox-row" style="margin-top:6px;">
+              <span class="pill">Weak risk</span>
+              <label class="check-pill">
+                <input type="checkbox" id="pseudo-iv90" />
+                <span>IV antibiotics in last 90 days</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="pseudo-bronch" />
+                <span>Bronchiectasis / structural lung disease</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="pseudo-copd" />
+                <span>Frequent COPD exacerbations requiring steroids/abx</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Empiric anti-Pseudomonas usually reserved for strong risk factors or severe CAP with multiple weak factors.
+            </div>
+          </div>
+        </section>
+
+        <!-- Source & clinical notes -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Clinical scenario &amp; notes</h2>
+            <p>Used mainly for the free-text assessment and plan you can copy.</p>
+          </div>
+
+          <div class="field">
+            <label>Clinical setting</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="setting-ed" />
+                <span>ED presentation</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="setting-outpt" />
+                <span>Outpatient / clinic</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="setting-ward" />
+                <span>Already admitted to ward</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="setting-icu" />
+                <span>Already in ICU</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Helpful notes (optional)</label>
+            <textarea id="notes" placeholder="e.g., 68-year-old with COPD, new LLL infiltrate, hypotensive in ED, creatinine up, already got 1 dose ceftriaxone + azithromycin."></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row">
+        <button type="button" class="btn-run" onclick="runPneumoniaHelper()">
+          <span>Generate severity, disposition &amp; antibiotic plan</span> ▸
+        </button>
+        <button type="button" class="btn-secondary" onclick="openCopyModal()">
+          📋 Preview &amp; copy full assessment &amp; plan
+        </button>
+      </div>
+
+      <!-- Results -->
+      <section class="card results-card">
+        <div class="card-header">
+          <h2>Assessment, Severity Scores &amp; Antibiotic Suggestion</h2>
+          <p class="tagline">
+            <span class="chip">⚠️ Decision support only — confirm with local CAP, ICU &amp; stewardship guidelines.</span>
+          </p>
+        </div>
+        <div class="results-grid">
+          <div class="results-section">
+            <h3>🧭 Severity summary &amp; disposition</h3>
+            <div id="severity-content">
+              <p>Enter basic data, then click “Generate…” to see CURB-65, PSI class, and suggested site-of-care.</p>
+            </div>
+          </div>
+          <div class="results-section">
+            <h3>💊 Antibiotic strategy &amp; reasoning</h3>
+            <div id="abx-content">
+              <p>Guideline-aligned regimens (NEJM review + 2019 ATS/IDSA) will appear here, including MRSA/Pseudomonas add-ons and allergy-aware alternatives.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div><span class="dot"></span>Light teal infectious disease theme. No dark mode.</div>
+      <div>Uses risk-factor approach (no HCAP category) and emphasizes avoiding unnecessary MRSA/Pseudomonas coverage.</div>
+    </footer>
+  </div>
+
+  <!-- Copy modal -->
+  <div class="modal-overlay" id="copy-modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="copy-modal-title">
+      <div class="modal-header">
+        <h3 id="copy-modal-title">Preview &amp; copy assessment &amp; plan</h3>
+        <button type="button" onclick="closeCopyModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="copy-modal-textarea" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <span class="copy-hint">Plain text for notes, admission H&amp;P, or sign-out.</span>
+        <button type="button" class="btn-secondary" onclick="copyPlanToClipboard()">Copy to clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPlanText = "";
+
+    function valNum(id) {
+      const el = document.getElementById(id);
+      if (!el || el.value === "") return null;
+      const n = Number(el.value);
+      return isNaN(n) ? null : n;
+    }
+
+    function isChecked(id) {
+      const el = document.getElementById(id);
+      return !!(el && el.checked);
+    }
+
+    function anyChecked(ids) {
+      return ids.some(isChecked);
+    }
+
+    // CURB-65 calculation
+    function calcCURB65() {
+      const age = valNum("age");
+      const confusion = isChecked("confusion");
+      const bun = valNum("bun");
+      const rr = valNum("rr");
+      const sbp = valNum("sbp");
+      const dbp = valNum("dbp");
+
+      let score = 0;
+      const points = [];
+
+      if (confusion) {
+        score++;
+        points.push("Confusion");
+      }
+      if (bun !== null && bun > 19) {
+        score++;
+        points.push("BUN >19 mg/dL");
+      }
+      if (rr !== null && rr >= 30) {
+        score++;
+        points.push("RR ≥30/min");
+      }
+      if ((sbp !== null && sbp < 90) || (dbp !== null && dbp <= 60)) {
+        score++;
+        points.push("SBP <90 or DBP ≤60");
+      }
+      if (age !== null && age >= 65) {
+        score++;
+        points.push("Age ≥65");
+      }
+
+      return { score, points };
+    }
+
+    // Simplified PSI scoring (approximate but fairly close to original)
+    function calcPSI() {
+      const age = valNum("age");
+      const sex = document.getElementById("sex").value;
+      const nursingHome = isChecked("nursing-home");
+
+      const comHeart = isChecked("com-heart");
+      const comLung = isChecked("com-lung");
+      const comLiver = isChecked("com-liver");
+      const comRenal = isChecked("com-renal");
+      const comMalignancy = isChecked("com-malignancy");
+      const comCVA = false; // not explicitly captured, so ignore
+      // For PSI we’ll treat “chronic heart disease” as CHF equivalent, “lung” as pulmonary disease, etc.
+
+      const confusion = isChecked("confusion");
+      const rr = valNum("rr");
+      const sbp = valNum("sbp");
+      const temp = valNum("temp");
+      const hr = valNum("hr");
+      const bun = valNum("bun");
+      const ph = valNum("ph");
+      const na = valNum("na");
+      const glucose = valNum("glucose");
+      const hct = valNum("hct");
+      const pao2 = valNum("pao2");
+      const spo2 = valNum("spo2");
+      const pleural = isChecked("pleural-effusion");
+
+      if (age === null) {
+        return { score: null, classLabel: "Insufficient data", notes: ["Age is required to approximate PSI."] };
+      }
+
+      let score = 0;
+      const notes = [];
+
+      // Age
+      if (sex === "female") {
+        score += age - 10; // original PSI uses age-10 for females
+        notes.push("Age (female): " + (age - 10) + " points");
+      } else {
+        score += age;
+        notes.push("Age: " + age + " points");
+      }
+
+      // Nursing home
+      if (nursingHome) {
+        score += 10;
+        notes.push("Nursing home: +10");
+      }
+
+      // Comorbidities
+      if (comNeoplastic()) {
+        score += 30;
+        notes.push("Neoplastic disease: +30 (approximated by malignancy)");
+      }
+      if (comLiver) {
+        score += 20;
+        notes.push("Liver disease: +20");
+      }
+      if (comHeart) {
+        score += 10;
+        notes.push("Heart disease: +10");
+      }
+      if (comCVA) {
+        score += 10;
+        notes.push("Cerebrovascular disease: +10");
+      }
+      if (comRenal) {
+        score += 10;
+        notes.push("Renal disease: +10");
+      }
+
+      // Physical exam
+      if (confusion) {
+        score += 20;
+        notes.push("Altered mental status: +20");
+      }
+      if (rr !== null && rr >= 30) {
+        score += 20;
+        notes.push("RR ≥30: +20");
+      }
+      if (sbp !== null && sbp < 90) {
+        score += 20;
+        notes.push("SBP <90: +20");
+      }
+      if (temp !== null && (temp < 35 || temp >= 40)) {
+        score += 15;
+        notes.push("Temp <35 or ≥40°C: +15");
+      }
+      if (hr !== null && hr >= 125) {
+        score += 10;
+        notes.push("HR ≥125: +10");
+      }
+
+      // Labs / imaging
+      if (ph !== null && ph < 7.35) {
+        score += 30;
+        notes.push("pH <7.35: +30");
+      }
+      if (bun !== null && bun >= 30) {
+        score += 20;
+        notes.push("BUN ≥30 mg/dL: +20");
+      }
+      if (na !== null && na < 130) {
+        score += 20;
+        notes.push("Na <130 mEq/L: +20");
+      }
+      if (glucose !== null && glucose >= 250) {
+        score += 10;
+        notes.push("Glucose ≥250 mg/dL: +10");
+      }
+      if (hct !== null && hct < 30) {
+        score += 10;
+        notes.push("Hct <30%: +10");
+      }
+      if (pao2 !== null && pao2 < 60) {
+        score += 10;
+        notes.push("PaO₂ <60 mmHg: +10");
+      } else if ((pao2 === null || isNaN(pao2)) && spo2 !== null && spo2 < 90) {
+        score += 10;
+        notes.push("SpO₂ <90% (surrogate PaO₂): +10");
+      }
+      if (pleural) {
+        score += 10;
+        notes.push("Pleural effusion: +10");
+      }
+
+      let classLabel = "";
+      if (score <= 70) {
+        classLabel = "PSI Class II (low risk)";
+      } else if (score <= 90) {
+        classLabel = "PSI Class III (moderate risk)";
+      } else if (score <= 130) {
+        classLabel = "PSI Class IV (high risk)";
+      } else {
+        classLabel = "PSI Class V (very high risk)";
+      }
+
+      return { score, classLabel, notes };
+    }
+
+    function comNeoplastic() {
+      return isChecked("com-malignancy");
+    }
+
+    function getComorbidityFlag() {
+      return anyChecked([
+        "com-heart",
+        "com-lung",
+        "com-liver",
+        "com-renal",
+        "com-diabetes",
+        "com-alcohol",
+        "com-malignancy",
+        "com-asplenia"
+      ]);
+    }
+
+    function summarizeDisposition(curb, psi) {
+      const age = valNum("age");
+      let setting = "outpatient";
+      let dispositionReason = [];
+
+      // Base on CURB-65
+      if (curb.score === null) {
+        // do nothing; handle with PSI
+      } else if (curb.score <= 1) {
+        dispositionReason.push("CURB-65 " + curb.score + " → generally ok for outpatient management if reliable follow-up.");
+      } else if (curb.score === 2) {
+        setting = "inpatient-ward";
+        dispositionReason.push("CURB-65 2 → consider inpatient (often ward) vs close observation.");
+      } else if (curb.score >= 3) {
+        setting = "inpatient-icu";
+        dispositionReason.push("CURB-65 ≥3 → severe CAP; usually requires hospitalization and often ICU/stepdown.");
+      }
+
+      // Combine with PSI if available
+      if (psi.score !== null) {
+        dispositionReason.push("PSI total score " + psi.score + " → " + psi.classLabel + ".");
+        if (psi.score <= 70) {
+          if (setting === "outpatient") {
+            dispositionReason.push("PSI low risk → typically outpatient if social situation is safe.");
+          }
+        } else if (psi.score <= 90) {
+          if (setting === "outpatient") setting = "inpatient-ward";
+          dispositionReason.push("PSI moderate risk → short-stay or inpatient observation often appropriate.");
+        } else if (psi.score <= 130) {
+          setting = "inpatient-ward";
+          dispositionReason.push("PSI Class IV → hospitalization recommended.");
+        } else {
+          setting = "inpatient-icu";
+          dispositionReason.push("PSI Class V → very high risk; often ICU level care or close monitoring.");
+        }
+      } else {
+        dispositionReason.push("PSI score not fully available → reliance on CURB-65, exam, and clinical judgment.");
+      }
+
+      // Age/other nuance
+      if (age !== null && age >= 80 && setting === "outpatient") {
+        dispositionReason.push("Advanced age → even with low scores, consider short-stay / observation depending on supports.");
+      }
+
+      return { setting, dispositionReason };
+    }
+
+    function getMRSAFlags() {
+      const strong = [];
+      const weak = [];
+
+      if (isChecked("mrsa-prior")) strong.push("prior MRSA respiratory isolation");
+      if (isChecked("mrsa-gram")) strong.push("Gram stain with GPC in clusters");
+
+      if (isChecked("mrsa-iv90")) weak.push("IV antibiotics in last 90 days");
+      if (isChecked("mrsa-postflu")) weak.push("recent influenza-like illness");
+      if (isChecked("mrsa-cavitary")) weak.push("cavitary infiltrate or empyema");
+      if (isChecked("mrsa-esrd")) weak.push("end-stage renal disease");
+
+      return { strong, weak };
+    }
+
+    function getPseudoFlags() {
+      const strong = [];
+      const weak = [];
+
+      if (isChecked("pseudo-prior")) strong.push("prior Pseudomonas respiratory isolation");
+      if (isChecked("pseudo-gram")) strong.push("Gram stain concerning for Pseudomonas");
+
+      if (isChecked("pseudo-iv90")) weak.push("IV antibiotics in last 90 days");
+      if (isChecked("pseudo-bronch")) weak.push("bronchiectasis / structural lung disease");
+      if (isChecked("pseudo-copd")) weak.push("frequent COPD exacerbations requiring steroids/antibiotics");
+
+      return { strong, weak };
+    }
+
+    function buildAbxPlan(setting, curb, psi, mrsa, pseudo) {
+      const hasComorbid = getComorbidityFlag();
+      const recentAbx = isChecked("recent-abx");
+      const allergy = document.getElementById("allergy").value;
+      const aspirationRisk = isChecked("aspiration-risk");
+      const chronicLung = isChecked("com-lung");
+      const nursingHome = isChecked("nursing-home");
+
+      const linesHtml = [];
+      const linesText = [];
+
+      // Setting label
+      let settingLabel = "";
+      if (setting === "outpatient") {
+        settingLabel = "Outpatient / ambulatory CAP management";
+      } else if (setting === "inpatient-ward") {
+        settingLabel = "Inpatient non-ICU (ward / stepdown) CAP management";
+      } else {
+        settingLabel = "Severe CAP — ICU or stepdown level management";
+      }
+
+      linesHtml.push("<p><strong>Proposed treatment setting:</strong> " + settingLabel + " (final decision per bedside assessment and local criteria).</p>");
+      linesText.push("Proposed treatment setting: " + settingLabel + " (final decision per bedside assessment & local criteria).");
+
+      // Abx base suggestion by setting
+      linesHtml.push("<h4>1. Core CAP regimen (no MRSA/Pseudomonas yet)</h4><ul>");
+      linesText.push("1) Core CAP regimen (before MRSA/Pseudomonas adjustments):");
+
+      if (setting === "outpatient") {
+        if (!hasComorbid && !recentAbx) {
+          // healthy, no recent abx
+          if (allergy === "severe") {
+            linesHtml.push("<li><strong>Preferred:</strong> Doxycycline 100 mg PO BID.</li>");
+            linesText.push("  - Preferred: Doxycycline 100 mg PO BID.");
+            linesHtml.push("<li><strong>Reason:</strong> No major comorbidities or recent antibiotics. Severe beta-lactam allergy → avoid amoxicillin; macrolide monotherapy generally avoided in US due to pneumococcal resistance &gt;25%.</li>");
+            linesText.push("  - Reason: No major comorbidities/recent abx; severe beta-lactam allergy so avoid amoxicillin; macrolide monotherapy usually avoided in US due to resistance.");
+          } else {
+            linesHtml.push("<li><strong>Preferred:</strong> Amoxicillin 1 g PO TID <em>or</em> doxycycline 100 mg PO BID.</li>");
+            linesText.push("  - Preferred: Amoxicillin 1 g PO TID or doxycycline 100 mg PO BID.");
+            linesHtml.push("<li><strong>Macrolide monotherapy:</strong> Azithromycin or clarithromycin only if local pneumococcal macrolide resistance &lt;25% (not generally true in US).</li>");
+            linesText.push("  - Macrolide monotherapy (azithro/clarithro) only if local pneumococcal macrolide resistance <25% (often not true in US).");
+          }
+        } else {
+          // comorbid or recent abx
+          if (allergy === "severe") {
+            linesHtml.push("<li><strong>Preferred (beta-lactam–allergic):</strong> Respiratory fluoroquinolone monotherapy — e.g., levofloxacin 750 mg PO daily or moxifloxacin 400 mg PO daily (if no contraindications).</li>");
+            linesText.push("  - Preferred (severe beta-lactam allergy): Respiratory fluoroquinolone monotherapy (e.g., levofloxacin 750 mg PO daily or moxifloxacin 400 mg PO daily) if no contraindications.");
+            linesHtml.push("<li><strong>Reason:</strong> Comorbidities or recent antibiotics increase risk of resistant pneumococcus and Gram-negatives; beta-lactams avoided due to severe allergy.</li>");
+            linesText.push("  - Reason: Comorbidities/recent abx increase risk of resistant pathogens; beta-lactams avoided because of severe allergy.");
+          } else {
+            linesHtml.push("<li><strong>Preferred:</strong> Amoxicillin-clavulanate (e.g., 875/125 mg PO BID) <em>plus</em> azithromycin 500 mg day 1 then 250 mg daily <em>or</em> doxycycline 100 mg BID.</li>");
+            linesText.push("  - Preferred: Amoxicillin-clavulanate (e.g., 875/125 mg PO BID) plus azithromycin (500 mg day 1 then 250 mg daily) or doxycycline 100 mg BID.");
+            linesHtml.push("<li><strong>Alternative:</strong> Cefpodoxime or cefuroxime PO plus azithromycin or doxycycline.</li>");
+            linesText.push("  - Alternative: Cefpodoxime or cefuroxime plus azithromycin or doxycycline.");
+            linesHtml.push("<li><strong>Reserve:</strong> Respiratory fluoroquinolone monotherapy for beta-lactam–intolerant patients or where combination is not feasible, given risk of C. difficile, resistance, and tendon toxicity.</li>");
+            linesText.push("  - Reserve: Respiratory fluoroquinolone monotherapy for beta-lactam–intolerant patients or when combination therapy not feasible, due to C. diff and toxicity concerns.");
+          }
+        }
+      } else if (setting === "inpatient-ward") {
+        if (allergy === "severe") {
+          linesHtml.push("<li><strong>Preferred (beta-lactam–allergic):</strong> Respiratory fluoroquinolone monotherapy — e.g., levofloxacin 750 mg IV/PO daily or moxifloxacin 400 mg IV/PO daily (if no contraindications).</li>");
+          linesText.push("  - Preferred (severe beta-lactam allergy): Respiratory fluoroquinolone monotherapy (e.g., levofloxacin 750 mg IV/PO daily or moxifloxacin 400 mg IV/PO daily).");
+          linesHtml.push("<li><strong>Reason:</strong> Inpatient non-severe CAP where standard is beta-lactam + macrolide; fluoroquinolone is accepted alternative when beta-lactams are contraindicated.</li>");
+          linesText.push("  - Reason: Non-severe inpatient CAP where standard is beta-lactam + macrolide; FQ is accepted alternative when beta-lactams contraindicated.");
+        } else {
+          linesHtml.push("<li><strong>Preferred:</strong> Ceftriaxone (or similar IV β-lactam) <em>plus</em> azithromycin.</li>");
+          linesText.push("  - Preferred: Ceftriaxone (or similar IV beta-lactam) plus azithromycin.");
+          linesHtml.push("<li><strong>Alternative:</strong> Ceftriaxone + respiratory fluoroquinolone, or beta-lactam + doxycycline if macrolide is contraindicated.</li>");
+          linesText.push("  - Alternative: Ceftriaxone + respiratory fluoroquinolone, or beta-lactam + doxycycline if macrolide contraindicated.");
+        }
+      } else { // ICU / severe
+        if (allergy === "severe") {
+          linesHtml.push("<li><strong>Preferred (beta-lactam–allergic):</strong> Levofloxacin 750 mg IV daily <em>plus</em> aztreonam if Gram-negative coverage is needed, with MRSA/Pseudomonas add-ons as indicated.</li>");
+          linesText.push("  - Preferred (severe beta-lactam allergy): Levofloxacin 750 mg IV daily plus aztreonam if Gram-negative coverage needed, with MRSA/Pseudomonas add-ons as indicated.");
+          linesHtml.push("<li><strong>Reason:</strong> Standard ICU CAP therapy is β-lactam + macrolide or β-lactam + fluoroquinolone; in severe allergy, combine a non-β-lactam Gram-negative agent with FQ and MRSA coverage when appropriate.</li>");
+          linesText.push("  - Reason: Standard ICU CAP therapy is beta-lactam + macrolide or beta-lactam + FQ; severe allergy requires non-beta-lactam Gram-negative plus FQ and MRSA coverage when needed.");
+        } else {
+          linesHtml.push("<li><strong>Preferred:</strong> IV β-lactam (e.g., ceftriaxone, cefotaxime, or ampicillin-sulbactam) <em>plus</em> azithromycin.</li>");
+          linesText.push("  - Preferred: IV beta-lactam (e.g., ceftriaxone, cefotaxime, or ampicillin-sulbactam) plus azithromycin.");
+          linesHtml.push("<li><strong>Alternative:</strong> IV β-lactam + respiratory fluoroquinolone (e.g., levofloxacin) if macrolide not suitable.</li>");
+          linesText.push("  - Alternative: IV beta-lactam + respiratory fluoroquinolone if macrolide not suitable.");
+        }
+      }
+      linesHtml.push("</ul>");
+
+      // MRSA / Pseudomonas add-ons
+      linesHtml.push("<h4>2. MRSA &amp; Pseudomonas coverage</h4><ul>");
+      linesText.push("2) MRSA & Pseudomonas coverage:");
+
+      const mrsaStrong = mrsa.strong.length > 0;
+      const mrsaWeak = mrsa.weak.length > 0;
+      const pseudoStrong = pseudo.strong.length > 0;
+      const pseudoWeak = pseudo.weak.length > 0;
+
+      if (!mrsaStrong && !mrsaWeak) {
+        linesHtml.push("<li><strong>MRSA:</strong> No MRSA risk factors checked → avoid routine empiric MRSA coverage; consider nasal swab or cultures if concern arises.</li>");
+        linesText.push("  - MRSA: No risk factors checked → avoid routine empiric MRSA coverage; consider nasal swab/cultures if concern later.");
+      } else {
+        if (mrsaStrong) {
+          linesHtml.push("<li><strong>MRSA (strong risk):</strong> " + mrsa.strong.join(", ") + ". Add empiric MRSA coverage (e.g., vancomycin dosed per levels or linezolid 600 mg IV/PO q12h) while cultures pending.</li>");
+          linesText.push("  - MRSA (strong risk: " + mrsa.strong.join(", ") + "): Add empiric MRSA coverage (vancomycin per levels or linezolid 600 mg IV/PO q12h) while cultures pending.");
+        }
+        if (mrsaWeak && !mrsaStrong) {
+          linesHtml.push("<li><strong>MRSA (weak risk only):</strong> " + mrsa.weak.join(", ") + ". Consider MRSA coverage if disease is severe (ICU, shock) or local data show high MRSA prevalence; otherwise may defer and rely on cultures.</li>");
+          linesText.push("  - MRSA (weak risk only: " + mrsa.weak.join(", ") + "): Consider coverage if severe CAP/ICU or local MRSA prevalence high; otherwise may defer and rely on cultures.");
+        }
+      }
+
+      if (!pseudoStrong && !pseudoWeak) {
+        linesHtml.push("<li><strong>Pseudomonas:</strong> No Pseudomonas risk factors checked → standard CAP β-lactam is appropriate without anti-pseudomonal escalation.</li>");
+        linesText.push("  - Pseudomonas: No risk factors checked → standard CAP beta-lactam is appropriate without anti-pseudomonal escalation.");
+      } else {
+        if (pseudoStrong) {
+          let baseText = "";
+          if (setting === "outpatient") {
+            baseText = "Given strong Pseudomonas risk and pneumonia severity, inpatient management with IV anti-pseudomonal β-lactam is usually warranted.";
+          } else {
+            baseText = "Use an anti-pseudomonal β-lactam such as piperacillin-tazobactam, cefepime, ceftazidime, or meropenem.";
+          }
+          linesHtml.push("<li><strong>Pseudomonas (strong risk):</strong> " + pseudo.strong.join(", ") + ". " + baseText + "</li>");
+          linesText.push("  - Pseudomonas (strong risk: " + pseudo.strong.join(", ") + "): " + baseText);
+        }
+        if (pseudoWeak && !pseudoStrong) {
+          linesHtml.push("<li><strong>Pseudomonas (weak risk only):</strong> " + pseudo.weak.join(", ") + ". Consider coverage in severe CAP, especially ICU/shock, or if multiple weak factors accumulate; avoid reflex broadening in stable ward/outpatient cases.</li>");
+          linesText.push("  - Pseudomonas (weak risk only: " + pseudo.weak.join(", ") + "): Consider anti-pseudomonal coverage in severe CAP/ICU or multiple risk factors; avoid reflex broadening in stable cases.");
+        }
+      }
+      linesHtml.push("</ul>");
+
+      // Aspiration / COPD nuance
+      linesHtml.push("<h4>3. Aspiration &amp; chronic lung disease considerations</h4><ul>");
+      linesText.push("3) Aspiration & chronic lung disease:");
+
+      if (aspirationRisk) {
+        linesHtml.push("<li><strong>Aspiration risk:</strong> Marked as present. Guidelines generally <em>do not</em> recommend routine anaerobic coverage for typical CAP unless there is classic aspiration with poor dentition plus lung abscess or empyema. Consider ampicillin-sulbactam IV or amoxicillin-clavulanate PO if true aspiration syndrome is suspected.</li>");
+        linesText.push("  - Aspiration risk present: Guidelines usually avoid routine anaerobic coverage unless classic aspiration with poor dentition and/or lung abscess/empyema; consider amp-sulbactam IV or amox-clav PO if true aspiration syndrome.");
+      } else {
+        linesHtml.push("<li><strong>Aspiration:</strong> Not specifically flagged. Avoid adding clindamycin/metronidazole just for “possible aspiration” without radiographic or clinical evidence of abscess/empyema.</li>");
+        linesText.push("  - Aspiration not flagged: Avoid routine anaerobic coverage unless radiographic or clinical evidence of abscess/empyema.");
+      }
+
+      if (chronicLung) {
+        linesHtml.push("<li><strong>Chronic lung disease (e.g., COPD):</strong> Regimens above cover typical CAP pathogens plus β-lactamase–producing <em>H. influenzae</em> and <em>M. catarrhalis</em>. Do not escalate to anti-pseudomonal therapy based on COPD alone without specific risk factors.</li>");
+        linesText.push("  - Chronic lung disease (e.g., COPD): Recommended regimens cover typical CAP plus beta-lactamase–producing H. influenzae and M. catarrhalis. Avoid anti-pseudomonal escalation for COPD alone.");
+      }
+
+      if (nursingHome) {
+        linesHtml.push("<li><strong>Nursing home resident:</strong> Current guidelines abandon the old HCAP category; use individual MRSA/Pseudomonas risk factors rather than setting alone to drive broad-spectrum coverage.</li>");
+        linesText.push("  - Nursing home resident: HCAP category abandoned; use MRSA/Pseudomonas risk factors rather than setting alone.");
+      }
+
+      linesHtml.push("</ul>");
+
+      // Allergy reminder
+      linesHtml.push("<h4>4. Allergy &amp; stewardship notes</h4><ul>");
+      linesText.push("4) Allergy & stewardship notes:");
+
+      if (allergy === "none") {
+        linesHtml.push("<li><strong>Allergy:</strong> No documented beta-lactam allergy. Standard β-lactam–based regimens preferred when otherwise appropriate.</li>");
+        linesText.push("  - Allergy: No beta-lactam allergy; standard beta-lactam-based regimens preferred.");
+      } else if (allergy === "nonsevere") {
+        linesHtml.push("<li><strong>Allergy:</strong> Non-severe beta-lactam reaction. Many patients can still safely receive cephalosporins or carefully selected β-lactams; consider allergy history and local policy.</li>");
+        linesText.push("  - Allergy: Non-severe beta-lactam reaction; cephalosporins may still be acceptable depending on reaction history and local policy.");
+      } else {
+        linesHtml.push("<li><strong>Allergy:</strong> Severe beta-lactam allergy. Plan above avoids β-lactams; consider allergy or immunology input if history is unclear, as many reported “penicillin allergies” are not true IgE-mediated.</li>");
+        linesText.push("  - Allergy: Severe beta-lactam allergy; regimens avoid beta-lactams. Consider allergy/immunology input if history uncertain.");
+      }
+
+      linesHtml.push("<li><strong>De-escalation:</strong> Reassess at 48–72 hours. Narrow or stop antibiotics based on cultures, viral testing, and clinical response.</li>");
+      linesText.push("  - De-escalation: Reassess at 48–72h and narrow/stop based on cultures, viral testing, and clinical response.");
+      linesHtml.push("</ul>");
+
+      return { html: linesHtml.join(""), text: linesText.join("\n") };
+    }
+
+    function runPneumoniaHelper() {
+      const age = valNum("age");
+      const sex = document.getElementById("sex").value;
+      const bun = valNum("bun");
+      const rr = valNum("rr");
+      const sbp = valNum("sbp");
+      const dbp = valNum("dbp");
+      const temp = valNum("temp");
+      const hr = valNum("hr");
+      const spo2 = valNum("spo2");
+      const comorbid = getComorbidityFlag();
+      const recentAbx = isChecked("recent-abx");
+      const notes = document.getElementById("notes").value.trim();
+
+      const curb = calcCURB65();
+      const psi = calcPSI();
+      const mrsa = getMRSAFlags();
+      const pseudo = getPseudoFlags();
+
+      const disposition = summarizeDisposition(curb, psi);
+
+      const severityEl = document.getElementById("severity-content");
+      const abxEl = document.getElementById("abx-content");
+
+      const severityHtml = [];
+      const severityText = [];
+
+      // Basic snapshot
+      const snapshot = [];
+      if (age !== null) snapshot.push("Age " + age + " years");
+      if (sex) snapshot.push("Sex " + sex);
+      if (temp !== null) snapshot.push("T " + temp + "°C");
+      if (hr !== null) snapshot.push("HR " + hr + " bpm");
+      if (rr !== null) snapshot.push("RR " + rr + "/min");
+      if (sbp !== null || dbp !== null) {
+        let bpLine = "BP ";
+        if (sbp !== null) bpLine += sbp + "/";
+        else bpLine += "?/";
+        if (dbp !== null) bpLine += dbp;
+        else bpLine += "?";
+        bpLine += " mmHg";
+        snapshot.push(bpLine);
+      }
+      if (spo2 !== null) snapshot.push("SpO₂ " + spo2 + "%");
+      if (bun !== null) snapshot.push("BUN " + bun + " mg/dL");
+
+      if (snapshot.length) {
+        severityHtml.push("<p><strong>Clinical snapshot:</strong> " + snapshot.join("; ") + ".</p>");
+        severityText.push("Clinical snapshot: " + snapshot.join("; ") + ".");
+      }
+
+      // CURB-65
+      let curbDesc = "CURB-65 score could not be fully calculated.";
+      if (age !== null || bun !== null || rr !== null || sbp !== null || dbp !== null || document.getElementById("confusion").checked) {
+        curbDesc = "CURB-65 score: " + curb.score + " (" + (curb.points.length ? curb.points.join(", ") : "no criteria met") + ").";
+      }
+      severityHtml.push("<p><strong>CURB-65:</strong> " + curbDesc + "</p>");
+      severityText.push("CURB-65: " + curbDesc);
+
+      // PSI
+      if (psi.score === null) {
+        severityHtml.push("<p><strong>PSI:</strong> " + psi.classLabel + ". " + psi.notes.join(" ") + "</p>");
+        severityText.push("PSI: " + psi.classLabel + ". " + psi.notes.join(" "));
+      } else {
+        severityHtml.push("<p><strong>PSI:</strong> Score " + psi.score + " → " + psi.classLabel + ".</p>");
+        severityText.push("PSI: Score " + psi.score + " → " + psi.classLabel + ".");
+        if (psi.notes.length) {
+          severityHtml.push("<ul>" + psi.notes.map(n => "<li>" + n + "</li>").join("") + "</ul>");
+          psi.notes.forEach(n => severityText.push("  - " + n));
+        }
+      }
+
+      // Comorbid / recent abx summary
+      const comPieces = [];
+      if (comorbid) comPieces.push("has ≥1 guideline-relevant comorbidity");
+      if (recentAbx) comPieces.push("received antibiotics in last 90 days");
+      if (comPieces.length) {
+        severityHtml.push("<p><strong>Risk for resistant pathogens / outpatient regimen:</strong> Patient " + comPieces.join(" and ") + ".</p>");
+        severityText.push("Risk for resistant pathogens/outpatient regimen: patient " + comPieces.join(" and ") + ".");
+      } else {
+        severityHtml.push("<p><strong>Risk for resistant pathogens / outpatient regimen:</strong> No comorbidities or recent antibiotics documented.</p>");
+        severityText.push("Risk for resistant pathogens/outpatient regimen: no comorbidities or recent antibiotics recorded.");
+      }
+
+      // MRSA/Pseudo summary
+      const mrsaPseudoSummary = [];
+      if (mrsa.strong.length || mrsa.weak.length) {
+        mrsaPseudoSummary.push("MRSA risk: " + (mrsa.strong.length ? "strong (" + mrsa.strong.join(", ") + ")" : "no strong; weak factors: " + mrsa.weak.join(", ")));
+      } else {
+        mrsaPseudoSummary.push("MRSA risk: none checked.");
+      }
+      if (pseudo.strong.length || pseudo.weak.length) {
+        pseudoText = "Pseudomonas risk: ";
+        if (pseudo.strong.length) pseudoText += "strong (" + pseudo.strong.join(", ") + ")";
+        else pseudoText += "no strong; weak factors: " + pseudo.weak.join(", ");
+        mrsaPseudoSummary.push(pseudoText);
+      } else {
+        mrsaPseudoSummary.push("Pseudomonas risk: none checked.");
+      }
+
+      severityHtml.push("<p><strong>MRSA / Pseudomonas:</strong> " + mrsaPseudoSummary.join(" | ") + "</p>");
+      severityText.push("MRSA/Pseudomonas: " + mrsaPseudoSummary.join(" | "));
+
+      // Disposition recommendation
+      severityHtml.push("<p><strong>Suggested site-of-care (guide only):</strong></p><ul>" +
+        disposition.dispositionReason.map(d => "<li>" + d + "</li>").join("") + "</ul>");
+      severityText.push("Suggested site-of-care (guide only):");
+      disposition.dispositionReason.forEach(d => severityText.push("  - " + d));
+
+      if (notes) {
+        severityHtml.push("<p><strong>Clinician note:</strong> " + notes + "</p>");
+        severityText.push("Clinician note: " + notes);
+      }
+
+      severityEl.innerHTML = severityHtml.join("");
+
+      // Build antibiotic plan
+      const abxPlan = buildAbxPlan(disposition.setting, curb, psi, mrsa, pseudo);
+      abxEl.innerHTML = abxPlan.html;
+
+      // Build combined text for copy modal
+      const lines = [];
+      lines.push("=== PNEUMONIA SEVERITY & ANTIBIOTIC ASSESSMENT ===");
+      lines.push(severityText.join("\n"));
+      lines.push("");
+      lines.push("=== ANTIBIOTIC STRATEGY & REASONING ===");
+      lines.push(abxPlan.text);
+      lines.push("");
+      lines.push("Note: Educational decision-support only. Confirm with local pneumonia/CAP guideline, ICU criteria, and antimicrobial stewardship or Infectious Disease consultation.");
+
+      currentPlanText = lines.join("\n");
+    }
+
+    function openCopyModal() {
+      if (!currentPlanText) {
+        alert("First generate the severity and antibiotic plan, then you can preview and copy it.");
+        return;
+      }
+      const overlay = document.getElementById("copy-modal-overlay");
+      const ta = document.getElementById("copy-modal-textarea");
+      ta.value = currentPlanText;
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeCopyModal() {
+      const overlay = document.getElementById("copy-modal-overlay");
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    function copyPlanToClipboard() {
+      if (!currentPlanText) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(currentPlanText)
+          .then(() => alert("Assessment & plan copied to clipboard."))
+          .catch(() => fallbackCopy());
+      } else {
+        fallbackCopy();
+      }
+    }
+
+    function fallbackCopy() {
+      const ta = document.getElementById("copy-modal-textarea");
+      ta.select();
+      try {
+        document.execCommand("copy");
+        alert("Assessment & plan copied to clipboard.");
+      } catch {
+        alert("Unable to copy automatically. Please manually select and copy the text.");
+      }
+    }
+  </script>
+</body>
+</html>
