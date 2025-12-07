@@ -1,161 +1,413 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cardiology Tools</title>
-
-<style>
-:root{
-  --bg1:#fdeaea;      /* light red/pink tone */
-  --bg2:#fff3f3;
-  --card:#ffffffee;
-  --accent:#d32f2f;   /* cardiology red */
-  --accent2:#b71c1c;  /* darker red */
-  --muted:#6b6b6b;
-  --border:#e0bcbc;
-  --radius:16px;
-}
-
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:linear-gradient(135deg,var(--bg1),var(--bg2));
-}
-
-/* Floating Home Button */
-.home-btn{
-  position:fixed;
-  top:15px;
-  right:15px;
-  background:var(--accent);
-  color:white;
-  padding:10px 18px;
-  border-radius:10px;
-  text-decoration:none;
-  font-weight:700;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  z-index:100;
-}
-.home-btn:hover{ background:var(--accent2); }
-
-/* Header */
-header{
-  text-align:center;
-  padding:32px 12px;
-}
-header .icon{
-  font-size:45px;
-}
-header h1{
-  margin:10px 0 0 0;
-  font-size:30px;
-  color:var(--accent2);
-}
-header p{
-  color:var(--muted);
-  font-size:15px;
-  margin-top:6px;
-}
-
-/* Grid */
-.grid{
-  max-width:1100px;
-  margin:0 auto;
-  padding:20px;
-  display:grid;
-  gap:20px;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-}
-
-.card{
-  background:var(--card);
-  padding:22px;
-  border-radius:var(--radius);
-  border:1px solid var(--border);
-  box-shadow:0 4px 14px rgba(0,0,0,0.12);
-  transition:0.2s;
-}
-.card:hover{
-  transform:translateY(-4px);
-}
-.card h2{
-  margin:0;
-  font-size:20px;
-  color:var(--accent2);
-}
-.card p{
-  margin:8px 0 16px 0;
-  color:var(--muted);
-  font-size:14px;
-}
-
-/* card buttons */
-.btn{
-  display:inline-block;
-  padding:10px 14px;
-  background:var(--accent);
-  color:white;
-  text-decoration:none;
-  border-radius:10px;
-  font-weight:600;
-}
-.btn:hover{
-  background:var(--accent2);
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cardiology Tools – Clinical Helper</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --surface: #0b1120;
+      --accent: #f97316;
+      --accent-soft: rgba(249,115,22,0.12);
+      --muted: #9ca3af;
+      --border: rgba(148,163,184,0.25);
+      --radius: 14px;
+      --pad: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(248,113,22,0.25), transparent 45%),
+        radial-gradient(circle at bottom, #020617, #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 1040px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .system-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 20%, #fed7aa, #fb923c 40%, #7f1d1d 100%);
+      box-shadow:
+        0 0 0 1px rgba(248,250,252,0.15),
+        0 18px 40px rgba(0,0,0,0.7);
+      font-size: 24px;
+    }
+    header h1 {
+      font-size: 1.7rem;
+      margin: 0;
+    }
+    header p {
+      margin: 2px 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+    }
+    .tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      background: rgba(15,23,42,0.9);
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+    @media (min-width: 720px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 1040px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.99));
+      border-radius: var(--radius);
+      padding: var(--pad);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 35px rgba(0,0,0,0.7);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,0.2), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .card-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: 100%;
+    }
+    .card h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #fed7aa;
+      border: 1px solid rgba(248,250,252,0.06);
+      white-space: nowrap;
+    }
+    .card p {
+      margin: 0;
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+    .pill {
+      font-size: 0.72rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.45);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.9);
+    }
+    .btn {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: none;
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      background: radial-gradient(circle at 0 0, #fed7aa, #fb923c 40%, #ea580c 100%);
+      color: #111827;
+      box-shadow: 0 10px 25px rgba(248,113,22,0.5);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 32px rgba(248,113,22,0.65);
+    }
+    .btn span.icon {
+      font-size: 1rem;
+    }
+    footer {
+      margin-top: 18px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
 </head>
-
 <body>
+  <main class="shell">
+    <header>
+      <div class="system-icon" aria-hidden="true">❤️</div>
+      <div>
+        <h1>Cardiology Tools</h1>
+        <p>ACS, AF, heart failure, hypertension & prevention decision aids – cardiology color theme.</p>
+        <div class="tag-row">
+          <span class="tag">Dark mode</span>
+          <span class="tag">Cardiology theme (orange/red)</span>
+          <span class="tag">Bedside risk & treatment helpers</span>
+        </div>
+      </div>
+    </header>
 
-<!-- Home -->
-<a class="home-btn" href="index.html">Home</a>
+    <section class="grid">
+      <!-- 1. Chest Pain Scores (HEART + TIMI) -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            Chest Pain Scores
+            <span class="badge">HEART + TIMI</span>
+          </h2>
+          <p>ED chest pain / UA-NSTEMI risk stratification using HEART and TIMI scores on one page.</p>
+          <div class="pill-row">
+            <span class="pill">HEART</span>
+            <span class="pill">TIMI UA/NSTEMI</span>
+            <span class="pill">ACS risk</span>
+          </div>
+          <a class="btn" href="cardiology/chest_pain_scores.html">
+            <span class="icon">📈</span>
+            <span>Open chest pain tool</span>
+          </a>
+        </div>
+      </article>
 
-<header>
-  <div class="icon">🫀</div>
-  <h1>Cardiology Tools</h1>
-  <p>Risk scores, ACS tools, arrhythmia scoring, and VTE calculators.</p>
-</header>
+      <!-- 2. GRACE ACS -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            GRACE ACS Risk
+            <span class="badge">In-hospital / 6-month</span>
+          </h2>
+          <p>GRACE risk score calculator for NSTEMI/UA and STEMI to estimate mortality and guide invasive strategy.</p>
+          <div class="pill-row">
+            <span class="pill">GRACE</span>
+            <span class="pill">NSTEMI/UA</span>
+            <span class="pill">STEMI</span>
+          </div>
+          <a class="btn" href="cardiology/grace_acs.html">
+            <span class="icon">📊</span>
+            <span>Open GRACE tool</span>
+          </a>
+        </div>
+      </article>
 
-<div class="grid">
+      <!-- 3. STEMI Reperfusion -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            STEMI Reperfusion
+            <span class="badge">PCI / Lysis</span>
+          </h2>
+          <p>STEMI checklist: PCI timing, fibrinolysis criteria & contraindications, basic dosing prompts.</p>
+          <div class="pill-row">
+            <span class="pill">STEMI</span>
+            <span class="pill">Door-to-balloon</span>
+            <span class="pill">Fibrinolysis</span>
+          </div>
+          <a class="btn" href="cardiology/stemi_reperfusion.html">
+            <span class="icon">⏱️</span>
+            <span>Open STEMI tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>CHA₂DS₂-VASc</h2>
-    <p>Stroke risk scoring for atrial fibrillation.</p>
-    <a class="btn" href="cardiology/chadvasc.html">Open</a>
-  </div>
+      <!-- 4. AF stroke & bleed (CHA2DS2-VASc + HAS-BLED) -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            AF Stroke & Bleeding
+            <span class="badge">CHA₂DS₂-VASc + HAS-BLED</span>
+          </h2>
+          <p>Combined stroke and bleeding risk calculators to support anticoagulation decisions in non-valvular AF.</p>
+          <div class="pill-row">
+            <span class="pill">CHA₂DS₂-VASc</span>
+            <span class="pill">HAS-BLED</span>
+            <span class="pill">OAC decision</span>
+          </div>
+          <a class="btn" href="cardiology/af_risk.html">
+            <span class="icon">🫀</span>
+            <span>Open AF risk tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>HAS-BLED</h2>
-    <p>Bleeding risk stratification for anticoagulation decisions.</p>
-    <a class="btn" href="cardiology/hasbled.html">Open</a>
-  </div>
+      <!-- 5. AF rate vs rhythm -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            AF Rate vs Rhythm
+            <span class="badge">Management helper</span>
+          </h2>
+          <p>Structured helper for rate vs rhythm strategy selection based on symptoms, stability, and comorbidities.</p>
+          <div class="pill-row">
+            <span class="pill">Rate control</span>
+            <span class="pill">Rhythm control</span>
+            <span class="pill">Med options</span>
+          </div>
+          <a class="btn" href="cardiology/af_rate_rhythm.html">
+            <span class="icon">📋</span>
+            <span>Open AF management tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>Wells + PERC</h2>
-    <p>DVT/PE risk assessment with integrated PERC rule.</p>
-    <a class="btn" href="cardiology/wells.html">Open</a>
-  </div>
+      <!-- 6. ASCVD Risk -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            ASCVD 10-year Risk
+            <span class="badge">Primary prevention</span>
+          </h2>
+          <p>Pooled-cohort style calculator: age, sex, BP, lipids, smoking & diabetes – plus risk category summary.</p>
+          <div class="pill-row">
+            <span class="pill">ASCVD</span>
+            <span class="pill">Primary prevention</span>
+            <span class="pill">Risk category</span>
+          </div>
+          <a class="btn" href="cardiology/ascvd.html">
+            <span class="icon">🧮</span>
+            <span>Open ASCVD tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>HEART Score</h2>
-    <p>Chest pain risk stratification used in emergency settings.</p>
-    <a class="btn" href="cardiology/heart.html">Open</a>
-  </div>
+      <!-- 7. Statin Selector -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            Statin Intensity Selector
+            <span class="badge">Lipid therapy</span>
+          </h2>
+          <p>Suggests high vs moderate vs low-intensity statins, with example agents & doses based on risk profile.</p>
+          <div class="pill-row">
+            <span class="pill">High-intensity</span>
+            <span class="pill">Moderate</span>
+            <span class="pill">Secondary prevention</span>
+          </div>
+          <a class="btn" href="cardiology/statin_selector.html">
+            <span class="icon">💊</span>
+            <span>Open statin tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>TIMI Score</h2>
-    <p>Mortality risk scoring for ACS patients.</p>
-    <a class="btn" href="cardiology/timi.html">Open</a>
-  </div>
+      <!-- 8. HF GDMT -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            HFrEF GDMT Helper
+            <span class="badge">HF therapy</span>
+          </h2>
+          <p>Guides ARNI/ACEI, beta-blocker, MRA, SGLT2i and diuretic choices based on EF, BP, K, Cr and symptoms.</p>
+          <div class="pill-row">
+            <span class="pill">ARNI / ACEI</span>
+            <span class="pill">BB</span>
+            <span class="pill">MRA / SGLT2</span>
+          </div>
+          <a class="btn" href="cardiology/hf_gdmt.html">
+            <span class="icon">📐</span>
+            <span>Open HF GDMT tool</span>
+          </a>
+        </div>
+      </article>
 
-  <div class="card">
-    <h2>ASCVD Risk (Future)</h2>
-    <p>10-year atherosclerotic cardiovascular disease risk.</p>
-    <a class="btn" href="#">Coming Soon</a>
-  </div>
+      <!-- 9. NYHA Class -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            NYHA Class Helper
+            <span class="badge">Symptoms</span>
+          </h2>
+          <p>Simple symptom-based wizard to label NYHA class I–IV and summarize activity tolerance.</p>
+          <div class="pill-row">
+            <span class="pill">NYHA I–IV</span>
+            <span class="pill">Symptom based</span>
+          </div>
+          <a class="btn" href="cardiology/nyha_class.html">
+            <span class="icon">🚶</span>
+            <span>Open NYHA tool</span>
+          </a>
+        </div>
+      </article>
 
-</div>
+      <!-- 10. BP Medication Selector -->
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            BP Medication Selector
+            <span class="badge">Hypertension</span>
+          </h2>
+          <p>Age, race, comorbidities, current meds & BP range → suggests first-line and add-on agents with dosing.</p>
+          <div class="pill-row">
+            <span class="pill">ACEI / ARB</span>
+            <span class="pill">Thiazide</span>
+            <span class="pill">CCB / BB</span>
+          </div>
+          <a class="btn" href="cardiology/bp_selector.html">
+            <span class="icon">🩺</span>
+            <span>Open BP selector</span>
+          </a>
+        </div>
+      </article>
+    </section>
 
+    <footer>
+      Educational decision support only – confirm with the latest ACC/AHA/ESC cardiology guidelines and local protocols.
+    </footer>
+  </main>
 </body>
 </html>
