@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vasopressor Selector – Critical Care</title>
+
+<style>
+:root {
+    --bg: #e0f7fa;
+    --card: #ffffff;
+    --accent: #00838f;
+    --accent-soft: #b2ebf2;
+    --muted: #546e7a;
+    --success: #2e7d32;
+    --danger: #c62828;
+    --radius: 14px;
+    --pad: 16px;
+}
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI";
+    background: radial-gradient(circle at top, #b2ebf2 0, #e0f7fa 40%, #e0f2f1 100%);
+}
+header {
+    padding: 16px;
+    background: linear-gradient(90deg, #00acc1, #00838f);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nav-buttons a {
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.8);
+    color: white;
+    font-size: .9rem;
+    margin-left: 6px;
+}
+main {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 12px;
+}
+.card {
+    background: var(--card);
+    padding: 18px;
+    margin-bottom: 16px;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+    color: #004d5a;
+}
+.subtitle {
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+label {
+    font-size: .9rem;
+    color: #37474f;
+    display: block;
+    margin-bottom: 4px;
+}
+select, input[type=number] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #cfd8dc;
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap: 12px;
+}
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    width: 100%;
+}
+.btn-primary:hover {
+    background: #006978;
+}
+.plan-box {
+    margin-top: 12px;
+    background: #f1ffff;
+    border: 1px dashed var(--accent);
+    padding: 10px;
+    border-radius: 10px;
+    white-space: pre-line;
+}
+button.copy-btn {
+    margin-top: 10px;
+    background: #eceff1;
+    border-radius: 999px;
+    padding: 10px 16px;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>💉 Vasopressor Selector</h1>
+    <div class="nav-buttons">
+        <a href="../home.html">🏠 Home</a>
+        <a href="../critical_care.html">⬅ Critical Care</a>
+    </div>
+</header>
+
+<main>
+
+    <div class="card">
+        <h2>Patient Hemodynamics</h2>
+        <p class="subtitle">Select the relevant clinical situation.</p>
+
+        <div class="grid-2">
+            <div>
+                <label>Shock Type (suspected)</label>
+                <select id="shock-type">
+                    <option value="">Select...</option>
+                    <option value="septic">Septic Shock</option>
+                    <option value="cardiogenic">Cardiogenic Shock</option>
+                    <option value="hypovolemic">Hypovolemic Shock</option>
+                    <option value="obstructive">Obstructive Shock</option>
+                    <option value="anaphylactic">Anaphylactic Shock</option>
+                    <option value="undifferentiated">Undifferentiated / Not sure</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Heart Rate</label>
+                <select id="hr">
+                    <option value="">Select...</option>
+                    <option value="tachy">Tachycardic</option>
+                    <option value="normal">Normal</option>
+                    <option value="brady">Bradycardic</option>
+                </select>
+            </div>
+
+            <div>
+                <label>MAP</label>
+                <input type="number" id="map" placeholder="e.g. 55">
+            </div>
+
+            <div>
+                <label>Arrhythmias?</label>
+                <select id="arrhythmia">
+                    <option value="">Select...</option>
+                    <option value="yes">Yes – AFib/VT/ectopy</option>
+                    <option value="no">No significant arrhythmia</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Pulmonary Hypertension / RV Failure?</label>
+                <select id="rv">
+                    <option value="">Select...</option>
+                    <option value="yes">Yes – RV strain, PAH</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="selectPressor()">Select Vasopressor</button>
+    </div>
+
+    <div class="card" id="results" style="display:none;">
+        <h2>Recommended Vasopressor Strategy</h2>
+        <div id="plan" class="plan-box"></div>
+        <button class="copy-btn" onclick="copyPlan()">📋 Copy Plan</button>
+    </div>
+
+</main>
+
+<script>
+let lastPlan = "";
+
+function selectPressor() {
+    const shock = document.getElementById("shock-type").value;
+    const hr = document.getElementById("hr").value;
+    const arr = document.getElementById("arrhythmia").value;
+    const rv = document.getElementById("rv").value;
+    const map = parseInt(document.getElementById("map").value);
+
+    let plan = "Vasopressor Strategy:\n\n";
+
+    // MAP check
+    if (!isNaN(map) && map >= 65) {
+        plan += "• MAP ≥ 65 – may not need pressor unless trending down.\n\n";
+    }
+
+    // Shock types
+    switch (shock) {
+        case "septic":
+            plan += "Primary: **Norepinephrine** (first-line)\n";
+            plan += "Dose: Start 0.05–0.1 mcg/kg/min, titrate.\n";
+            if (rv === "yes") plan += "• RV failure → add vasopressin early.\n";
+            plan += "• Add Vasopressin 0.03 U/min if NE ≥ 0.2.\n";
+            plan += "• Add Epinephrine if still hypotensive.\n";
+            break;
+
+        case "cardiogenic":
+            plan += "Primary: **Norepinephrine** (preferred over dopamine)\n";
+            if (hr === "brady") plan += "• Bradycardia → do NOT use dopamine.\n";
+            plan += "• Add **Dobutamine** if low cardiac output.\n";
+            if (arr === "yes") plan += "• Avoid dopamine due to arrhythmias.\n";
+            break;
+
+        case "hypovolemic":
+            plan += "Primary: **Fluids first**.\n";
+            plan += "• If still hypotensive after fluids → Norepinephrine.\n";
+            plan += "• Avoid pure vasoconstrictors without volume.\n";
+            break;
+
+        case "obstructive":
+            plan += "Primary: **Treat cause immediately** (PE/tamponade/PTX).\n";
+            plan += "• Use Norepinephrine temporarily to maintain MAP.\n";
+            if (rv === "yes") plan += "• Add Vasopressin for RV support.\n";
+            break;
+
+        case "anaphylactic":
+            plan += "Primary: **Epinephrine**.\n";
+            plan += "IM: 0.3–0.5 mg every 5–10 min.\n";
+            plan += "IV infusion if hypotensive: start 1–4 mcg/min.\n";
+            plan += "• Add fluids and H1/H2 blockers.\n";
+            break;
+
+        case "undifferentiated":
+            plan += "Primary: **Norepinephrine**.\n";
+            plan += "• Safest first-line in unclear shock.\n";
+            plan += "• Add Vasopressin if escalating.\n";
+            break;
+
+        default:
+            plan += "No shock type selected — cannot recommend.\n";
+    }
+
+    // Arrhythmias
+    if (arr === "yes") {
+        plan += "\nArrhythmia Note:\n";
+        plan += "• Avoid dopamine (arrhythmogenic).\n";
+        plan += "• Prefer Norepinephrine or Vasopressin.\n";
+    }
+
+    // RV strain
+    if (rv === "yes") {
+        plan += "\nRV Failure Note:\n";
+        plan += "• Avoid high-dose vasoconstriction.\n";
+        plan += "• Prefer NE + Vasopressin.\n";
+        plan += "• Consider inotrope if low RV output.\n";
+    }
+
+    lastPlan = plan;
+    document.getElementById("plan").innerText = plan;
+    document.getElementById("results").style.display = "block";
+}
+
+function copyPlan() {
+    navigator.clipboard.writeText(lastPlan)
+        .then(() => alert("Plan copied to clipboard"))
+        .catch(() => alert("Could not copy"));
+}
+</script>
+
+</body>
+</html>
