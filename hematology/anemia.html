@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anemia Assessment Tool</title>
+
+<style>
+    :root {
+        --primary: #7b1fa2;        /* Hematology purple/burgundy */
+        --primary-dark: #4a148c;
+        --bg1: #f6f2f9;
+        --bg2: #ffffff;
+        --text-dark: #2c003e;
+        --card-shadow: rgba(0,0,0,0.15);
+        --radius: 14px;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, var(--bg1), #fafafa);
+    }
+
+    h1 {
+        text-align: center;
+        color: var(--primary-dark);
+        font-size: 26px;
+        margin-top: 20px;
+    }
+
+    /* Floating Home Button */
+    .home-btn {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        background: var(--primary);
+        color: white;
+        padding: 10px 18px;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 15px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+        transition: 0.2s;
+        z-index: 1000;
+    }
+    .home-btn:hover { background: var(--primary-dark); }
+
+    /* Container */
+    .container {
+        max-width: 920px;
+        margin: auto;
+        background: var(--bg2);
+        padding: 30px;
+        margin-top: 30px;
+        border-radius: var(--radius);
+        box-shadow: 0px 8px 20px var(--card-shadow);
+    }
+
+    /* Input grid */
+    .grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border-radius: 10px;
+        border: 1px solid #c7b8d9;
+        background: #faf7ff;
+        font-size: 15px;
+    }
+
+    /* Assess button */
+    button {
+        margin-top: 30px;
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border: none;
+        color: white;
+        font-size: 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+        transition: 0.2s;
+    }
+    button:hover { transform: scale(1.02); }
+
+    /* Results area */
+    .result {
+        margin-top: 25px;
+        padding: 20px;
+        background: #f3e5f5;
+        border-left: 6px solid var(--primary);
+        border-radius: 10px;
+        line-height: 1.5;
+    }
+
+    /* EMR Box */
+    .emr-box {
+        margin-top: 25px;
+        padding: 20px;
+        background: #ede7f6;
+        border-left: 6px solid var(--primary-dark);
+        border-radius: 10px;
+    }
+
+    .copy-btn {
+        margin-top: 12px;
+        padding: 10px;
+        background: var(--primary-dark);
+        border: none;
+        color: white;
+        font-size: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+    }
+</style>
+</head>
+
+<body>
+
+<a href="index.html" class="home-btn">Home</a>
+
+<h1>🩸 Anemia Assessment Tool</h1>
+
+<div class="container">
+
+    <div class="grid">
+        <div><label>Hemoglobin (g/dL)</label><input type="number" id="hb" step="0.1"></div>
+        <div><label>Hematocrit (%)</label><input type="number" id="hct" step="0.1"></div>
+        <div><label>MCV (fL)</label><input type="number" id="mcv" step="0.1"></div>
+        <div><label>Ferritin (ng/mL)</label><input type="number" id="ferritin" step="0.1"></div>
+        <div><label>Iron (µg/dL)</label><input type="number" id="iron" step="0.1"></div>
+        <div><label>TIBC (µg/dL)</label><input type="number" id="tibc" step="0.1"></div>
+        <div><label>TSAT (%)</label><input type="number" id="tsat" step="0.1"></div>
+        <div><label>LDH (U/L)</label><input type="number" id="ldh" step="0.1"></div>
+        <div><label>Reticulocyte (%)</label><input type="number" id="retic" step="0.1"></div>
+        <div><label>Haptoglobin (mg/dL)</label><input type="number" id="haptoglobin" step="0.1"></div>
+        <div><label>Vitamin B12 (pg/mL)</label><input type="number" id="b12" step="0.1"></div>
+        <div><label>Folate (ng/mL)</label><input type="number" id="folate" step="0.1"></div>
+        <div><label>CRP (mg/L)</label><input type="number" id="crp" step="0.1"></div>
+        <div><label>ESR (mm/hr)</label><input type="number" id="esr" step="0.1"></div>
+        <div><label>TSH (µIU/mL)</label><input type="number" id="tsh" step="0.01"></div>
+    </div>
+
+    <button onclick="assessAnemia()">Assess</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <div id="emrBox" class="emr-box" style="display:none;">
+        <h3>Assessment & Plan</h3>
+        <pre id="emrText" style="white-space:pre-wrap; font-size:15px;"></pre>
+        <button class="copy-btn" onclick="copyEMR()">Copy to Clipboard</button>
+    </div>
+
+</div>
+
+<script>
+function val(id) {
+    let v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? null : v;
+}
+
+function assessAnemia() {
+
+    const hb = val('hb');
+    const hct = val('hct');
+    const mcv = val('mcv');
+    const ferritin = val('ferritin');
+    const iron = val('iron');
+    const tibc = val('tibc');
+    const tsat = val('tsat');
+    const ldh = val('ldh');
+    const retic = val('retic');
+    const haptoglobin = val('haptoglobin');
+    const b12 = val('b12');
+    const folate = val('folate');
+
+    let out = "";
+    let A = [];
+    let P = [];
+    let miss = [];
+
+    /* ===============================
+       HEMOGLOBIN
+    ================================= */
+    if (hb !== null) {
+        if (hb < 13) {
+            out += `<b>Anemia detected</b> — Hb ${hb} g/dL<br>`;
+            A.push(`Anemia (Hb ${hb})`);
+
+            if (hb < 7) P.push("Transfusion threshold reached (Hb <7).");
+            else if (hb < 8) P.push("Consider transfusion if symptomatic or cardiac history.");
+        } else {
+            out += `Hb normal (${hb})<br>`;
+        }
+    } else miss.push("Hemoglobin missing");
+
+    /* ===============================
+       MCV CLASS
+    ================================= */
+    if (mcv !== null) {
+        if (mcv < 80) { out += "Microcytic pattern<br>"; A.push("Microcytic anemia"); }
+        else if (mcv > 100) { out += "Macrocytic pattern<br>"; A.push("Macrocytic anemia"); }
+        else { out += "Normocytic pattern<br>"; A.push("Normocytic anemia"); }
+    }
+
+    /* ===============================
+       IRON STUDIES
+    ================================= */
+    if (ferritin !== null && tsat !== null && tibc !== null) {
+
+        if (ferritin < 30 && tsat < 20) {
+            out += "Iron deficiency anemia<br>";
+            A.push("IDA");
+            P.push("Start PO iron or consider IV if intolerance.");
+        }
+
+        else if (ferritin > 100 && tsat < 20) {
+            out += "Anemia of chronic inflammation<br>";
+            A.push("ACD");
+            P.push("Evaluate inflammatory/chronic disease etiology.");
+        }
+
+    }
+
+    /* ===============================
+       B12 / FOLATE
+    ================================= */
+    if (mcv > 100) {
+        if (b12 !== null && b12 < 200) {
+            out += "Vitamin B12 deficiency<br>";
+            A.push("B12 deficiency");
+            P.push("Start IM/PO B12 replacement.");
+        }
+        if (folate !== null && folate < 4) {
+            out += "Folate deficiency<br>";
+            A.push("Folate deficiency");
+            P.push("Start folate supplementation.");
+        }
+    }
+
+    /* ===============================
+       HEMOLYSIS
+    ================================= */
+    if (ldh !== null && haptoglobin !== null) {
+        if (ldh > 250 && haptoglobin < 30) {
+            out += "Hemolysis suspected<br>";
+            A.push("Hemolysis pattern");
+            P.push("Order smear, bilirubin, and Coombs test.");
+        }
+    }
+
+    /* ===============================
+       RETIC INDEX
+    ================================= */
+    if (retic !== null && hct !== null) {
+        let rpi = (retic * (hct / 45)).toFixed(2);
+        out += `RPI: ${rpi}<br>`;
+
+        if (rpi < 2) {
+            A.push("Hypoproliferative process");
+            P.push("Consider marrow suppression (CKD, chronic disease, endocrine).");
+        } else {
+            A.push("Hyperproliferative anemia");
+        }
+    }
+
+    /* ===============================
+       MISSING LABS
+    ================================= */
+    if (miss.length > 0) {
+        out += "<br><b>Missing:</b><ul>";
+        miss.forEach(m => out += `<li>${m}</li>`);
+        out += "</ul>";
+    }
+
+    /* ===============================
+       OUTPUT
+    ================================= */
+    document.getElementById("result").innerHTML = out;
+    document.getElementById("result").style.display = "block";
+
+    let emr = "Assessment:\n";
+    A.forEach(a => emr += `• ${a}\n`);
+
+    emr += "\nPlan:\n";
+    P.forEach(p => emr += `• ${p}\n`);
+
+    if (miss.length > 0) {
+        emr += "\nMissing labs:\n";
+        miss.forEach(m => emr += `• ${m}\n`);
+    }
+
+    document.getElementById("emrText").textContent = emr;
+    document.getElementById("emrBox").style.display = "block";
+}
+
+function copyEMR() {
+    navigator.clipboard.writeText(document.getElementById("emrText").textContent);
+}
+</script>
+
+</body>
+</html>
