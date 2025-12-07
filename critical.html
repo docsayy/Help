@@ -2,74 +2,150 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Critical Care Tools</title>
 
 <style>
-:root{
-  --bg1:#ffebee;
-  --bg2:#ffcdd2;
-  --card:#ffffffee;
-  --accent:#c62828;
-  --accent2:#b71c1c;
-  --muted:#6b6b6b;
-  --border:#ef9a9a;
-  --radius:16px;
-}
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #e6f7ff, #ffffff);
+        margin: 0;
+        padding: 0;
+        color: #00394d;
+    }
 
-body{margin:0;font-family:Inter,Arial,sans-serif;
-background:linear-gradient(135deg,var(--bg1),var(--bg2));}
-.home-btn{position:fixed;top:15px;right:15px;background:var(--accent);
-color:white;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none;
-box-shadow:0 4px 12px rgba(0,0,0,0.2);}
-.home-btn:hover{background:var(--accent2);}
-header{text-align:center;padding:32px 12px;}
-header .icon{font-size:45px;}
-header h1{margin:10px 0;color:var(--accent2);}
-header p{color:var(--muted);}
-.grid{max-width:1100px;margin:0 auto;padding:20px;display:grid;
-gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
-.card{background:var(--card);padding:22px;border-radius:var(--radius);
-border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,0.12);}
-.card h2{margin:0;color:var(--accent2);}
-.card p{margin:8px 0;color:var(--muted);}
-.btn{background:var(--accent);padding:10px 14px;color:white;
-text-decoration:none;border-radius:10px;font-weight:600;}
-.btn:hover{background:var(--accent2);}
+    header {
+        background: #0099cc;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    header img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    h2 {
+        color: #006688;
+        border-left: 6px solid #0099cc;
+        padding-left: 10px;
+        margin-top: 35px;
+        font-size: 22px;
+    }
+
+    .tool-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tool-list li {
+        background: #f2fbff;
+        margin: 10px 0;
+        padding: 14px 18px;
+        border-radius: 10px;
+        border: 1px solid #ccefff;
+        font-size: 18px;
+        transition: 0.2s;
+    }
+
+    .tool-list li:hover {
+        background: #e0f7ff;
+        transform: translateX(4px);
+    }
+
+    a {
+        text-decoration: none;
+        color: #004d66;
+        font-weight: bold;
+    }
+
+    .home-btn {
+        display: block;
+        margin: 25px auto;
+        width: fit-content;
+        background: #0077aa;
+        color: white;
+        padding: 12px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .home-btn:hover {
+        background: #005f88;
+    }
+
 </style>
 </head>
 
 <body>
 
-<a class="home-btn" href="index.html">Home</a>
-
 <header>
-  <div class="icon">🚑</div>
-  <h1>Critical Care Tools</h1>
-  <p>Shock, fluids, pressors, sepsis bundle.</p>
+    <img src="icons/critical-care.png" alt="Critical Care Icon">
+    Critical Care Tools
 </header>
 
-<div class="grid">
+<div class="container">
 
-  <div class="card">
-    <h2>Shock Classification (Future)</h2>
-    <p>Hypovolemic, septic, cardiogenic, distributive.</p>
-    <a class="btn" href="#">Coming Soon</a>
-  </div>
+    <!-- Ventilation & ABG -->
+    <h2>Ventilation & ABG Management</h2>
+    <ul class="tool-list">
+        <li><a href="critical_care/abg_vent_helper.html">ABG-Based Vent Adjustment Helper</a></li>
+        <li><a href="critical_care/abg_vent_boss.html">ABG Vent Boss (Advanced Logic)</a></li>
+        <li><a href="critical_care/vent_initial_settings.html">Initial Ventilator Settings Tool</a></li>
+        <li><a href="critical_care/ventilator_mode_selector.html">Ventilator Mode Selector</a></li>
+        <li><a href="critical_care/ett_tidal_volume.html">ETT Depth & Tidal Volume Calculator</a></li>
+        <li><a href="critical_care/oxygenation_helper.html">Oxygenation & PEEP Helper</a></li>
+        <li><a href="critical_care/weaning_rsbi.html">RSBI / Weaning Readiness Tool</a></li>
+        <li><a href="critical_care/copd_autopeep_helper.html">COPD Auto-PEEP / Dynamic Hyperinflation Tool</a></li>
+    </ul>
 
-  <div class="card">
-    <h2>Fluid Resuscitation (Future)</h2>
-    <p>30 mL/kg sepsis bolus + maintenance fluids.</p>
-    <a class="btn" href="#">Coming Soon</a>
-  </div>
+    <!-- Critical Illness -->
+    <h2>Shock, Sepsis & Hemodynamics</h2>
+    <ul class="tool-list">
+        <li><a href="critical_care/shock_classifier.html">Shock Classifier (Hypovolemic / Septic / Cardiogenic / Obstructive)</a></li>
+        <li><a href="critical_care/vasopressor_selector.html">Vasopressor Selector</a></li>
+        <li><a href="critical_care/septic_shock_bundle.html">Septic Shock Bundle Checklist</a></li>
+        <li><a href="critical_care/iv_fluid_selector.html">IV Fluid Selector</a></li>
+        <li><a href="critical_care/hemodynamic_pocus_helper.html">Hemodynamic POCUS Helper</a></li>
+    </ul>
 
-  <div class="card">
-    <h2>Pressor Guidance (Future)</h2>
-    <p>NorEpi dosing, MAP goals, shock escalation.</p>
-    <a class="btn" href="#">Coming Soon</a>
-  </div>
+    <!-- Airway -->
+    <h2>Airway & RSI</h2>
+    <ul class="tool-list">
+        <li><a href="critical_care/rsi_difficult_airway.html">RSI & Difficult Airway Tool</a></li>
+    </ul>
+
+    <!-- ARDS -->
+    <h2>ARDS</h2>
+    <ul class="tool-list">
+        <li><a href="critical_care/ards_tool.html">ARDS Severity & Management Tool</a></li>
+    </ul>
+
+    <!-- ICU Sedation -->
+    <h2>Sedation & Analgesia</h2>
+    <ul class="tool-list">
+        <li><a href="critical_care/icu_sedation_analgesia.html">ICU Sedation & Analgesia Guide</a></li>
+    </ul>
 
 </div>
+
+<a href="index.html" class="home-btn">🏠 Home</a>
 
 </body>
 </html>
