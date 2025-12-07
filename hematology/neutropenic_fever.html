@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neutropenic Fever Tool</title>
+
+<style>
+:root {
+    --primary: #7b1fa2;
+    --primary-dark: #4a148c;
+    --bg1: #f6f2f9;
+    --bg2: #ffffff;
+    --text-dark: #2c003e;
+    --radius: 14px;
+    --card-shadow: rgba(0,0,0,0.15);
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), #fafafa);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--primary-dark);
+    font-size: 26px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #5f4375;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Nav buttons */
+.nav-btn {
+    position: fixed;
+    top: 15px;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    z-index: 1000;
+    transition: 0.2s;
+    font-size: 14px;
+}
+.nav-btn:hover { background: var(--primary-dark); }
+.left { left: 15px; }
+.right { right: 15px; }
+
+/* Card container */
+.container {
+    max-width: 950px;
+    margin: auto;
+    background: var(--bg2);
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 20px var(--card-shadow);
+}
+
+.section-title {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 16px;
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 9px 10px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 1px solid #c7b8d9;
+    background: #faf7ff;
+    font-size: 14px;
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    color: white;
+    border-radius: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: 0.2s;
+}
+button:hover { transform: scale(1.02); }
+
+.result {
+    margin-top: 22px;
+    padding: 18px;
+    background: #f3e5f5;
+    border-left: 6px solid var(--primary);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.emr-box {
+    margin-top: 20px;
+    padding: 18px;
+    background: #ede7f6;
+    border-left: 6px solid var(--primary-dark);
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.copy-btn {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<a href="hematology.html" class="nav-btn left">← Hematology</a>
+<a href="index.html" class="nav-btn right">Home</a>
+
+<h1>🧫 Neutropenic Fever Tool</h1>
+<div class="subtitle">
+    Risk stratification and empiric therapy framework for febrile neutropenia (copy-ready A&P).
+</div>
+
+<div class="container">
+
+    <div class="section-title">Basic Labs & Counts</div>
+    <div class="grid">
+        <div>
+            <label>ANC (K/µL)</label>
+            <input type="number" id="anc" step="0.01">
+        </div>
+        <div>
+            <label>Total WBC (K/µL)</label>
+            <input type="number" id="wbc" step="0.1">
+        </div>
+        <div>
+            <label>Platelets (K/µL)</label>
+            <input type="number" id="plt" step="1">
+        </div>
+        <div>
+            <label>Creatinine (mg/dL)</label>
+            <input type="number" id="cr" step="0.1">
+        </div>
+        <div>
+            <label>Bilirubin (mg/dL)</label>
+            <input type="number" id="bili" step="0.1">
+        </div>
+        <div>
+            <label>ALT/AST (x ULN, approx)</label>
+            <input type="number" id="lfts" step="0.1">
+        </div>
+    </div>
+
+    <div class="section-title">Fever & Vitals</div>
+    <div class="grid">
+        <div>
+            <label>Max temperature (°C)</label>
+            <input type="number" id="temp" step="0.1">
+        </div>
+        <div>
+            <label>Systolic BP (mmHg)</label>
+            <input type="number" id="sbp">
+        </div>
+        <div>
+            <label>Heart rate (bpm)</label>
+            <input type="number" id="hr">
+        </div>
+        <div>
+            <label>Respiratory rate (per min)</label>
+            <input type="number" id="rr">
+        </div>
+        <div>
+            <label>O₂ saturation (%)</label>
+            <input type="number" id="sat">
+        </div>
+        <div>
+            <label>Altered mental status?</label>
+            <select id="ams">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="section-title">Risk Factors & Source Clues</div>
+    <div class="grid">
+        <div>
+            <label>Planned/anticipated duration of neutropenia ≥7 days?</label>
+            <select id="dur7">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (prolonged)</option>
+                <option value="no">No (<7 days)</option>
+            </select>
+        </div>
+        <div>
+            <label>Relapsed/refractory malignancy or intensive chemo?</label>
+            <select id="highintensity">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes high-risk malignancy/chemo</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Central venous catheter?</label>
+            <select id="cvc">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Clinically suspected pneumonia?</label>
+            <select id="pna">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Abdominal pain, peritoneal signs, severe diarrhea?</label>
+            <select id="abd">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (enterocolitis/typhlitis concern)</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Severe mucositis (impairs PO)</label>
+            <select id="mucositis">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (severe)</option>
+                <option value="no">No / mild</option>
+            </select>
+        </div>
+        <div>
+            <label>Hemodynamic instability (hypotension, lactate, etc)?</label>
+            <select id="shock">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (sepsis/septic shock)</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Known colonization with MRSA/VRE/ESBL/CRE?</label>
+            <select id="colonization">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes / suspected</option>
+                <option value="no">No / unknown</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="assessNeutropenicFever()">Assess Neutropenic Fever</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <div id="emrBox" class="emr-box" style="display:none;">
+        <h3>Assessment & Plan (Copy Ready)</h3>
+        <pre id="emrText" style="white-space:pre-wrap;"></pre>
+        <button class="copy-btn" onclick="copyEMR()">Copy to Clipboard</button>
+    </div>
+
+</div>
+
+<script>
+function num(id){
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? null : v;
+}
+function val(id){
+    const v = document.getElementById(id).value;
+    return v === "" ? null : v;
+}
+function yn(id){
+    const v = document.getElementById(id).value;
+    if (v === "") return null;
+    return v === "yes";
+}
+
+function assessNeutropenicFever(){
+    const anc        = num("anc");
+    const wbc        = num("wbc");
+    const plt        = num("plt");
+    const cr         = num("cr");
+    const bili       = num("bili");
+    const lfts       = num("lfts");
+
+    const temp       = num("temp");
+    const sbp        = num("sbp");
+    const hr         = num("hr");
+    const rr         = num("rr");
+    const sat        = num("sat");
+    const ams        = yn("ams");
+
+    const dur7       = yn("dur7");
+    const highint    = yn("highintensity");
+    const cvc        = yn("cvc");
+    const pna        = yn("pna");
+    const abd        = yn("abd");
+    const mucositis  = yn("mucositis");
+    const shock      = yn("shock");
+    const colon      = yn("colonization");
+
+    let out = "";
+    let A = [];
+    let P = [];
+    let missing = [];
+
+    /* Basic neutropenia definition */
+    if (anc !== null) {
+        out += `ANC: <b>${anc.toFixed(2)} K/µL</b><br>`;
+        if (anc < 0.5) {
+            out += "Severe neutropenia (ANC <0.5).<br>";
+            A.push("Severe neutropenia");
+        } else if (anc < 1.0) {
+            out += "Moderate neutropenia (ANC 0.5–1.0).<br>";
+            A.push("Moderate neutropenia");
+        } else {
+            out += "ANC not in neutropenic range (>1.0).<br>";
+        }
+    } else {
+        missing.push("ANC");
+    }
+
+    if (temp !== null) {
+        out += `Max temp: <b>${temp.toFixed(1)} °C</b><br>`;
+        if (temp >= 38.0) {
+            A.push("Fever in setting of neutropenia – febrile neutropenia.");
+        }
+    } else {
+        missing.push("Temperature");
+    }
+
+    /* Hemodynamics / shock flags */
+    let unstable = false;
+    if (sbp !== null && sbp < 90) unstable = true;
+    if (shock === true) unstable = true;
+    if (ams === true) unstable = true;
+    if (sat !== null && sat < 92) unstable = true;
+
+    if (unstable) {
+        out += "<br><b>Unstable / high-acuity features present.</b><br>";
+        A.push("Sepsis / high-risk clinical status in neutropenia.");
+    }
+
+    /* High-risk vs low-risk classification (simplified MASCC-style) */
+    let highRisk = false;
+
+    // Criteria leaning to HIGH risk
+    if (anc !== null && anc < 0.1) highRisk = true; // profound neutropenia
+    if (dur7 === true) highRisk = true;
+    if (highint === true) highRisk = true;
+    if (unstable) highRisk = true;
+    if (pna === true || abd === true) highRisk = true;
+    if (mucositis === true) highRisk = true;
+    if (cr !== null && cr > 2) highRisk = true;
+    if (bili !== null && bili > 2) highRisk = true;
+    if (lfts !== null && lfts > 3) highRisk = true;
+
+    /* Risk label */
+    if (highRisk) {
+        out += "<br><b>Risk Category:</b> High-risk febrile neutropenia (inpatient IV therapy recommended).<br>";
+        A.push("High-risk febrile neutropenia.");
+        P.push("Admit for IV empiric broad-spectrum antipseudomonal beta-lactam (e.g., cefepime, piperacillin-tazobactam, or a carbapenem) per local protocol.");
+    } else {
+        out += "<br><b>Risk Category:</b> Low-risk features (may be candidate for oral/short-stay regimen if clinically appropriate).<br>";
+        A.push("Low-risk febrile neutropenia (if confirmed).");
+        P.push("Consider outpatient or short-stay oral regimen (e.g., fluoroquinolone + amoxicillin-clavulanate) only if truly low-risk and able to return promptly if worse, per institutional protocol.");
+    }
+
+    /* Source clues & additional coverage */
+    if (pna === true) {
+        A.push("Clinical concern for pneumonia.");
+        P.push("Ensure chest imaging; consider adding MRSA coverage (e.g., vancomycin) if severe pneumonia or MRSA risk factors.");
+    }
+    if (abd === true) {
+        A.push("Abdominal / enterocolitis concern.");
+        P.push("Broaden for anaerobes if not already covered; consider abdominal imaging for typhlitis or perforation.");
+    }
+    if (cvc === true) {
+        A.push("Central venous catheter present – possible line infection.");
+        P.push("Obtain paired blood cultures (peripheral + line); consider MRSA coverage (e.g., vancomycin) if line infection suspected.");
+    }
+    if (mucositis === true) {
+        A.push("Severe mucositis – higher risk for bacteremia and poor PO absorption.");
+        P.push("Avoid exclusive oral regimens; monitor for gram-negative and viridans strep bacteremia.");
+    }
+
+    /* MRSA / resistant organism considerations */
+    if (colon === true) {
+        A.push("History of colonization with resistant organism.");
+        P.push("Choose empiric regimen guided by prior cultures and local antibiogram (e.g., consider MRSA-active or ESBL/CRE-active agents as appropriate).");
+    }
+
+    /* Basic workup reminders */
+    P.push("Obtain at least 2 sets of blood cultures (including any central lines) prior to or at the time of antibiotics (do not delay antibiotics for cultures).");
+    P.push("Urinalysis and urine culture if urinary symptoms or no clear source.");
+    P.push("Chest imaging if respiratory symptoms or abnormal exam/oxygenation.");
+    P.push("Stool testing and abdominal imaging if severe diarrhea, abdominal pain, or typhlitis concern.");
+    P.push("Reassess daily for de-escalation and for antifungal evaluation if persistent fever ≥4–7 days despite broad-spectrum antibiotics.");
+
+    /* Missing data summary */
+    if (wbc === null)  missing.push("Total WBC");
+    if (plt === null)  missing.push("Platelet count");
+    if (sbp === null)  missing.push("Systolic BP");
+    if (hr === null)   missing.push("Heart rate");
+    if (rr === null)   missing.push("Respiratory rate");
+    if (sat === null)  missing.push("Oxygen saturation");
+    if (dur7 === null) missing.push("Expected duration of neutropenia");
+    if (shock === null) missing.push("Sepsis / shock assessment");
+    if (cvc === null)  missing.push("Central venous catheter status");
+
+    // Deduplicate
+    missing = [...new Set(missing)];
+
+    if (missing.length > 0) {
+        out += "<br><b>Suggested additional data:</b><ul>";
+        missing.forEach(m => out += `<li>${m}</li>`);
+        out += "</ul>";
+    }
+
+    if (A.length === 0) {
+        A.push("Neutropenic fever evaluation – limited data; risk status uncertain.");
+    }
+
+    if (P.length === 0) {
+        P.push("Clarify vitals, ANC, expected duration, and organ dysfunction; start empiric therapy per local protocol if febrile and neutropenic.");
+    }
+
+    /* EMR output */
+    let emr = "Assessment:\n";
+    A.forEach(a => emr += `• ${a}\n`);
+
+    emr += "\nPlan:\n";
+    P.forEach(p => emr += `• ${p}\n`);
+
+    if (missing.length > 0) {
+        emr += "\nSuggested additional data:\n";
+        missing.forEach(m => emr += `• ${m}\n`);
+    }
+
+    document.getElementById("result").innerHTML = out;
+    document.getElementById("result").style.display = "block";
+    document.getElementById("emrText").textContent = emr;
+    document.getElementById("emrBox").style.display = "block";
+}
+
+function copyEMR(){
+    navigator.clipboard.writeText(
+        document.getElementById("emrText").textContent
+    );
+}
+</script>
+
+</body>
+</html>
