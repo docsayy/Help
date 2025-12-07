@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARDS Diagnosis & Severity Tool – Critical Care</title>
+
+<style>
+:root {
+    --bg:#e0f7fa;
+    --card:#ffffff;
+    --accent:#00838f;
+    --accent-soft:#b2ebf2;
+    --muted:#546e7a;
+    --radius:14px;
+}
+body {
+    margin:0;
+    font-family:system-ui,sans-serif;
+    background:radial-gradient(circle at top,#b2ebf2 0,#e0f7fa 40%,#e0f2f1 100%);
+}
+header {
+    background:linear-gradient(90deg,#00acc1,#00838f);
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    color:white;
+}
+header h1 { margin:0;font-size:1.25rem; }
+.nav-buttons a {
+    text-decoration:none;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:.9rem;
+    color:white;
+    border:1px solid rgba(255,255,255,0.8);
+    margin-left:6px;
+}
+main {
+    max-width:900px;
+    margin:20px auto;
+    padding:0 12px;
+}
+.card {
+    background:var(--card);
+    padding:18px;
+    border-radius:var(--radius);
+    margin-bottom:18px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.1);
+}
+h2 {
+    margin:0 0 8px;
+    font-size:1.2rem;
+    color:#004d5a;
+}
+.subtitle { color:var(--muted);margin-bottom:14px; }
+
+label { display:block;margin-bottom:6px; }
+input,select {
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #cfd8dc;
+}
+.grid-2 {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
+}
+.btn-primary {
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:999px;
+    background:var(--accent);
+    color:white;
+    font-weight:600;
+    margin-top:12px;
+    cursor:pointer;
+}
+.plan-box {
+    background:#f1ffff;
+    border:1px dashed var(--accent);
+    padding:14px;
+    border-radius:12px;
+    white-space:pre-line;
+}
+.copy-btn {
+    margin-top:10px;
+    background:#eceff1;
+    padding:10px 16px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌬️ ARDS Diagnosis & Severity Tool</h1>
+    <div class="nav-buttons">
+        <a href="../home.html">🏠 Home</a>
+        <a href="../critical_care.html">⬅ Critical Care</a>
+    </div>
+</header>
+
+<main>
+
+<div class="card">
+    <h2>ARDS Inputs</h2>
+    <p class="subtitle">Enter values to diagnose ARDS and determine severity.</p>
+
+    <div class="grid-2">
+
+        <div>
+            <label>PaO₂ (mmHg)</label>
+            <input type="number" id="pao2" placeholder="e.g. 70">
+        </div>
+
+        <div>
+            <label>FiO₂ (%)</label>
+            <input type="number" id="fio2" placeholder="e.g. 80">
+        </div>
+
+        <div>
+            <label>PEEP (cmH₂O)</label>
+            <input type="number" id="peep" placeholder="e.g. 10">
+        </div>
+
+        <div>
+            <label>Onset within 1 week of insult?</label>
+            <select id="onset">
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Bilateral opacities on imaging?</label>
+            <select id="imaging">
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Not explained by cardiac failure?</label>
+            <select id="cardiac">
+                <option value="">Select...</option>
+                <option value="yes">Yes (not cardiac)</option>
+                <option value="no">No (cardiac cause)</option>
+            </select>
+        </div>
+
+    </div>
+
+    <button class="btn-primary" onclick="calculateARDS()">Diagnose ARDS</button>
+</div>
+
+<div class="card" id="results" style="display:none;">
+    <h2>Results</h2>
+    <div id="plan" class="plan-box"></div>
+    <button class="copy-btn" onclick="copyPlan()">📋 Copy</button>
+</div>
+
+</main>
+
+<script>
+let lastPlan = "";
+
+function calculateARDS() {
+    const pao2 = parseFloat(document.getElementById("pao2").value);
+    const fio2 = parseFloat(document.getElementById("fio2").value);
+    const peep = parseFloat(document.getElementById("peep").value);
+
+    const onset = document.getElementById("onset").value;
+    const imaging = document.getElementById("imaging").value;
+    const cardiac = document.getElementById("cardiac").value;
+
+    let plan = "";
+
+    if (isNaN(pao2) || isNaN(fio2) || isNaN(peep)) {
+        plan = "Please enter PaO₂, FiO₂, and PEEP.";
+        show(plan);
+        return;
+    }
+
+    const pfr = pao2 / (fio2 / 100);
+
+    plan += "P/F RATIO: " + pfr.toFixed(0) + "\n\n";
+
+    let ards = true;
+
+    if (onset !== "yes") ards = false;
+    if (imaging !== "yes") ards = false;
+    if (cardiac !== "yes") ards = false;
+    if (peep < 5) ards = false;
+
+    if (!ards) {
+        plan += "ARDS criteria NOT met.\n";
+        lastPlan = plan;
+        show(plan);
+        return;
+    }
+
+    // ARDS severity
+    plan += "ARDS DIAGNOSIS CONFIRMED\n\n";
+
+    if (pfr > 200) plan += "Severity: ⭐ MILD ARDS (P/F 201–300)\n\n";
+    else if (pfr > 100) plan += "Severity: ⭐⭐ MODERATE ARDS (P/F 101–200)\n\n";
+    else plan += "Severity: ⭐⭐⭐ SEVERE ARDS (P/F ≤100)\n\n";
+
+    plan += "MANAGEMENT RECOMMENDATIONS\n";
+
+    plan += "• Low tidal volume ventilation: 6 mL/kg PBW\n";
+    plan += "• Keep plateau pressure < 30 cmH₂O\n";
+    plan += "• Use ARDSnet PEEP/FiO₂ table\n";
+
+    if (pfr < 150) {
+        plan += "• Strongly consider prone positioning\n";
+    }
+    if (pfr < 100) {
+        plan += "• Consider neuromuscular blockade (CI for 24–48 hrs)\n";
+        plan += "• Evaluate for ECMO availability\n";
+    }
+
+    plan += "• Conservative fluids\n";
+    plan += "• Avoid hyperoxia — keep SpO₂ 88–95%\n";
+
+    lastPlan = plan;
+    show(plan);
+}
+
+function show(text) {
+    document.getElementById("plan").innerText = text;
+    document.getElementById("results").style.display = "block";
+}
+
+function copyPlan() {
+    navigator.clipboard.writeText(lastPlan)
+        .then(() => alert("Copied!"))
+        .catch(() => alert("Unable to copy."));
+}
+</script>
+
+</body>
+</html>
