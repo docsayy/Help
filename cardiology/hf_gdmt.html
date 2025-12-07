@@ -1,1 +1,509 @@
-HF
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HFrEF GDMT Tool – Cardiology</title>
+<style>
+:root{
+  --bg:#020617;
+  --card:#0b1120;
+  --accent:#f97316;
+  --accent-soft:rgba(249,115,22,0.16);
+  --muted:#9ca3af;
+  --border:rgba(148,163,184,0.35);
+  --radius:16px;
+  --pad:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top,rgba(248,113,22,0.22),transparent 50%),
+    radial-gradient(circle at bottom,#020617,#020617 55%);
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  color:#e5e7eb;
+  display:flex;
+  justify-content:center;
+  padding:14px;
+}
+main{
+  width:100%;
+  max-width:1100px;
+}
+header{
+  margin-bottom:14px;
+}
+h1{
+  margin:0 0 4px;
+  font-size:1.6rem;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+h1 .icon{
+  font-size:1.6rem;
+}
+header p{
+  margin:0;
+  font-size:0.9rem;
+  color:var(--muted);
+}
+.tag-row{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+.tag{
+  font-size:0.75rem;
+  padding:3px 7px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,0.5);
+  color:var(--muted);
+  background:rgba(15,23,42,0.9);
+}
+.grid{
+  display:grid;
+  gap:14px;
+}
+@media(min-width:880px){
+  .grid{
+    grid-template-columns:1.2fr 1fr;
+  }
+}
+.card{
+  background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(15,23,42,0.99));
+  border:1px solid var(--border);
+  padding:var(--pad);
+  border-radius:var(--radius);
+  box-shadow:0 18px 40px rgba(0,0,0,0.7);
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-45%;
+  background:
+    radial-gradient(circle at 0 0,rgba(248,113,113,0.16),transparent 55%),
+    radial-gradient(circle at 100% 100%,rgba(249,115,22,0.22),transparent 55%);
+  opacity:0.7;
+  pointer-events:none;
+}
+.card-inner{
+  position:relative;
+  z-index:1;
+}
+.card h2{
+  margin:0 0 4px;
+  font-size:1.1rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.badge{
+  font-size:0.7rem;
+  padding:3px 7px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:#fed7aa;
+  border:1px solid rgba(248,250,252,0.1);
+}
+.subtitle{
+  font-size:0.85rem;
+  color:var(--muted);
+  margin:0 0 8px;
+}
+form{
+  display:grid;
+  gap:8px;
+}
+.field{
+  display:flex;
+  flex-direction:column;
+  font-size:0.85rem;
+}
+input,select{
+  margin-top:3px;
+  padding:7px 8px;
+  border-radius:9px;
+  border:1px solid rgba(148,163,184,0.5);
+  background:rgba(15,23,42,0.95);
+  color:#e5e7eb;
+}
+.checkbox-group{
+  display:grid;
+  gap:4px;
+  font-size:0.82rem;
+  margin-top:4px;
+}
+.btn-row{
+  margin-top:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+button{
+  border-radius:999px;
+  border:none;
+  padding:8px 15px;
+  font-size:0.85rem;
+  font-weight:600;
+  cursor:pointer;
+  background:radial-gradient(circle at 0 0,#fed7aa,#fb923c 40%,#ea580c 100%);
+  color:#111827;
+  box-shadow:0 10px 26px rgba(248,113,22,0.55);
+  transition:0.08s;
+}
+button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+}
+button.secondary{
+  border:1px solid rgba(148,163,184,0.6);
+  background:transparent;
+  color:#e5e7eb;
+  box-shadow:none;
+}
+.result{
+  display:grid;
+  gap:10px;
+}
+.block{
+  background:rgba(15,23,42,0.92);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,0.45);
+}
+.block-title{
+  font-weight:700;
+  margin-bottom:4px;
+  font-size:0.9rem;
+}
+.pill-row{
+  margin-top:4px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.pill{
+  font-size:0.72rem;
+  padding:3px 6px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,0.5);
+}
+footer{
+  margin-top:14px;
+  font-size:0.75rem;
+  color:var(--muted);
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1><span class="icon">🫀</span> HFrEF GDMT Helper</h1>
+  <p>Guides ARNI/ACEI → BB → MRA → SGLT2i + diuretics based on EF, vitals, kidney function, and symptoms.</p>
+  <div class="tag-row">
+    <span class="tag">Cardiology theme</span>
+    <span class="tag">GDMT pillars</span>
+    <span class="tag">Dark mode</span>
+  </div>
+</header>
+
+<section class="grid">
+
+  <!-- INPUT SIDE -->
+  <article class="card">
+    <div class="card-inner">
+      <h2>Patient Profile <span class="badge">Inputs</span></h2>
+      <p class="subtitle">Enter the key clinical values for GDMT decisions.</p>
+
+      <form id="hf-form">
+
+        <div class="field">
+          <label for="ef">Ejection Fraction (%)</label>
+          <input id="ef" type="number" min="5" max="70" placeholder="e.g. 25">
+        </div>
+
+        <div class="field">
+          <label for="nyha">NYHA class</label>
+          <select id="nyha">
+            <option value="1">I</option>
+            <option value="2" selected>II</option>
+            <option value="3">III</option>
+            <option value="4">IV</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="sbp">Systolic BP (mmHg)</label>
+          <input id="sbp" type="number" min="60" max="200" placeholder="e.g. 102">
+        </div>
+
+        <div class="field">
+          <label for="hr">Heart rate (bpm)</label>
+          <input id="hr" type="number" min="30" max="160" placeholder="e.g. 78">
+        </div>
+
+        <div class="field">
+          <label for="cr">Creatinine (mg/dL)</label>
+          <input id="cr" type="number" step="0.1" min="0.3" max="10" placeholder="e.g. 1.2">
+        </div>
+
+        <div class="field">
+          <label for="egfr">eGFR (ml/min)</label>
+          <input id="egfr" type="number" min="5" max="150" placeholder="e.g. 55">
+        </div>
+
+        <div class="field">
+          <label for="k">Potassium (K+)</label>
+          <input id="k" type="number" min="2" max="7" step="0.1" placeholder="e.g. 4.7">
+        </div>
+
+        <div class="field">
+          <label>Volume status</label>
+          <select id="volume">
+            <option value="eu">Euvolemic</option>
+            <option value="hyper">Congested / fluid overload</option>
+            <option value="hypo">Dry / suspected hypovolemia</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Comorbidities / flags</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="af"> Atrial fibrillation</label>
+            <label><input type="checkbox" id="asthma"> Asthma/COPD (avoid carvedilol if severe)</label>
+            <label><input type="checkbox" id="acecough"> ACEI cough history</label>
+            <label><input type="checkbox" id="hyperkalemia"> History recurrent hyperkalemia</label>
+            <label><input type="checkbox" id="ckddialysis"> CKD stage 4–5 / dialysis</label>
+            <label><input type="checkbox" id="symhypo"> Symptomatic hypotension</label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit">Generate GDMT Plan</button>
+          <button type="button" class="secondary" id="reset">Reset</button>
+        </div>
+      </form>
+
+    </div>
+  </article>
+
+  <!-- OUTPUT SIDE -->
+  <article class="card">
+    <div class="card-inner">
+      <h2>GDMT Recommendations <span class="badge">Output</span></h2>
+      <p class="subtitle">Pillars with dosing guidance & cautions.</p>
+
+      <div id="result" class="result">
+        <div class="block">
+          <div class="block-title">Enter patient data to view GDMT recommendations.</div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<footer>
+Educational support only — confirm with ACC/AHA HF guidelines & local protocols.
+</footer>
+
+</main>
+
+<script>
+document.getElementById("hf-form").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const EF = Number(document.getElementById("ef").value || NaN);
+  const NYHA = Number(document.getElementById("nyha").value);
+  const SBP = Number(document.getElementById("sbp").value || NaN);
+  const HR = Number(document.getElementById("hr").value || NaN);
+  const Cr = Number(document.getElementById("cr").value || NaN);
+  const eGFR = Number(document.getElementById("egfr").value || NaN);
+  const K = Number(document.getElementById("k").value || NaN);
+  const vol = document.getElementById("volume").value;
+
+  const AF = document.getElementById("af").checked;
+  const COPD = document.getElementById("asthma").checked;
+  const ACEcough = document.getElementById("acecough").checked;
+  const hyperK = document.getElementById("hyperkalemia").checked;
+  const dialysis = document.getElementById("ckddialysis").checked;
+  const hypo = document.getElementById("symhypo").checked;
+
+  let output = "";
+
+  /* ------------------
+     1. ARNI / ACEI / ARB
+     ------------------ */
+  let arniBlock = `
+    <div class="block">
+      <div class="block-title">1. ARNI / ACEI / ARB</div>
+  `;
+
+  if (SBP < 95 || hypo) {
+    arniBlock += `
+      <div>• Low SBP or symptomatic hypotension → <strong>delay or start at very low dose</strong>.</div>
+      <div>• Prefer ACEI/ARB over ARNI initially if unstable.</div>
+    `;
+  } else if (ACEcough) {
+    arniBlock += `
+      <div>• ACEI cough → consider <strong>ARB</strong> or <strong>ARNI</strong> if BP allows.</div>
+    `;
+  } else {
+    arniBlock += `
+      <div>• If BP stable → <strong>Start ARNI (sacubitril/valsartan)</strong> if possible.</div>
+      <div>• If not available or not tolerated → ACEI or ARB.</div>
+    `;
+  }
+
+  arniBlock += `
+      <div class="pill-row">
+        <span class="pill">ARNI start: 24/26 mg BID</span>
+        <span class="pill">Target: 97/103 mg BID</span>
+        <span class="pill">Enalapril start: 2.5 mg BID</span>
+        <span class="pill">Losartan start: 25–50 mg daily</span>
+      </div>
+    </div>
+  `;
+  output += arniBlock;
+
+
+  /* ------------------
+     2. Beta-blocker
+     ------------------ */
+  let bbBlock = `
+    <div class="block">
+      <div class="block-title">2. Beta-blocker</div>
+  `;
+
+  if (HR < 55) {
+    bbBlock += `<div>• HR <55 → use caution, start minimal dose or delay.</div>`;
+  }
+  if (COPD) {
+    bbBlock += `<div>• COPD/asthma → prefer <strong>metoprolol succinate</strong> or <strong>bisoprolol</strong> over carvedilol.</div>`;
+  }
+  bbBlock += `
+      <div>• Evidence-based options: <strong>metoprolol succinate, carvedilol, bisoprolol</strong>.</div>
+      <div class="pill-row">
+        <span class="pill">Carvedilol 3.125 mg BID → 25 mg BID</span>
+        <span class="pill">Metoprolol succinate 12.5–25 mg → 200 mg daily</span>
+        <span class="pill">Bisoprolol 1.25 mg → 10 mg daily</span>
+      </div>
+    </div>
+  `;
+  output += bbBlock;
+
+
+  /* ------------------
+     3. MRA
+     ------------------ */
+  let mraBlock = `
+    <div class="block">
+      <div class="block-title">3. Mineralocorticoid Receptor Antagonist (MRA)</div>
+  `;
+
+  if (K > 5.0 || hyperK) {
+    mraBlock += `<div>• K>5 or recurrent hyperkalemia → <strong>avoid or monitor extremely closely</strong>.</div>`;
+  } else if (eGFR < 30 || dialysis) {
+    mraBlock += `<div>• eGFR <30 or dialysis → MRA generally <strong>not recommended</strong>.</div>`;
+  } else {
+    mraBlock += `<div>• Good candidate for MRA (spironolactone or eplerenone).</div>`;
+  }
+
+  mraBlock += `
+      <div class="pill-row">
+        <span class="pill">Spironolactone 12.5–25 mg daily</span>
+        <span class="pill">Eplerenone 25 mg daily</span>
+      </div>
+    </div>
+  `;
+  output += mraBlock;
+
+
+  /* ------------------
+     4. SGLT2 Inhibitor
+     ------------------ */
+  let sglt2Block = `
+    <div class="block">
+      <div class="block-title">4. SGLT2 inhibitor</div>
+  `;
+
+  if (eGFR < 20) {
+    sglt2Block += `<div>• eGFR<20 → limited data; consider specialist input.</div>`;
+  } else {
+    sglt2Block += `<div>• Can start <strong>dapagliflozin 10 mg</strong> or <strong>empagliflozin 10 mg</strong> daily regardless of diabetes.</div>`;
+  }
+
+  sglt2Block += `
+      <div class="pill-row">
+        <span class="pill">Dapagliflozin 10 mg</span>
+        <span class="pill">Empagliflozin 10 mg</span>
+      </div>
+    </div>
+  `;
+  output += sglt2Block;
+
+
+  /* ------------------
+     5. Diuretics
+     ------------------ */
+  let diBlock = `
+    <div class="block">
+      <div class="block-title">5. Diuretics</div>
+  `;
+
+  if (vol === "hyper") {
+    diBlock += `<div>• Volume overload → IV or higher dose loop diuretic.</div>`;
+  } else if (vol === "hypo") {
+    diBlock += `<div>• Suspected hypovolemia → reduce diuretic dose.</div>`;
+  } else {
+    diBlock += `<div>• Euvolemic → continue home dose or low-dose loop.</div>`;
+  }
+
+  diBlock += `
+      <div class="pill-row">
+        <span class="pill">Furosemide 20–40 mg</span>
+        <span class="pill">Torsemide 10–20 mg</span>
+      </div>
+    </div>
+  `;
+  output += diBlock;
+
+
+  /* ------------------
+     6. AF considerations
+     ------------------ */
+  if (AF){
+    output += `
+    <div class="block">
+      <div class="block-title">Atrial Fibrillation Considerations</div>
+      <div>• Optimize rate control (BB preferred).</div>
+      <div>• Consider rhythm control if symptoms persist.</div>
+      <div>• Anticoagulation per CHA₂DS₂-VASc (see AF tool).</div>
+    </div>
+    `;
+  }
+
+  document.getElementById("result").innerHTML = output;
+});
+
+/* -------------------------
+   Reset
+-------------------------- */
+document.getElementById("reset").addEventListener("click",()=>{
+  document.getElementById("hf-form").reset();
+  document.getElementById("result").innerHTML = `
+    <div class="block">
+      <div class="block-title">Enter patient data to view GDMT recommendations.</div>
+    </div>`;
+});
+</script>
+
+</body>
+</html>
