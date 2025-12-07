@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventilator Mode Selector – Critical Care</title>
+
+<style>
+:root {
+    --bg: #e0f7fa;
+    --card: #ffffff;
+    --accent: #00838f;
+    --accent-soft: #b2ebf2;
+    --muted: #546e7a;
+    --radius: 14px;
+}
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: radial-gradient(circle at top, #b2ebf2 0, #e0f7fa 40%, #e0f2f1 100%);
+}
+header {
+    background: linear-gradient(90deg, #00acc1, #00838f);
+    padding: 16px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+header h1 { margin: 0; font-size: 1.25rem; }
+.nav-buttons a {
+    margin-left: 6px;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: white;
+    font-size: .9rem;
+    border: 1px solid rgba(255,255,255,0.8);
+}
+main { max-width: 900px; margin: 20px auto; padding: 0 12px; }
+.card {
+    background: var(--card);
+    padding: 18px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+h2 { margin: 0 0 6px; color: #004d5a; }
+.subtitle { margin: 0 0 14px; color: var(--muted); }
+
+label { display: block; margin-bottom: 6px; color: #37474f; font-size: .9rem; }
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #cfd8dc;
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap: 12px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 12px;
+    width: 100%;
+    margin-top: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.plan-box {
+    background: #f1ffff;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px dashed var(--accent);
+    white-space: pre-line;
+}
+.copy-btn {
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: #eceff1;
+    border: none;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🫁 Ventilator Mode Selector</h1>
+    <div class="nav-buttons">
+        <a href="../home.html">🏠 Home</a>
+        <a href="../critical_care.html">⬅ Critical Care</a>
+    </div>
+</header>
+
+<main>
+
+    <div class="card">
+        <h2>Patient Data</h2>
+        <p class="subtitle">Enter clinical context to determine optimal ventilator strategy</p>
+
+        <div class="grid-2">
+
+            <div>
+                <label>Gender</label>
+                <select id="gender">
+                    <option value="">Select...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Height (cm)</label>
+                <input type="number" id="height" placeholder="e.g. 175">
+            </div>
+
+            <div>
+                <label>Primary Clinical Situation</label>
+                <select id="situation">
+                    <option value="">Select...</option>
+                    <option value="ards">ARDS / Severe hypoxemia</option>
+                    <option value="copd">COPD / Asthma</option>
+                    <option value="neuro">Neurologic injury / ICP</option>
+                    <option value="metabolic">Metabolic acidosis</option>
+                    <option value="shock">Shock / Hemodynamic instability</option>
+                    <option value="postop">Post-operative / routine</option>
+                    <option value="general">General hypoxic respiratory failure</option>
+                </select>
+            </div>
+
+            <div>
+                <label>pH (optional)</label>
+                <input type="number" step="0.01" id="ph" placeholder="e.g. 7.18">
+            </div>
+
+            <div>
+                <label>PaCO₂ (optional)</label>
+                <input type="number" id="pco2" placeholder="e.g. 55">
+            </div>
+
+            <div>
+                <label>FiO₂ (current)</label>
+                <input type="number" id="fio2" placeholder="e.g. 80">
+            </div>
+
+            <div>
+                <label>PEEP (current)</label>
+                <input type="number" id="peep" placeholder="e.g. 5">
+            </div>
+
+        </div>
+
+        <button class="btn-primary" onclick="generateVentPlan()">Generate Vent Strategy</button>
+    </div>
+
+    <div class="card" id="results" style="display:none;">
+        <h2>Recommended Ventilator Settings</h2>
+        <div id="plan" class="plan-box"></div>
+        <button class="copy-btn" onclick="copyPlan()">📋 Copy Plan</button>
+    </div>
+
+</main>
+
+<script>
+let lastPlan = "";
+
+function PBW(gender, height) {
+    if (!gender || !height) return null;
+    return gender === "male"
+        ? 50 + 0.91 * (height - 152.4)
+        : 45.5 + 0.91 * (height - 152.4);
+}
+
+function generateVentPlan() {
+    const gender = document.getElementById("gender").value;
+    const height = parseFloat(document.getElementById("height").value);
+    const situation = document.getElementById("situation").value;
+
+    let ph = parseFloat(document.getElementById("ph").value);
+    let pco2 = parseFloat(document.getElementById("pco2").value);
+
+    const pbw = PBW(gender, height);
+
+    let plan = "";
+
+    plan += "VENTILATOR STRATEGY\n\n";
+
+    if (!pbw) {
+        plan += "• PBW cannot be calculated — need gender + height.\n\n";
+    } else {
+        plan += "Predicted Body Weight (PBW): " + pbw.toFixed(1) + " kg\n";
+        plan += "Suggested Tidal Volume Range:\n";
+        plan += "• 6 mL/kg → " + (pbw * 6).toFixed(0) + " mL\n";
+        plan += "• 8 mL/kg → " + (pbw * 8).toFixed(0) + " mL\n\n";
+    }
+
+    // MODE selection
+    let mode = "Volume Control (VC)";
+    let rr = 16;
+    let peep = 5;
+    let fio2 = 100;
+
+    let notes = [];
+
+    switch (situation) {
+
+        case "ards":
+            mode = "Volume Control (AC/VC)";
+            notes.push("ARDS → MUST use low tidal volume (6 mL/kg PBW).");
+            notes.push("High PEEP/FiO₂ ladder recommended.");
+            peep = 10;
+            fio2 = 100;
+            rr = 22;
+            break;
+
+        case "copd":
+            mode = "Volume Control or Pressure Control";
+            notes.push("COPD/Asthma → avoid auto-PEEP.");
+            notes.push("Use long I:E ratio (1:3 to 1:5).");
+            rr = 10–12;
+            peep = 5 or lower;
+            fio2 = 40–60;
+            break;
+
+        case "neuro":
+            mode = "Volume Control (AC/VC)";
+            notes.push("Neuro injury → maintain PaCO₂ 35–40.");
+            notes.push("Avoid hypoxia and hyperventilation unless herniation.");
+            rr = 14;
+            peep = 5;
+            fio2 = 40–60;
+            break;
+
+        case "metabolic":
+            mode = "Volume Control (AC/VC)";
+            notes.push("Metabolic acidosis → high minute ventilation.");
+            notes.push("Increase RR to maintain compensatory hyperventilation.");
+            rr = 22–28;
+            peep = 5;
+            fio2 = 40–60;
+            break;
+
+        case "shock":
+            mode = "AC/VC or Pressure Control";
+            notes.push("Shock → avoid excessive PEEP; avoid overly high Vt.");
+            rr = 16;
+            peep = 5;
+            fio2 = 60–100;
+            break;
+
+        case "postop":
+            mode = "Volume Control (AC/VC)";
+            notes.push("Routine postop → simple VC mode okay.");
+            rr = 14;
+            peep = 5;
+            fio2 = 40;
+            break;
+
+        case "general":
+            mode = "Volume Control (AC/VC)";
+            notes.push("General hypoxic respiratory failure → VC appropriate.");
+            rr = 16;
+            peep = 5–8;
+            fio2 = 60–100;
+            break;
+
+        default:
+            notes.push("No scenario selected.");
+    }
+
+    plan += "Recommended Mode: " + mode + "\n";
+    plan += "Suggested RR: " + rr + " breaths/min\n";
+    plan += "Initial PEEP: " + peep + " cmH₂O\n";
+    plan += "Initial FiO₂: " + fio2 + "%\n\n";
+
+    plan += "Rationale:\n";
+    notes.forEach(n => plan += "• " + n + "\n");
+
+    lastPlan = plan;
+    document.getElementById("plan").innerText = plan;
+    document.getElementById("results").style.display = "block";
+}
+
+function copyPlan() {
+    navigator.clipboard.writeText(lastPlan)
+        .then(() => alert("Plan copied!"));
+}
+</script>
+
+</body>
+</html>
