@@ -1,1 +1,1447 @@
-infectious_disease/sepsis_tool.html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SIRS • Sepsis • Septic Shock Wizard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --accent: #06b6d4; /* teal */
+      --accent-soft: #e0f7fa;
+      --accent-strong: #0284c7;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --border-subtle: #d1d5db;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 12px 28px rgba(6, 182, 212, 0.18);
+      --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top left, #e0f7fa 0, #f3f4f6 40%, #ffffff 100%);
+      color: var(--text-main);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 20px 12px 32px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 20px 60px rgba(6, 182, 212, 0.2);
+      backdrop-filter: blur(16px);
+      padding: 20px 18px 26px;
+    }
+
+    @media (min-width: 768px) {
+      .app-shell {
+        padding: 24px 28px 32px;
+      }
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 16px;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .title-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .system-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 20px;
+      background: radial-gradient(circle at 25% 20%, #ffffff 0, #a5f3fc 40%, #06b6d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 12px 28px rgba(6, 182, 212, 0.4);
+      flex-shrink: 0;
+    }
+
+    .title-text h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .title-text p {
+      margin: 6px 0 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: #f9fafb;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-subtle);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+      background: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+      box-shadow: 0 14px 32px rgba(14, 165, 233, 0.4);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .section-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 900px) {
+      .section-row {
+        grid-template-columns: 1.05fr 1.05fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.16), transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-header {
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-header p {
+      margin: 4px 0 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: #e0f2fe;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      border: 1px solid #bfdbfe;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px 12px;
+    }
+
+    @media (min-width: 640px) {
+      .form-grid.two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 3px;
+      color: #0f172a;
+    }
+
+    .field {
+      margin-bottom: 6px;
+    }
+
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #f9fafb;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.3);
+      background: #ffffff;
+    }
+
+    .checkbox-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      margin-top: 4px;
+    }
+
+    .check-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #f9fafb;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .check-pill input {
+      margin: 0;
+    }
+
+    .check-pill:hover {
+      background: #eef2ff;
+      border-color: #a5b4fc;
+      box-shadow: 0 3px 8px rgba(129, 140, 248, 0.3);
+    }
+
+    .subtle-note {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 6px 0 6px;
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-run {
+      padding: 9px 18px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(6, 182, 212, 0.4);
+      background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    }
+
+    .btn-secondary {
+      border-radius: var(--radius-pill);
+      padding: 7px 14px;
+      border: 1px solid #bae6fd;
+      background: #ecfeff;
+      color: #0369a1;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(6, 182, 212, 0.16);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(6, 182, 212, 0.25);
+      background: #e0f7fa;
+    }
+
+    .results-card {
+      margin-top: 6px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 900px) {
+      .results-grid {
+        grid-template-columns: 1.05fr 1fr;
+      }
+    }
+
+    .results-section h3 {
+      margin: 0 0 4px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .results-section h4 {
+      margin: 6px 0 2px;
+      font-size: 0.9rem;
+    }
+
+    .results-section p,
+    .results-section li {
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .tagline {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      font-size: 0.75rem;
+    }
+
+    ul {
+      padding-left: 18px;
+      margin: 4px 0 4px;
+    }
+
+    footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      max-width: 620px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+      border: 1px solid #d1d5db;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .modal-header button {
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .modal-body {
+      margin-bottom: 8px;
+    }
+
+    .modal-body textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.8rem;
+      padding: 8px;
+      resize: vertical;
+      min-height: 180px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #f9fafb;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .copy-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="title-block">
+        <div class="system-icon" aria-hidden="true">⚡</div>
+        <div class="title-text">
+          <h1>SIRS • Sepsis • Septic Shock Wizard</h1>
+          <div class="badge">
+            🦠 Infectious Disease • Hemodynamic &amp; bundle helper
+          </div>
+          <p>
+            Structured assessment of SIRS, qSOFA, Sepsis-3, and septic shock with a fluid, MAP, lactate, and antibiotic bundle you can copy into your note.
+          </p>
+        </div>
+      </div>
+      <nav class="nav-buttons" aria-label="Page navigation">
+        <a href="../index.html" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 3.172 3 10.5V20a1 1 0 0 0 1 1h6v-5h4v5h6a1 1 0 0 0 1-1v-9.5L12 3.172Z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="../infectious_disease.html" class="btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 5.5 5.5 12l1.4 1.4L11 9.3V19h2V9.3l4.1 4.1 1.4-1.4L12 5.5Z"/>
+          </svg>
+          <span>Back to Infectious Disease</span>
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Top row: basics + infection & organ dysfunction -->
+      <div class="section-row">
+        <!-- Patient & vitals -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Patient &amp; Vitals</h2>
+            <p>Core data for SIRS, qSOFA, and shock classification.</p>
+          </div>
+          <div class="form-grid two-col">
+            <div class="field">
+              <label for="age">Age (years)</label>
+              <input type="number" id="age" min="0" max="120">
+            </div>
+            <div class="field">
+              <label for="weight">Weight (kg)</label>
+              <input type="number" id="weight" min="0" max="400">
+              <div class="subtle-note">Used for 30 mL/kg fluid calculation.</div>
+            </div>
+
+            <div class="field">
+              <label for="temp">Temperature (°C)</label>
+              <input type="number" step="0.1" id="temp">
+              <div class="subtle-note">SIRS: &gt;38°C or &lt;36°C.</div>
+            </div>
+            <div class="field">
+              <label for="hr">Heart rate (bpm)</label>
+              <input type="number" id="hr">
+              <div class="subtle-note">SIRS: &gt;90 bpm.</div>
+            </div>
+
+            <div class="field">
+              <label for="rr">Respiratory rate (breaths/min)</label>
+              <input type="number" id="rr">
+              <div class="subtle-note">SIRS: &gt;20; qSOFA: ≥22.</div>
+            </div>
+            <div class="field">
+              <label for="sbp">Systolic BP (mmHg)</label>
+              <input type="number" id="sbp">
+              <div class="subtle-note">qSOFA: ≤100; hypotension for sepsis.</div>
+            </div>
+
+            <div class="field">
+              <label for="map">MAP (mmHg)</label>
+              <input type="number" id="map">
+              <div class="subtle-note">Shock if MAP &lt;65 despite resuscitation.</div>
+            </div>
+            <div class="field">
+              <label for="spo2">SpO₂ (%)</label>
+              <input type="number" id="spo2" min="0" max="100">
+              <div class="subtle-note">Consider O₂ need as organ dysfunction.</div>
+            </div>
+
+            <div class="field">
+              <label for="wbc">WBC (×10<sup>9</sup>/L)</label>
+              <input type="number" step="0.1" id="wbc">
+              <div class="subtle-note">SIRS: &gt;12 or &lt;4.</div>
+            </div>
+            <div class="field">
+              <label for="bands">Bands (%)</label>
+              <input type="number" step="0.1" id="bands">
+              <div class="subtle-note">SIRS: &gt;10% bands.</div>
+            </div>
+
+            <div class="field">
+              <label for="lactate">Lactate (mmol/L)</label>
+              <input type="number" step="0.1" id="lactate">
+              <div class="subtle-note">≥2: organ dysfunction; ≥4: high-risk, drives fluids.</div>
+            </div>
+            <div class="field">
+              <label for="uop">Urine output last 6 h (mL)</label>
+              <input type="number" id="uop">
+              <div class="subtle-note">Oliguria suggests renal dysfunction.</div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Neurologic status</label>
+              <div class="checkbox-row">
+                <label class="check-pill">
+                  <input type="checkbox" id="altered-mental">
+                  <span>Altered mentation (confusion, GCS &lt;15)</span>
+                </label>
+              </div>
+              <div class="subtle-note">
+                qSOFA uses “altered mentation” as one of three criteria.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Infection, organ dysfunction, risk -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Infection, Organ Dysfunction &amp; Risk</h2>
+            <p>Sepsis-3 uses infection + organ dysfunction (SOFA ≥2). This tool uses pragmatic surrogates.</p>
+          </div>
+
+          <div class="field">
+            <label>Is infection suspected?</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="infection-suspected">
+                <span>Suspected / confirmed infection</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Without suspected infection, SIRS/qSOFA may reflect non-infectious causes (e.g., pancreatitis, trauma).
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="field">
+            <label>Organ dysfunction features (check any new/worsening)</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="ofd-hypotension">
+                <span>Hypotension (SBP &lt;90 or MAP &lt;65)</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="ofd-oxygen">
+                <span>New O₂ requirement / escalating O₂</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="ofd-renal">
+                <span>Renal: rising Cr / oliguria</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="ofd-hepatic">
+                <span>Hepatic: Tbili &gt;2, INR &gt;1.5</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="ofd-heme">
+                <span>Heme: Plt &lt;100k, DIC concern</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Any of these plus infection supports “sepsis” by Sepsis-3 (SOFA ≥2 equivalent).
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Vasopressors &amp; fluids</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="fluids-30mlkg">
+                <span>Received ≥30 mL/kg crystalloid</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="on-pressors">
+                <span>On vasopressors to keep MAP ≥65</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              Septic shock: sepsis + pressors for MAP ≥65 + lactate ≥2 after fluids.
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="field">
+            <label>High-risk host factors</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="risk-immuno">
+                <span>Immunocompromised</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="risk-neutropenia">
+                <span>Neutropenia</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="risk-liver">
+                <span>Advanced liver disease</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="risk-preg">
+                <span>Pregnancy</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="risk-age-elderly">
+                <span>Older adult / frail</span>
+              </label>
+            </div>
+            <div class="subtle-note">
+              These lower threshold for ICU, aggressive monitoring, and early ID/critical care involvement.
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Second row: scoring + suspected source -->
+      <div class="section-row">
+        <!-- Scores card -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Scoring Snapshot</h2>
+            <p>Tool will calculate SIRS count, qSOFA, and classify sepsis vs septic shock.</p>
+          </div>
+          <div class="form-grid two-col">
+            <div class="field">
+              <label>Auto-calculated scores</label>
+              <p class="subtle-note">
+                After clicking “Generate assessment &amp; bundle,” you’ll see:
+              </p>
+              <ul>
+                <li>SIRS criteria (0–4+)</li>
+                <li>qSOFA score (0–3)</li>
+                <li>Classification: no sepsis / sepsis / septic shock</li>
+              </ul>
+            </div>
+            <div class="field">
+              <label>Clinical hints</label>
+              <ul>
+                <li>SIRS ≥2 + infection = “sepsis” in older definitions.</li>
+                <li>Sepsis-3: infection + organ dysfunction.</li>
+                <li>Shock: sepsis + MAP &lt;65 on pressors + lactate ≥2 after fluids.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Suspected source card -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Suspected Source &amp; Comments</h2>
+            <p>Pairs well with your Antibiotic Wizard and site-specific tools.</p>
+          </div>
+          <div class="field">
+            <label>Likely source (select all that apply)</label>
+            <div class="checkbox-row">
+              <label class="check-pill">
+                <input type="checkbox" id="src-lung">
+                <span>🫁 Lung (pneumonia)</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="src-uti">
+                <span>💧 Urinary tract</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="src-abd">
+                <span>🫙 Intra-abdominal</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="src-skin">
+                <span>🩹 Skin / soft tissue</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="src-line">
+                <span>💉 Line / device</span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" id="src-other">
+                <span>❓ Other / unclear</span>
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="notes">Clinical note (optional)</label>
+            <textarea id="notes" placeholder="e.g., hypotension with suspected pneumonia; already received 1 L LR; on low-dose norepinephrine."></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row">
+        <button type="button" class="btn-run" onclick="runSepsisWizard()">
+          <span>Generate assessment &amp; bundle</span> ▸
+        </button>
+        <button type="button" class="btn-secondary" onclick="openCopyModal()">
+          📋 Preview &amp; copy full plan
+        </button>
+      </div>
+
+      <!-- Results -->
+      <section class="card results-card">
+        <div class="card-header">
+          <h2>Assessment, Classification &amp; Sepsis Bundle</h2>
+          <p class="tagline">
+            <span class="chip">⚠️ Not a substitute for bedside clinical judgment</span>
+            Use for cognitive scaffolding; confirm against your local protocols.
+          </p>
+        </div>
+        <div class="results-grid">
+          <div class="results-section">
+            <h3>🧭 Summary &amp; Scores</h3>
+            <div id="summary-content">
+              <p>Enter vitals, labs, and infection status, then click “Generate assessment &amp; bundle.”</p>
+            </div>
+          </div>
+          <div class="results-section">
+            <h3>📦 Sepsis Bundle &amp; Management</h3>
+            <div id="bundle-content">
+              <p>Fluid, MAP, lactate, culture, and antibiotic recommendations will populate here.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div><span class="dot"></span>Light teal ID theme. No dark mode.</div>
+      <div>Bundle derived from Sepsis-3 / Surviving Sepsis principles, simplified for bedside use.</div>
+    </footer>
+  </div>
+
+  <!-- Copy modal -->
+  <div class="modal-overlay" id="copy-modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="copy-modal-title">
+      <div class="modal-header">
+        <h3 id="copy-modal-title">Preview &amp; copy plan</h3>
+        <button type="button" onclick="closeCopyModal()" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="copy-modal-textarea" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <span class="copy-hint">Plain text for notes / sign-out / admission H&amp;P.</span>
+        <button type="button" class="btn-secondary" onclick="copyPlanToClipboard()">Copy to clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPlanText = "";
+
+    function valNum(id) {
+      const v = document.getElementById(id)?.value;
+      if (v === null || v === undefined || v === "") return null;
+      const n = Number(v);
+      return isNaN(n) ? null : n;
+    }
+
+    function isChecked(id) {
+      const el = document.getElementById(id);
+      return !!(el && el.checked);
+    }
+
+    function calcSIRS() {
+      const temp = valNum("temp");
+      const hr = valNum("hr");
+      const rr = valNum("rr");
+      const wbc = valNum("wbc");
+      const bands = valNum("bands");
+
+      let count = 0;
+      const criteria = [];
+
+      if (temp !== null && (temp > 38 || temp < 36)) {
+        count++;
+        criteria.push("Abnormal temperature (T " + temp + "°C)");
+      }
+      if (hr !== null && hr > 90) {
+        count++;
+        criteria.push("Tachycardia (HR " + hr + " bpm)");
+      }
+      if (rr !== null && rr > 20) {
+        count++;
+        criteria.push("Tachypnea (RR " + rr + "/min)");
+      }
+      if (wbc !== null && (wbc > 12 || wbc < 4)) {
+        count++;
+        criteria.push("Abnormal WBC (" + wbc + " ×10⁹/L)");
+      }
+      if (bands !== null && bands > 10) {
+        count++;
+        criteria.push("Bandemia (" + bands + "%)");
+      }
+      return { count, criteria };
+    }
+
+    function calcQsofa() {
+      const rr = valNum("rr");
+      const sbp = valNum("sbp");
+      const altered = isChecked("altered-mental");
+
+      let score = 0;
+      const criteria = [];
+
+      if (rr !== null && rr >= 22) {
+        score++;
+        criteria.push("RR ≥22");
+      }
+      if (sbp !== null && sbp <= 100) {
+        score++;
+        criteria.push("SBP ≤100 mmHg");
+      }
+      if (altered) {
+        score++;
+        criteria.push("Altered mentation");
+      }
+
+      return { score, criteria };
+    }
+
+    function hasOrganDysfunction() {
+      const map = valNum("map");
+      const sbp = valNum("sbp");
+      const lactate = valNum("lactate");
+      const uop = valNum("uop");
+      const wt = valNum("weight");
+
+      const ofdHypotension = isChecked("ofd-hypotension");
+      const ofdO2 = isChecked("ofd-oxygen");
+      const ofdRenal = isChecked("ofd-renal");
+      const ofdHepatic = isChecked("ofd-hepatic");
+      const ofdHeme = isChecked("ofd-heme");
+
+      let organ = false;
+      const features = [];
+
+      if (ofdHypotension || (map !== null && map < 65) || (sbp !== null && sbp < 90)) {
+        organ = true;
+        features.push("Hypotension / low MAP");
+      }
+      if (ofdO2) {
+        organ = true;
+        features.push("New / increased oxygen requirement");
+      }
+      if (ofdRenal) {
+        organ = true;
+        features.push("Renal dysfunction (Cr/oliguria)");
+      }
+      if (ofdHepatic) {
+        organ = true;
+        features.push("Hepatic dysfunction (Tbili/INR)");
+      }
+      if (ofdHeme) {
+        organ = true;
+        features.push("Hematologic dysfunction (platelets/coagulopathy)");
+      }
+
+      if (lactate !== null && lactate >= 2) {
+        organ = true;
+        features.push("Elevated lactate (" + lactate + " mmol/L)");
+      }
+
+      if (uop !== null && wt !== null && wt > 0) {
+        const uopPerKgHr = uop / wt / 6; // approximate
+        if (uopPerKgHr < 0.5) {
+          organ = true;
+          features.push("Oliguria (urine output ~" + uopPerKgHr.toFixed(2) + " mL/kg/h)");
+        }
+      }
+
+      return { organ, features };
+    }
+
+    function classifySepsis() {
+      const infection = isChecked("infection-suspected");
+      const sirs = calcSIRS();
+      const qsofa = calcQsofa();
+      const ofd = hasOrganDysfunction();
+
+      const lactate = valNum("lactate");
+      const onPressors = isChecked("on-pressors");
+      const fluids30 = isChecked("fluids-30mlkg");
+
+      let label = "No sepsis";
+      const notes = [];
+
+      if (!infection) {
+        if (sirs.count >= 2 || qsofa.score >= 1) {
+          label = "Systemic inflammatory response without documented infection";
+          notes.push("SIRS/qSOFA present, but infection not marked as suspected.");
+        } else {
+          label = "No clear sepsis or shock features";
+          notes.push("Neither infection nor significant SIRS/qSOFA present based on entered data.");
+        }
+        return { label, notes, sirs, qsofa, ofd, septicShock: false };
+      }
+
+      // infection suspected
+      if (ofd.organ) {
+        label = "Sepsis (Sepsis-3: infection + organ dysfunction)";
+        notes.push("Infection suspected plus organ dysfunction features consistent with Sepsis-3.");
+      } else if (sirs.count >= 2) {
+        label = "Sepsis (older SIRS-based definition, no clear organ dysfunction)";
+        notes.push("Infection + ≥2 SIRS criteria without clear organ dysfunction features.");
+      } else {
+        label = "Infection without clear sepsis by SIRS/Sepsis-3";
+        notes.push("Infection suspected but limited systemic/organ dysfunction on current data.");
+      }
+
+      let septicShock = false;
+      if (infection && ofd.organ && onPressors && fluids30 && lactate !== null && lactate >= 2) {
+        septicShock = true;
+        label = "Septic shock (Sepsis-3)";
+        notes.push("Infection + organ dysfunction + vasopressors for MAP ≥65 after ≥30 mL/kg and lactate ≥2 → septic shock.");
+      }
+
+      return { label, notes, sirs, qsofa, ofd, septicShock };
+    }
+
+    function getSourceSummary() {
+      const src = [];
+      if (isChecked("src-lung")) src.push("lung (pneumonia)");
+      if (isChecked("src-uti")) src.push("urinary tract");
+      if (isChecked("src-abd")) src.push("intra-abdominal");
+      if (isChecked("src-skin")) src.push("skin/soft tissue");
+      if (isChecked("src-line")) src.push("line/device");
+      if (isChecked("src-other")) src.push("other/unclear");
+
+      if (!src.length) return null;
+      return "Suspected source(s): " + src.join(", ") + ".";
+    }
+
+    function getRiskSummary() {
+      const risks = [];
+      if (isChecked("risk-immuno")) risks.push("immunocompromised");
+      if (isChecked("risk-neutropenia")) risks.push("neutropenia");
+      if (isChecked("risk-liver")) risks.push("advanced liver disease");
+      if (isChecked("risk-preg")) risks.push("pregnancy");
+      if (isChecked("risk-age-elderly")) risks.push("older adult/frail");
+
+      if (!risks.length) return "No specific high-risk host flags checked.";
+      return "High-risk host factors: " + risks.join(", ") + ".";
+    }
+
+    function getSettingSummary() {
+      const map = valNum("map");
+      const sbp = valNum("sbp");
+      const lactate = valNum("lactate");
+      const wt = valNum("weight");
+      const fluids30 = isChecked("fluids-30mlkg");
+      const onPressors = isChecked("on-pressors");
+
+      const lines = [];
+      if (sbp !== null) lines.push("SBP " + sbp + " mmHg");
+      if (map !== null) lines.push("MAP " + map + " mmHg");
+      if (lactate !== null) lines.push("lactate " + lactate + " mmol/L");
+      if (wt !== null) lines.push("weight " + wt + " kg");
+      if (fluids30) lines.push("≥30 mL/kg crystalloid documented");
+      if (onPressors) lines.push("vasopressors running to maintain MAP ≥65");
+
+      if (!lines.length) return "Hemodynamic details not fully provided.";
+      return lines.join("; ") + ".";
+    }
+
+    function buildBundleRecommendations(classification) {
+      const lactate = valNum("lactate");
+      const map = valNum("map");
+      const sbp = valNum("sbp");
+      const wt = valNum("weight");
+      const fluids30 = isChecked("fluids-30mlkg");
+      const onPressors = isChecked("on-pressors");
+
+      const infection = isChecked("infection-suspected");
+      const srcText = getSourceSummary();
+      const riskText = getRiskSummary();
+
+      const linesHtml = [];
+      const linesText = [];
+
+      // 1. Antibiotics & source control
+      linesHtml.push("<h4>1. Antibiotics &amp; source control</h4><ul>");
+      linesText.push("1) Antibiotics & source control:");
+
+      if (infection) {
+        linesHtml.push("<li>Administer broad-spectrum antibiotics <strong>as soon as possible</strong>, ideally within 1 hour of recognizing sepsis/shock. Use your local guidelines and Antibiotic Wizard for site-specific regimen.</li>");
+        linesText.push("  - Start broad-spectrum antibiotics as soon as possible (goal ≤1 h from sepsis/shock recognition).");
+      } else {
+        linesHtml.push("<li>Infection not clearly marked as suspected. Reassess for infectious vs non-infectious etiologies before broad-spectrum therapy.</li>");
+        linesText.push("  - Infection not clearly marked as suspected; reassess if antibiotics indicated.");
+      }
+
+      if (srcText) {
+        linesHtml.push("<li>" + srcText + " Consider early imaging and procedural/surgical consultation where source control is needed (e.g., abscess, perforation, obstructing stone).</li>");
+        linesText.push("  - " + srcText + " Consider imaging and procedural/surgical help for source control.");
+      } else {
+        linesHtml.push("<li>Source not well localized. Reassess lung, UTI, abdomen, skin, and line/device sources; obtain imaging as indicated.</li>");
+        linesText.push("  - Source not localized; reassess all common sources (lung, UTI, abdomen, skin, line/device).");
+      }
+
+      linesHtml.push("</ul>");
+
+      // 2. Fluids
+      linesHtml.push("<h4>2. Fluids &amp; hemodynamics</h4><ul>");
+      linesText.push("2) Fluids & hemodynamics:");
+
+      const hypotensive = (map !== null && map < 65) || (sbp !== null && sbp < 90);
+
+      if (wt !== null) {
+        const target = (30 * wt).toFixed(0);
+        linesHtml.push("<li>Initial bolus: ~30 mL/kg crystalloid (≈ " + target + " mL for weight " + wt + " kg) in patients with hypotension or lactate ≥4.</li>");
+        linesText.push("  - Initial bolus: ~30 mL/kg crystalloid (~" + target + " mL for " + wt + " kg) if hypotensive or lactate ≥4.");
+      } else {
+        linesHtml.push("<li>Initial bolus: ~30 mL/kg crystalloid in patients with hypotension or lactate ≥4 (use best estimated weight).</li>");
+        linesText.push("  - Initial bolus: ~30 mL/kg crystalloid if hypotensive or lactate ≥4.");
+      }
+
+      if (!fluids30 && (hypotensive || (lactate !== null && lactate >= 4))) {
+        linesHtml.push("<li><strong>Current status:</strong> Box for ≥30 mL/kg is not checked; if no contraindication (e.g., flash pulmonary edema), complete initial resuscitation.</li>");
+        linesText.push("  - ≥30 mL/kg not marked as given; if no contraindication, complete initial fluid resuscitation.");
+      } else if (fluids30) {
+        linesHtml.push("<li>≥30 mL/kg crystalloid marked as given. Reassess fluid responsiveness using exam, ultrasound, or dynamic measures (e.g., passive leg raise).</li>");
+        linesText.push("  - ≥30 mL/kg given; reassess fluid responsiveness using exam/US/dynamic measures.");
+      }
+
+      if (hypotensive || onPressors) {
+        linesHtml.push("<li>Target MAP ≥65 mmHg. If MAP remains &lt;65 after adequate fluids, start norepinephrine and titrate to MAP goal.</li>");
+        linesText.push("  - Target MAP ≥65. If MAP <65 after fluids, start norepinephrine and titrate.");
+      } else {
+        linesHtml.push("<li>Hemodynamics appear stable on current data, but continue to monitor MAP, urine output, mental status, and perfusion.</li>");
+        linesText.push("  - Hemodynamics appear stable; continue close monitoring of MAP, UOP, mentation, perfusion.");
+      }
+
+      if (onPressors) {
+        linesHtml.push("<li>Patient is already on vasopressors. Ensure central access when feasible, monitor for arrhythmia/ischemia, and consider adding vasopressin if escalating doses are required (per local protocol).</li>");
+        linesText.push("  - Vasopressors running: ensure central access, monitor arrhythmia/ischemia, consider vasopressin per protocol if escalating doses.");
+      }
+
+      linesHtml.push("</ul>");
+
+      // 3. Lactate & perfusion
+      linesHtml.push("<h4>3. Lactate &amp; perfusion monitoring</h4><ul>");
+      linesText.push("3) Lactate & perfusion:");
+
+      if (lactate === null) {
+        linesHtml.push("<li>No lactate value entered. Obtain serum lactate to help risk stratify and track perfusion.</li>");
+        linesText.push("  - Obtain serum lactate to risk stratify and monitor perfusion.");
+      } else if (lactate < 2) {
+        linesHtml.push("<li>Lactate " + lactate + " mmol/L (not elevated). This does not exclude sepsis; continue clinical monitoring.</li>");
+        linesText.push("  - Lactate " + lactate + " mmol/L (not elevated); does not exclude sepsis, monitor clinically.");
+      } else if (lactate >= 2 && lactate < 4) {
+        linesHtml.push("<li>Lactate " + lactate + " mmol/L (elevated). Treat as organ dysfunction; repeat lactate after resuscitation to document clearance.</li>");
+        linesText.push("  - Lactate " + lactate + " mmol/L (elevated); repeat after resuscitation to document clearance.");
+      } else {
+        linesHtml.push("<li>Lactate " + lactate + " mmol/L (≥4). High-risk; ensure prompt 30 mL/kg fluid resuscitation and early vasopressor support if hypotensive.</li>");
+        linesText.push("  - Lactate " + lactate + " mmol/L (≥4); high-risk—ensure 30 mL/kg fluid and early vasopressors if hypotensive.");
+      }
+
+      linesHtml.push("<li>Track perfusion using mental status, skin perfusion, capillary refill, and urine output (&gt;0.5 mL/kg/h).</li>");
+      linesText.push("  - Track perfusion: mental status, skin/capillary refill, urine output (>0.5 mL/kg/h).");
+      linesHtml.push("</ul>");
+
+      // 4. Diagnostics & monitoring
+      linesHtml.push("<h4>4. Diagnostics &amp; monitoring</h4><ul>");
+      linesText.push("4) Diagnostics & monitoring:");
+
+      linesHtml.push("<li>Obtain blood cultures (at least two sets) and site-specific cultures (e.g., urine, sputum, wound, line) <em>before</em> antibiotics when feasible but do not delay therapy in unstable patients.</li>");
+      linesText.push("  - Blood cultures (≥2 sets) and site-specific cultures before antibiotics if feasible, without delaying therapy in unstable patients.");
+
+      if (srcText && srcText.includes("lung")) {
+        linesHtml.push("<li>For lung source: chest imaging (CXR; CT if needed) and consider ABG/VBG for gas exchange in hypoxemia.</li>");
+        linesText.push("  - Lung source: chest imaging; consider ABG/VBG in hypoxemia.");
+      }
+      if (srcText && srcText.includes("urinary")) {
+        linesHtml.push("<li>For urinary source: urinalysis and urine culture; change or remove Foley catheter before sending culture if CAUTI suspected.</li>");
+        linesText.push("  - Urinary source: UA and culture; change/remove Foley before culture if CAUTI suspected.");
+      }
+      if (srcText && srcText.includes("intra-abdominal")) {
+        linesHtml.push("<li>For intra-abdominal source: CT abdomen/pelvis with contrast when safe; early surgical/interventional radiology input for source control.</li>");
+        linesText.push("  - Intra-abdominal source: CT abd/pelvis (when safe); early surgery/IR for source control.");
+      }
+
+      linesHtml.push("<li>Monitor vital signs, MAP, mental status, and urine output closely (often q15–60 minutes early on).</li>");
+      linesText.push("  - Monitor vitals, MAP, mentation, and urine output closely (q15–60 min early on).");
+      linesHtml.push("</ul>");
+
+      // 5. Level of care & consults
+      linesHtml.push("<h4>5. Level of care &amp; consults</h4><ul>");
+      linesText.push("5) Level of care & consults:");
+
+      if (classification.septicShock || onPressors || (lactate !== null && lactate >= 4)) {
+        linesHtml.push("<li>ICU level care is usually indicated for septic shock, need for vasopressors, or marked lactate elevation.</li>");
+        linesText.push("  - ICU level care typically indicated for septic shock, vasopressors, or very high lactate.");
+      } else {
+        linesHtml.push("<li>Consider ICU vs stepdown based on hemodynamics, oxygen needs, comorbidities, and local criteria.</li>");
+        linesText.push("  - Consider ICU vs stepdown based on hemodynamics, O₂ needs, comorbidities, and local criteria.");
+      }
+
+      if (riskText) {
+        linesHtml.push("<li>" + riskText + " These patients may warrant earlier ICU/ID involvement.</li>");
+        linesText.push("  - " + riskText + " → lower threshold for ICU/ID involvement.");
+      }
+
+      if (classification.septicShock || classification.ofd.organ || classification.qsofa.score >= 2 || isChecked("risk-neutropenia") || isChecked("risk-immuno")) {
+        linesHtml.push("<li>Strongly consider early Infectious Disease consultation, especially if neutropenic, immunocompromised, or high risk for resistant pathogens.</li>");
+        linesText.push("  - Strongly consider early Infectious Disease consultation in this context.");
+      }
+
+      linesHtml.push("</ul>");
+
+      return { html: linesHtml.join(""), text: linesText.join("\n") };
+    }
+
+    function runSepsisWizard() {
+      const age = valNum("age");
+      const temp = valNum("temp");
+      const hr = valNum("hr");
+      const rr = valNum("rr");
+      const sbp = valNum("sbp");
+      const map = valNum("map");
+      const spo2 = valNum("spo2");
+      const wbc = valNum("wbc");
+      const lactate = valNum("lactate");
+      const uop = valNum("uop");
+
+      const notes = document.getElementById("notes").value.trim();
+
+      const classification = classifySepsis();
+      const sirs = classification.sirs;
+      const qsofa = classification.qsofa;
+      const ofd = classification.ofd;
+
+      const summaryEl = document.getElementById("summary-content");
+      const bundleEl = document.getElementById("bundle-content");
+
+      const summaryHtmlParts = [];
+      const summaryTextParts = [];
+
+      // Basic snapshot
+      const snapshot = [];
+      const snapshotText = [];
+
+      if (age !== null) {
+        snapshot.push("Age " + age + " years");
+        snapshotText.push("Age " + age + " years");
+      }
+      if (temp !== null) {
+        snapshot.push("T " + temp + "°C");
+        snapshotText.push("T " + temp + "°C");
+      }
+      if (hr !== null) {
+        snapshot.push("HR " + hr + " bpm");
+        snapshotText.push("HR " + hr + " bpm");
+      }
+      if (rr !== null) {
+        snapshot.push("RR " + rr + "/min");
+        snapshotText.push("RR " + rr + "/min");
+      }
+      if (sbp !== null || map !== null) {
+        const line = "BP " + (sbp !== null ? "SBP " + sbp + " mmHg" : "") + (map !== null ? " (MAP " + map + " mmHg)" : "");
+        snapshot.push(line.trim());
+        snapshotText.push(line.trim());
+      }
+      if (spo2 !== null) {
+        snapshot.push("SpO₂ " + spo2 + "%");
+        snapshotText.push("SpO₂ " + spo2 + "%");
+      }
+      if (wbc !== null) {
+        snapshot.push("WBC " + wbc + " ×10⁹/L");
+        snapshotText.push("WBC " + wbc + " ×10⁹/L");
+      }
+      if (lactate !== null) {
+        snapshot.push("Lactate " + lactate + " mmol/L");
+        snapshotText.push("Lactate " + lactate + " mmol/L");
+      }
+      if (uop !== null) {
+        snapshot.push("UOP last 6 h " + uop + " mL");
+        snapshotText.push("UOP last 6 h " + uop + " mL");
+      }
+
+      if (snapshot.length) {
+        summaryHtmlParts.push("<p><strong>Vital snapshot:</strong> " + snapshot.join("; ") + ".</p>");
+        summaryTextParts.push("Vital snapshot: " + snapshotText.join("; ") + ".");
+      }
+
+      // Scores
+      const sirsDesc = "SIRS criteria: " + sirs.count + " met" + (sirs.criteria.length ? " (" + sirs.criteria.join(", ") + ")" : "") + ".";
+      const qsofaDesc = "qSOFA score: " + qsofa.score + " (" + (qsofa.criteria.length ? qsofa.criteria.join(", ") : "no criteria met") + ").";
+
+      summaryHtmlParts.push("<p><strong>SIRS:</strong> " + sirsDesc + "</p>");
+      summaryHtmlParts.push("<p><strong>qSOFA:</strong> " + qsofaDesc + "</p>");
+      summaryTextParts.push("SIRS: " + sirsDesc);
+      summaryTextParts.push("qSOFA: " + qsofaDesc);
+
+      if (ofd.organ) {
+        summaryHtmlParts.push("<p><strong>Organ dysfunction features:</strong> " + ofd.features.join("; ") + ".</p>");
+        summaryTextParts.push("Organ dysfunction features: " + ofd.features.join("; ") + ".");
+      } else {
+        summaryHtmlParts.push("<p><strong>Organ dysfunction features:</strong> none clearly checked based on inputs.</p>");
+        summaryTextParts.push("Organ dysfunction features: none clearly checked based on inputs.");
+      }
+
+      // Classification label
+      summaryHtmlParts.push("<p><strong>Overall classification:</strong> " + classification.label + "</p>");
+      summaryTextParts.push("Overall classification: " + classification.label);
+
+      if (classification.notes.length) {
+        summaryHtmlParts.push("<ul>" + classification.notes.map(n => "<li>" + n + "</li>").join("") + "</ul>");
+        classification.notes.forEach(n => summaryTextParts.push("  - " + n));
+      }
+
+      const sourceSummary = getSourceSummary();
+      if (sourceSummary) {
+        summaryHtmlParts.push("<p>" + sourceSummary + "</p>");
+        summaryTextParts.push(sourceSummary);
+      }
+
+      const riskSummary = getRiskSummary();
+      if (riskSummary) {
+        summaryHtmlParts.push("<p>" + riskSummary + "</p>");
+        summaryTextParts.push(riskSummary);
+      }
+
+      const hemoSummary = getSettingSummary();
+      if (hemoSummary) {
+        summaryHtmlParts.push("<p><strong>Hemodynamics &amp; lactate:</strong> " + hemoSummary + "</p>");
+        summaryTextParts.push("Hemodynamics & lactate: " + hemoSummary);
+      }
+
+      if (notes) {
+        summaryHtmlParts.push("<p><strong>Clinician note:</strong> " + notes + "</p>");
+        summaryTextParts.push("Clinician note: " + notes);
+      }
+
+      summaryEl.innerHTML = summaryHtmlParts.join("");
+
+      // Bundle
+      const bundle = buildBundleRecommendations(classification);
+      bundleEl.innerHTML = bundle.html;
+
+      // Build text for copy modal
+      const planLines = [];
+      planLines.push("=== SIRS • SEPSIS • SEPTIC SHOCK ASSESSMENT ===");
+      planLines.push(summaryTextParts.join("\n"));
+      planLines.push("");
+      planLines.push("=== SEPSIS BUNDLE & MANAGEMENT PLAN ===");
+      planLines.push(bundle.text);
+      planLines.push("");
+      planLines.push("Note: Educational decision-support only. Confirm with local sepsis protocol, hemodynamic guidance, and ID/ICU consultation.");
+
+      currentPlanText = planLines.join("\n");
+    }
+
+    function openCopyModal() {
+      if (!currentPlanText) {
+        alert("Run the wizard first to generate an assessment and bundle, then you can preview and copy it.");
+        return;
+      }
+      const overlay = document.getElementById("copy-modal-overlay");
+      const ta = document.getElementById("copy-modal-textarea");
+      ta.value = currentPlanText;
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeCopyModal() {
+      const overlay = document.getElementById("copy-modal-overlay");
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    function copyPlanToClipboard() {
+      if (!currentPlanText) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(currentPlanText)
+          .then(() => {
+            alert("Plan copied to clipboard.");
+          })
+          .catch(() => {
+            fallbackCopy();
+          });
+      } else {
+        fallbackCopy();
+      }
+    }
+
+    function fallbackCopy() {
+      const ta = document.getElementById("copy-modal-textarea");
+      ta.select();
+      try {
+        document.execCommand("copy");
+        alert("Plan copied to clipboard.");
+      } catch {
+        alert("Unable to copy automatically. You can manually select and copy the text.");
+      }
+    }
+  </script>
+</body>
+</html>
