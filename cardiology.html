@@ -4,94 +4,154 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cardiology Tools</title>
+
 <style>
 :root{
-  --bg1:#e3f2fd; --bg2:#e0f7fa; --card:#ffffffee;
-  --accent:#0288d1; --accent2:#0277bd;
-  --muted:#546e7a; --border:#cfd8dc; --radius:16px;
+  --bg1:#fdeaea;      /* light red/pink tone */
+  --bg2:#fff3f3;
+  --card:#ffffffee;
+  --accent:#d32f2f;   /* cardiology red */
+  --accent2:#b71c1c;  /* darker red */
+  --muted:#6b6b6b;
+  --border:#e0bcbc;
+  --radius:16px;
 }
+
 body{
-  margin:0;font-family:Inter,Arial,sans-serif;
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
   background:linear-gradient(135deg,var(--bg1),var(--bg2));
 }
-header{
-  text-align:center;padding:28px 12px;
+
+/* Floating Home Button */
+.home-btn{
+  position:fixed;
+  top:15px;
+  right:15px;
+  background:var(--accent);
+  color:white;
+  padding:10px 18px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:700;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  z-index:100;
 }
-header h1{
-  margin:0;font-size:28px;color:#01579b;
+.home-btn:hover{ background:var(--accent2); }
+
+/* Header */
+header{
+  text-align:center;
+  padding:32px 12px;
 }
 header .icon{
-  font-size:42px;margin-bottom:8px;
+  font-size:45px;
 }
+header h1{
+  margin:10px 0 0 0;
+  font-size:30px;
+  color:var(--accent2);
+}
+header p{
+  color:var(--muted);
+  font-size:15px;
+  margin-top:6px;
+}
+
+/* Grid */
 .grid{
-  max-width:1100px;margin:0 auto;padding:20px;
-  display:grid;gap:20px;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  max-width:1100px;
+  margin:0 auto;
+  padding:20px;
+  display:grid;
+  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
 }
+
 .card{
   background:var(--card);
-  padding:20px;border-radius:var(--radius);
+  padding:22px;
+  border-radius:var(--radius);
   border:1px solid var(--border);
-  box-shadow:0 4px 14px rgba(0,0,0,0.1);
+  box-shadow:0 4px 14px rgba(0,0,0,0.12);
+  transition:0.2s;
 }
-.card h2{margin:0 0 6px 0;color:#01579b;font-size:18px;}
-.card p{color:var(--muted);margin-bottom:12px;font-size:14px;}
+.card:hover{
+  transform:translateY(-4px);
+}
+.card h2{
+  margin:0;
+  font-size:20px;
+  color:var(--accent2);
+}
+.card p{
+  margin:8px 0 16px 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* card buttons */
 .btn{
-  display:inline-block;padding:10px 14px;background:var(--accent);
-  text-decoration:none;color:white;border-radius:10px;font-weight:600;
+  display:inline-block;
+  padding:10px 14px;
+  background:var(--accent);
+  color:white;
+  text-decoration:none;
+  border-radius:10px;
+  font-weight:600;
 }
-.btn:hover{background:var(--accent2);}
-.home-btn{
-  position:fixed;top:15px;right:15px;background:var(--accent);
-  color:white;padding:10px 18px;border-radius:10px;
-  text-decoration:none;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.2);
+.btn:hover{
+  background:var(--accent2);
 }
 </style>
 </head>
 
 <body>
-<a href="../index.html" class="home-btn">Home</a>
+
+<!-- Home -->
+<a class="home-btn" href="index.html">Home</a>
 
 <header>
   <div class="icon">🫀</div>
   <h1>Cardiology Tools</h1>
+  <p>Risk scores, ACS tools, arrhythmia scoring, and VTE calculators.</p>
 </header>
 
 <div class="grid">
 
   <div class="card">
     <h2>CHA₂DS₂-VASc</h2>
-    <p>Stroke risk in AFib.</p>
-    <a class="btn" href="../tools/chadvasc.html">Open</a>
+    <p>Stroke risk scoring for atrial fibrillation.</p>
+    <a class="btn" href="cardiology/chadvasc.html">Open</a>
   </div>
 
   <div class="card">
     <h2>HAS-BLED</h2>
-    <p>Bleeding risk scoring.</p>
-    <a class="btn" href="../tools/hasbled.html">Open</a>
+    <p>Bleeding risk stratification for anticoagulation decisions.</p>
+    <a class="btn" href="cardiology/hasbled.html">Open</a>
   </div>
 
   <div class="card">
-    <h2>Wells + PERC (PE/DVT)</h2>
-    <p>Probability scoring with PERC integration.</p>
-    <a class="btn" href="../tools/wells.html">Open</a>
+    <h2>Wells + PERC</h2>
+    <p>DVT/PE risk assessment with integrated PERC rule.</p>
+    <a class="btn" href="cardiology/wells.html">Open</a>
   </div>
 
   <div class="card">
     <h2>HEART Score</h2>
-    <p>ED chest pain risk assessment.</p>
-    <a class="btn" href="../tools/heart.html">Open</a>
+    <p>Chest pain risk stratification used in emergency settings.</p>
+    <a class="btn" href="cardiology/heart.html">Open</a>
   </div>
 
   <div class="card">
     <h2>TIMI Score</h2>
-    <p>ACS mortality risk scoring.</p>
-    <a class="btn" href="../tools/timi.html">Open</a>
+    <p>Mortality risk scoring for ACS patients.</p>
+    <a class="btn" href="cardiology/timi.html">Open</a>
   </div>
 
   <div class="card">
     <h2>ASCVD Risk (Future)</h2>
-    <p>10-year CV risk calculator.</p>
+    <p>10-year atherosclerotic cardiovascular disease risk.</p>
     <a class="btn" href="#">Coming Soon</a>
   </div>
 
