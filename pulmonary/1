@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ILD Pattern & Workup Helper</title>
+
+<style>
+    :root {
+        --bg: #e0f7fa;
+        --card: #ffffff;
+        --accent: #00838f;
+        --accent-soft: rgba(0,131,143,0.08);
+        --text-main: #0f172a;
+        --muted: #607d8b;
+        --danger: #c62828;
+        --warning: #ef6c00;
+        --success: #2e7d32;
+        --radius: 14px;
+        --shadow: 0 14px 30px rgba(15,23,42,0.12);
+        --pad: 14px;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at top left, #e0f7fa, #f1f5f9, #e3f2fd);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: 960px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .nav-buttons a {
+        text-decoration: none;
+        background: #fff;
+        padding: 6px 12px;
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        color: var(--accent);
+        font-size: 0.85rem;
+        margin-left: 6px;
+    }
+
+    .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: var(--pad);
+        margin-bottom: 14px;
+        border: 1px solid rgba(148,163,184,0.2);
+        box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+    }
+
+    label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 10px;
+        display: block;
+    }
+
+    select, input {
+        width: 100%;
+        padding: 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.7);
+        background: #f9fafb;
+    }
+
+    .btn {
+        margin-top: 10px;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #00acc1, #00838f);
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .badge {
+        display:inline-block;
+        padding:4px 10px;
+        border-radius:20px;
+        margin:4px 4px 8px 0;
+        font-size:0.75rem;
+    }
+    .badge-good { background: rgba(46,125,50,0.15); color: var(--success); }
+    .badge-warning { background: rgba(239,108,0,0.15); color: var(--warning); }
+    .badge-danger { background: rgba(198,40,40,0.2); color: var(--danger); }
+
+    textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.7);
+    }
+</style>
+</head>
+
+<body>
+<div class="app-container">
+
+<header>
+    <h1>🫁 ILD Pattern & Workup Helper</h1>
+    <div class="nav-buttons">
+        <a href="../pulmonary.html">↩ Pulmonary</a>
+        <a href="../index.html">🏠 Home</a>
+    </div>
+</header>
+
+<!-- INPUT CARD -->
+<div class="card">
+    <h3>CT Chest Pattern Inputs</h3>
+
+    <label>Basal & subpleural predominance?</label>
+    <select id="basal">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Honeycombing present?</label>
+    <select id="honeycomb">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="possible">Possible / subtle</option>
+    </select>
+
+    <label>Traction bronchiectasis present?</label>
+    <select id="traction">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Ground-glass opacity predominant?</label>
+    <select id="ggo">
+        <option value="yes">Yes (GGO > reticulation)</option>
+        <option value="mixed">Mixed pattern</option>
+        <option value="no">No</option>
+    </select>
+
+    <label>Mosaic attenuation / air trapping?</label>
+    <select id="mosaic">
+        <option value="no">No</option>
+        <option value="yes">Yes (suggests HP or small airways)</option>
+    </select>
+
+    <label>Craniocaudal gradient typical for UIP?</label>
+    <select id="gradient">
+        <option value="yes">Yes</option>
+        <option value="no">No / atypical</option>
+    </select>
+
+    <button class="btn" onclick="calcILD()">Classify ILD Pattern</button>
+</div>
+
+<!-- RESULTS -->
+<div class="card">
+    <h3>Pattern Classification</h3>
+    <div id="badges"></div>
+    <p id="pattern"></p>
+
+    <h4>Interpretation</h4>
+    <div id="interpret"></div>
+</div>
+
+<!-- WORKUP CARD -->
+<div class="card">
+    <h3>Generate ILD Workup A&P</h3>
+    <label>Symptoms duration</label>
+    <select id="duration">
+        <option value="chronic">Chronic (>6–12 weeks)</option>
+        <option value="subacute">Subacute</option>
+        <option value="acute">Acute (<2 weeks)</option>
+    </select>
+
+    <label>Autoimmune symptoms?</label>
+    <select id="ctd">
+        <option value="no">No obvious CTD symptoms</option>
+        <option value="yes">Joint pains / Raynaud / rash / myositis suspected</option>
+    </select>
+
+    <label>Exposure history?</label>
+    <select id="exposure">
+        <option value="none">None identified</option>
+        <option value="possible">Possible (birds, mold, farm, hot tub)</option>
+        <option value="strong">Strong exposure history</option>
+    </select>
+
+    <label>Drug-induced suspicion?</label>
+    <select id="drug">
+        <option value="no">No</option>
+        <option value="yes">Possible (amiodarone, MTX, nitrofurantoin, chemo)</option>
+    </select>
+
+    <button class="btn" onclick="makeAP()">Generate A&P</button>
+
+    <h4>Assessment & Plan</h4>
+    <textarea id="ap"></textarea>
+    <button class="btn" onclick="copyAP()">Copy</button>
+</div>
+
+</div>
+
+<script>
+function calcILD() {
+    let basal = document.getElementById("basal").value;
+    let honey = document.getElementById("honeycomb").value;
+    let traction = document.getElementById("traction").value;
+    let ggo = document.getElementById("ggo").value;
+    let mosaic = document.getElementById("mosaic").value;
+    let gradient = document.getElementById("gradient").value;
+
+    const badges = document.getElementById("badges");
+    badges.innerHTML = "";
+
+    function addBadge(text, type) {
+        let span = document.createElement("span");
+        span.className = "badge " + type;
+        span.innerHTML = text;
+        badges.appendChild(span);
+    }
+
+    let pattern = "";
+    // UIP
+    if (basal === "yes" && gradient === "yes" && honey === "yes") {
+        pattern = "UIP Pattern (Typical for IPF)";
+        addBadge("UIP", "badge-danger");
+    }
+    // Probable UIP
+    else if (basal === "yes" && traction === "yes" && honey !== "yes") {
+        pattern = "Probable UIP pattern";
+        addBadge("Probable UIP", "badge-warning");
+    }
+    // Indeterminate
+    else if (ggo === "mixed" || honey === "possible") {
+        pattern = "Indeterminate for UIP";
+        addBadge("Indeterminate", "badge-warning");
+    }
+    // Alternative diagnosis
+    else if (mosaic === "yes" || ggo === "yes") {
+        pattern = "Alternative diagnosis likely (HP, NSIP, OP, sarcoid, drug-induced)";
+        addBadge("Alternative pattern", "badge-good");
+    }
+    else {
+        pattern = "Atypical / unclassifiable pattern";
+        addBadge("Unclassifiable", "badge-warning");
+    }
+
+    document.getElementById("pattern").innerHTML = `<strong>${pattern}</strong>`;
+
+    let interpret = `
+        <ul>
+            <li>Assess for autoimmune disease (CTD-ILD): ANA, RF, CCP, ENA panel, myositis panel.</li>
+            <li>Evaluate exposures: birds, mold, farming, hot tub, occupational antigens.</li>
+            <li>Review medications for drug-induced ILD: amiodarone, nitrofurantoin, MTX, chemo agents.</li>
+            <li>Consider bronchoscopy ± MDT discussion if diagnostic uncertainty persists.</li>
+        </ul>
+    `;
+    document.getElementById("interpret").innerHTML = interpret;
+}
+
+function makeAP() {
+    let duration = document.getElementById("duration").value;
+    let ctd = document.getElementById("ctd").value;
+    let exposure = document.getElementById("exposure").value;
+    let drug = document.getElementById("drug").value;
+    let patternText = document.getElementById("pattern").innerText;
+
+    let ap = [];
+
+    ap.push(`ILD pattern: ${patternText}`);
+    ap.push("");
+
+    ap.push("Assessment:");
+    ap.push(`- Symptom duration: ${duration}.`);
+    ap.push(`- CTD features: ${ctd}.`);
+    ap.push(`- Exposure history: ${exposure}.`);
+    ap.push(`- Drug-induced suspicion: ${drug}.`);
+    ap.push("");
+
+    ap.push("Plan:");
+    ap.push("- Obtain CTD-ILD lab panel (ANA, ENA, RF, CCP, dsDNA, myositis panel).");
+    ap.push("- HP evaluation if exposures suspected (serologies, environmental assessment).");
+    ap.push("- Review medications (amiodarone, MTX, nitrofurantoin).");
+    ap.push("- PFTs: DLCO + lung volumes.");
+    ap.push("- Consider bronchoscopy with BAL if HP or infection suspected.");
+    ap.push("- Discuss in ILD multidisciplinary team (radiology + rheum + pulm).");
+    ap.push("- Consider early referral to ILD center.");
+
+    document.getElementById("ap").value = ap.join("\n");
+}
+
+function copyAP() {
+    navigator.clipboard.writeText(document.getElementById("ap").value);
+    alert("Copied!");
+}
+</script>
+
+</body>
+</html>
