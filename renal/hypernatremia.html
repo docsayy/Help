@@ -1,1 +1,558 @@
-hypernatremia.html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Hypernatremia Helper</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --accent:#0f766e;
+      --accent-soft:#e0f2f1;
+      --border:#d1d5db;
+      --muted:#6b7280;
+      --danger:#b91c1c;
+      --radius:14px;
+      --pad:14px;
+      --shadow:0 10px 25px rgba(15,118,110,0.10);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:radial-gradient(circle at top left,#e0f2fe,#f4f7fb 40%,#fdfefe 80%);
+      color:#0f172a;
+    }
+    .app{
+      max-width:1000px;
+      margin:0 auto;
+      padding:16px 12px 24px;
+    }
+    header{
+      text-align:center;
+      margin-bottom:16px;
+    }
+    header h1{
+      font-size:1.35rem;
+      margin:0;
+    }
+    header p{
+      margin:4px 0 0;
+      font-size:0.85rem;
+      color:var(--muted);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:14px;
+    }
+    @media(min-width:900px){
+      .grid{
+        grid-template-columns:1.1fr 1fr;
+        align-items:flex-start;
+      }
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:var(--pad);
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+    }
+    h2{
+      margin:0 0 8px;
+      font-size:1rem;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .badge{
+      font-size:0.65rem;
+      text-transform:uppercase;
+      letter-spacing:0.08em;
+      background:var(--accent-soft);
+      color:var(--accent);
+      padding:2px 8px;
+      border-radius:999px;
+    }
+    .section-note{
+      font-size:0.75rem;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .field-group{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    @media(max-width:700px){
+      .field-group{
+        grid-template-columns:1fr;
+      }
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    label{
+      font-size:0.78rem;
+      color:#0f172a;
+    }
+    label span.hint{
+      color:var(--muted);
+      font-size:0.72rem;
+      font-weight:400;
+    }
+    input, select{
+      border-radius:8px;
+      border:1px solid var(--border);
+      padding:6px 8px;
+      font-size:0.8rem;
+      background:#f9fafb;
+    }
+    input:focus, select:focus{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 1px rgba(15,118,110,0.25);
+      background:#ffffff;
+    }
+    .inline{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:6px;
+      flex-wrap:wrap;
+    }
+    .inline label{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:0.78rem;
+      color:var(--muted);
+    }
+    .btn-row{
+      margin:10px 0 2px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+    button{
+      border-radius:999px;
+      border:none;
+      padding:8px 16px;
+      font-size:0.8rem;
+      cursor:pointer;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      transition:transform 0.08s ease, box-shadow 0.08s ease, background 0.1s;
+    }
+    .btn-primary{
+      background:var(--accent);
+      color:white;
+      box-shadow:0 6px 16px rgba(15,118,110,0.30);
+    }
+    .btn-primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 10px 25px rgba(15,118,110,0.45);
+    }
+    .btn-ghost{
+      background:transparent;
+      color:var(--muted);
+      border:1px solid var(--border);
+    }
+    .btn-ghost:hover{
+      background:#f3f4f6;
+    }
+    .result-block{
+      padding:8px 10px;
+      border-radius:10px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    .result-title{
+      font-weight:600;
+      margin-bottom:2px;
+    }
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:4px;
+    }
+    .pill{
+      padding:2px 8px;
+      font-size:0.72rem;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:var(--accent);
+    }
+    .pill-danger{
+      background:#fee2e2;
+      color:var(--danger);
+    }
+    .small{
+      font-size:0.75rem;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Hypernatremia Algorithm Helper</h1>
+    <p>Classifies cause, estimates water deficit, and suggests a correction strategy (education only)</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>
+        Inputs
+        <span class="badge">Labs & Clinical</span>
+      </h2>
+      <p class="section-note">
+        Water deficit is approximate and assumes chronic hypernatremia unless specified otherwise.
+      </p>
+
+      <div class="field-group">
+        <div class="field">
+          <label for="na">Serum Na (mEq/L)</label>
+          <input id="na" type="number" step="0.1">
+        </div>
+        <div class="field">
+          <label for="na_goal">Target Na (mEq/L) <span class="hint">(default 140)</span></label>
+          <input id="na_goal" type="number" step="0.1" placeholder="140">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <label for="weight">Weight (kg)</label>
+          <input id="weight" type="number" step="0.1">
+        </div>
+        <div class="field">
+          <label for="sex">Sex</label>
+          <select id="sex">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="inline">
+        <label>
+          <input id="elderly" type="checkbox">
+          Elderly / frail (use lower TBW fraction)
+        </label>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <label for="volume">Clinical volume status</label>
+          <select id="volume">
+            <option value="">Select</option>
+            <option value="hypo">Hypovolemic</option>
+            <option value="eu">Euvolemic</option>
+            <option value="hyper">Hypervolemic</option>
+            <option value="uncertain">Uncertain / mixed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="uosm">Urine osmolality (mOsm/kg) <span class="hint">(if available)</span></label>
+          <input id="uosm" type="number" step="1">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <label for="uop">Urine output pattern</label>
+          <select id="uop">
+            <option value="">Select</option>
+            <option value="low">Low (&lt;0.5 mL/kg/hr)</option>
+            <option value="normal">Normal</option>
+            <option value="high">High / polyuria</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="max_corr">Planned Na decrease in first 24h (mEq/L) <span class="hint">(e.g., 8–10)</span></label>
+          <input id="max_corr" type="number" step="0.1">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <label for="chronicity">Chronicity</label>
+          <select id="chronicity">
+            <option value="">Unknown</option>
+            <option value="acute">&lt; 48 hours (acute)</option>
+            <option value="chronic">&gt; 48 hours / chronic</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="neuSymptoms">Neurologic symptoms</label>
+          <select id="neuSymptoms">
+            <option value="">Select</option>
+            <option value="mild">Mild / none</option>
+            <option value="moderate">Moderate (irritability, lethargy)</option>
+            <option value="severe">Severe (seizure, coma)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="inline">
+        <label>
+          <input id="giLoss" type="checkbox">
+          Significant GI losses (vomiting/diarrhea)
+        </label>
+        <label>
+          <input id="insensible" type="checkbox">
+          High insensible losses (fever, burns, tachypnea)
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-ghost" type="button" onclick="resetForm()">Clear</button>
+        <button class="btn-primary" type="button" onclick="calculate()">▶︎ Calculate</button>
+      </div>
+
+      <p class="small">
+        This tool is for educational decision support only and does not replace clinical judgment, frequent labs, or local protocols.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>
+        Results
+        <span class="badge">Assessment & Plan</span>
+      </h2>
+
+      <div class="result-block">
+        <div class="result-title">Water Deficit & TBW</div>
+        <div id="tbw-text">No calculation yet.</div>
+        <div id="deficit-text" class="small" style="margin-top:4px;"></div>
+      </div>
+
+      <div class="result-block">
+        <div class="result-title">Likely Etiology Pattern</div>
+        <div id="etiology">Enter values and click Calculate.</div>
+        <div class="pill-row" id="pill-row"></div>
+      </div>
+
+      <div class="result-block">
+        <div class="result-title">Suggested Correction Strategy</div>
+        <ul id="treatment" class="small" style="padding-left:18px;margin:4px 0 0;"></ul>
+      </div>
+
+      <div class="result-block">
+        <div class="result-title">Copy-ready Summary</div>
+        <div id="summary" class="small">No summary yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function parseNum(id){
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
+}
+function round(v,d=1){
+  if(v===null||isNaN(v)) return null;
+  const f=Math.pow(10,d);
+  return Math.round(v*f)/f;
+}
+
+function calculate(){
+  const na = parseNum("na");
+  let naGoal = parseNum("na_goal");
+  const weight = parseNum("weight");
+  const sex = document.getElementById("sex").value;
+  const elderly = document.getElementById("elderly").checked;
+  const volume = document.getElementById("volume").value;
+  const uosm = parseNum("uosm");
+  const uop = document.getElementById("uop").value;
+  const maxCorr = parseNum("max_corr");
+  const chronicity = document.getElementById("chronicity").value;
+  const neuSymptoms = document.getElementById("neuSymptoms").value;
+  const giLoss = document.getElementById("giLoss").checked;
+  const insensible = document.getElementById("insensible").checked;
+
+  const tbwTextDiv = document.getElementById("tbw-text");
+  const deficitDiv = document.getElementById("deficit-text");
+  const etDiv = document.getElementById("etiology");
+  const pillRow = document.getElementById("pill-row");
+  const treatUl = document.getElementById("treatment");
+  const summaryDiv = document.getElementById("summary");
+
+  pillRow.innerHTML = "";
+  treatUl.innerHTML = "";
+  summaryDiv.textContent = "";
+
+  if(na === null){
+    tbwTextDiv.textContent="Need serum Na to proceed.";
+    deficitDiv.textContent="";
+    etDiv.textContent="Enter at least Na, weight, and volume status.";
+    summaryDiv.textContent="No summary – Na missing.";
+    return;
+  }
+  if(naGoal === null) naGoal = 140;
+
+  // TBW
+  let tbw = null;
+  let frac;
+  if(weight !== null && weight > 0){
+    if(sex === "male"){
+      frac = elderly ? 0.5 : 0.6;
+    }else{
+      frac = elderly ? 0.45 : 0.5;
+    }
+    tbw = weight * frac;
+    tbwTextDiv.textContent = `TBW ≈ ${round(tbw,1)} L (fraction ${frac} × ${weight} kg).`;
+  }else{
+    tbwTextDiv.textContent = "Need weight to estimate TBW and water deficit.";
+  }
+
+  // Water deficit
+  let deficit = null;
+  if(tbw !== null && naGoal > 0){
+    deficit = tbw * (na/naGoal - 1);
+    if(deficit <= 0){
+      deficitDiv.textContent = `Calculated deficit ≤0 L (Na ${na} not above target ${naGoal}). Check target and labs.`;
+    }else{
+      deficitDiv.textContent = `Estimated free water deficit ≈ ${round(deficit,1)} L to bring Na toward ${naGoal} mEq/L. Replace gradually (often over 48–72h), adjusting for ongoing losses.`;
+    }
+  }else if(tbw === null){
+    deficitDiv.textContent = "";
+  }
+
+  // Etiology
+  let eti = [];
+  const pill1 = document.createElement("span");
+  pill1.className = "pill";
+
+  if(volume === "hypo"){
+    eti.push("Hypovolemic hypernatremia – think GI losses, renal losses (diuretics, osmotic diuresis), or third spacing combined with inadequate water intake.");
+    pill1.textContent="Hypovolemic";
+  }else if(volume === "eu"){
+    eti.push("Euvolemic hypernatremia – consider diabetes insipidus (central or nephrogenic) or pure water loss without major Na deficit.");
+    pill1.textContent="Euvolemic";
+  }else if(volume === "hyper"){
+    eti.push("Hypervolemic hypernatremia – usually iatrogenic Na gain (hypertonic saline, sodium bicarbonate, high-sodium feeds) in setting of limited water access.");
+    pill1.textContent="Hypervolemic";
+  }else{
+    eti.push("Volume status unclear – integrate physical exam, I/O, and ultrasound to clarify hypo-, eu-, or hypervolemia.");
+    pill1.textContent="Volume ?"; 
+  }
+  pillRow.appendChild(pill1);
+
+  if(uop === "high"){
+    eti.push("High urine output suggests water diuresis (consider central or nephrogenic DI) or osmotic diuresis.");
+  }else if(uop === "low"){
+    eti.push("Low urine output suggests impaired kidney function or extrarenal water losses without adequate intake.");
+  }
+
+  if(uosm !== null){
+    if(uosm < 300){
+      eti.push("Urine osmolality &lt;300 mOsm/kg suggests complete DI or marked inability to concentrate urine.");
+    }else if(uosm >= 300 && uosm < 600){
+      eti.push("Urine osmolality 300–600 mOsm/kg may be partial DI or osmotic diuresis; interpret in context of UOP and glucose/urea.");
+    }else{
+      eti.push("Urine osmolality &gt;600 mOsm/kg suggests appropriate concentration – extrarenal water losses or inadequate intake more likely.");
+    }
+  }
+
+  if(giLoss){
+    eti.push("Significant GI losses (vomiting/diarrhea) support hypovolemic hypernatremia due to hypotonic fluid loss.");
+  }
+  if(insensible){
+    eti.push("High insensible losses (fever, burns, tachypnea) increase free water loss and contribute to hypernatremia.");
+  }
+
+  if(eti.length === 0){
+    eti.push("Insufficient data to define etiology; obtain urine osmolality, urine output pattern, and better volume assessment.");
+  }
+
+  etDiv.textContent = eti.join(" ");
+
+  // Treatment suggestions
+  const tx = [];
+
+  if(chronicity === "chronic" || chronicity === ""){
+    tx.push("Treat as chronic hypernatremia unless clearly acute: generally correct Na by ≤10–12 mEq/L per day (or slower in high-risk patients).");
+  }else if(chronicity === "acute"){
+    tx.push("Acute hypernatremia (&lt;48h) may tolerate faster correction, but avoid overshooting; follow local protocols.");
+  }
+
+  if(neuSymptoms === "severe"){
+    tx.push("Severe neurologic symptoms: manage in ICU, treat concomitant issues (hypotension, sepsis, seizures), and correct Na carefully with frequent checks.");
+  }
+
+  if(volume === "hypo"){
+    tx.push("Hypovolemic hypernatremia: restore intravascular volume first with isotonic fluids (e.g., 0.9% NaCl), then switch to hypotonic fluids (e.g., D5W or 0.45% NaCl) for free water replacement.");
+  }else if(volume === "eu"){
+    tx.push("Euvolemic hypernatremia (consider DI): match free water losses with D5W / enteral water and treat DI if present (DDAVP for central DI, address offending drugs or hypercalcemia/hypokalemia for nephrogenic DI).");
+  }else if(volume === "hyper"){
+    tx.push("Hypervolemic hypernatremia: combine free water administration (D5W) with loop diuretics to remove excess Na, and stop exogenous Na sources.");
+  }
+
+  if(deficit !== null && deficit > 0){
+    if(maxCorr !== null && maxCorr > 0){
+      const totalChange = na - naGoal;
+      if(totalChange > 0){
+        const fraction = Math.min(maxCorr/totalChange,1);
+        const water24 = deficit*fraction;
+        tx.push(`If aiming to lower Na by ~${round(maxCorr,1)} mEq/L in 24h from ${round(na,1)} toward ${round(naGoal,1)}, a rough estimate is ~${round(water24,1)} L of free water over 24h (~${round(water24*1000/24,0)} mL/h), adjusting for ongoing losses and labs.`);
+      }
+    }else{
+      tx.push("Use the calculated deficit to guide free water replacement over 48–72h, tailoring based on serial Na and clinical status.");
+    }
+  }
+
+  tx.push("Check serum Na at least every 4–6 hours during active correction and adjust rate to avoid overly rapid change.");
+
+  tx.forEach(t=>{
+    const li=document.createElement("li");
+    li.textContent=t;
+    treatUl.appendChild(li);
+  });
+
+  // Summary
+  const summary = [];
+  summary.push(`Hypernatremia: Na ${na} mEq/L (target ${naGoal} mEq/L).`);
+  if(weight!==null) summary.push(`Weight ${weight} kg.`);
+  if(tbw!==null) summary.push(`TBW ≈ ${round(tbw,1)} L.`);
+  if(deficit!==null && deficit>0) summary.push(`Free water deficit ≈ ${round(deficit,1)} L.`);
+  if(volume) summary.push(`Volume status: ${volume}.`);
+  if(uop) summary.push(`UOP: ${uop}.`);
+  if(uosm!==null) summary.push(`Urine osmolality ${uosm} mOsm/kg.`);
+  summary.push(eti.join(" "));
+  summary.push("Plan: " + tx.join(" "));
+  summaryDiv.textContent = summary.join(" | ");
+}
+
+function resetForm(){
+  ["na","na_goal","weight","uosm","max_corr"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("sex").value="male";
+  document.getElementById("elderly").checked=false;
+  document.getElementById("volume").value="";
+  document.getElementById("uop").value="";
+  document.getElementById("chronicity").value="";
+  document.getElementById("neuSymptoms").value="";
+  document.getElementById("giLoss").checked=false;
+  document.getElementById("insensible").checked=false;
+  document.getElementById("tbw-text").textContent="No calculation yet.";
+  document.getElementById("deficit-text").textContent="";
+  document.getElementById("etiology").textContent="Enter values and click Calculate.";
+  document.getElementById("pill-row").innerHTML="";
+  document.getElementById("treatment").innerHTML="";
+  document.getElementById("summary").textContent="No summary yet.";
+}
+</script>
+</body>
+</html>
