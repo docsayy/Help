@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shock Type Classifier – Critical Care Tool</title>
+<style>
+    :root {
+        --bg: #e0f7fa;
+        --card: #ffffff;
+        --accent: #00838f;
+        --accent-soft: #b2ebf2;
+        --muted: #546e7a;
+        --danger: #d32f2f;
+        --success: #2e7d32;
+        --radius: 14px;
+        --pad: 16px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #b2ebf2 0, #e0f7fa 40%, #e0f2f1 100%);
+        color: #102a43;
+    }
+
+    header {
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(90deg, #00acc1, #00838f);
+        color: white;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    header h1 span.icon {
+        font-size: 1.4rem;
+    }
+
+    .nav-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .nav-buttons a {
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.8);
+        color: white;
+        background: rgba(0,0,0,0.08);
+        transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .nav-buttons a:hover {
+        background: rgba(0,0,0,0.18);
+        transform: translateY(-1px);
+    }
+
+    main {
+        max-width: 960px;
+        margin: 16px auto 32px;
+        padding: 0 12px 24px;
+    }
+
+    .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: 0 8px 24px rgba(15, 76, 92, 0.18);
+        padding: 18px;
+        margin-bottom: 16px;
+    }
+
+    .title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .title-row h2 {
+        margin: 0;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #004d5a;
+    }
+
+    .chip {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: #004d40;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .subtitle {
+        margin: 0 0 12px;
+        font-size: 0.9rem;
+        color: var(--muted);
+    }
+
+    /* Stepper */
+    .stepper {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .step-pill {
+        text-align: center;
+        padding: 6px 4px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.8);
+        color: var(--muted);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .step-pill.active {
+        background: var(--accent);
+        color: white;
+        font-weight: 600;
+        border-color: transparent;
+    }
+
+    .step-pill span {
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+    }
+
+    label {
+        display: block;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        color: #37474f;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid #cfd8dc;
+        font-size: 0.9rem;
+        outline: none;
+        background: #f9feff;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(0,131,143,0.18);
+        background: #ffffff;
+    }
+
+    .pill-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .pill-checkbox {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 11px;
+        border-radius: 999px;
+        border: 1px solid #cfd8dc;
+        font-size: 0.8rem;
+        background: #f5fcfd;
+        cursor: pointer;
+        user-select: none;
+        gap: 6px;
+    }
+
+    .pill-checkbox input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .pill-checkbox span.dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        border: 1px solid #90a4ae;
+        background: white;
+    }
+
+    .pill-checkbox input:checked + span.dot {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .pill-checkbox input:checked ~ span.text {
+        color: #004d40;
+        font-weight: 600;
+    }
+
+    .pill-checkbox input:checked ~ span.badge-septic {
+        background: #ffecb3;
+    }
+
+    .pill-checkbox input:checked ~ span.badge-cardio {
+        background: #ffcdd2;
+    }
+
+    .pill-checkbox input:checked ~ span.badge-hypo {
+        background: #dcedc8;
+    }
+
+    .pill-checkbox input:checked ~ span.badge-obstr {
+        background: #ffe0b2;
+    }
+
+    .badge {
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        color: #37474f;
+        background: #eceff1;
+    }
+
+    .section-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 12px 0 4px;
+        color: #37474f;
+    }
+
+    .buttons-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .buttons-right {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    button {
+        border-radius: 999px;
+        border: none;
+        padding: 9px 18px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.15s ease, transform 0.08s ease, box-shadow 0.1s ease;
+        white-space: nowrap;
+    }
+
+    button:active {
+        transform: translateY(1px);
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        background: #eceff1;
+        color: #37474f;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,131,143,0.4);
+    }
+
+    .btn-primary:hover {
+        background: #006978;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.8);
+        color: white;
+        box-shadow: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .results-main {
+        border-left: 4px solid var(--accent);
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        background: #e0f2f1;
+        color: #004d40;
+        margin-right: 4px;
+        margin-bottom: 4px;
+    }
+
+    .tag span.dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--accent);
+    }
+
+    .badge-primary-type {
+        background: #e0f2f1;
+        color: #004d40;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-severity {
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        color: white;
+        background: var(--danger);
+        margin-left: 4px;
+    }
+
+    .results-section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 10px 0 4px;
+        color: #37474f;
+    }
+
+    .results-list {
+        margin: 4px 0 0;
+        padding-left: 18px;
+        font-size: 0.87rem;
+        color: #455a64;
+    }
+
+    .results-list li {
+        margin-bottom: 3px;
+    }
+
+    .plan-box {
+        background: #f5fdfd;
+        border-radius: 12px;
+        padding: 10px 12px;
+        border: 1px dashed #b2ebf2;
+        font-size: 0.86rem;
+        white-space: pre-line;
+        color: #37474f;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        background: #fff8e1;
+        color: #795548;
+    }
+
+    .status-pill.danger {
+        background: #ffebee;
+        color: #b71c1c;
+    }
+
+    .status-pill.ok {
+        background: #e8f5e9;
+        color: #1b5e20;
+    }
+
+    .helper-text {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    @media (max-width: 600px) {
+        header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .nav-buttons {
+            width: 100%;
+        }
+        .buttons-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .buttons-right {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .buttons-right button {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1><span class="icon">🫀</span> Shock Type Classifier</h1>
+    <div class="nav-buttons">
+        <a href="../index.html">🏠 Home</a>
+        <a href=".//critical_care.html">⬅ Back to Critical Care</a>
+    </div>
+</header>
+
+<main>
+    <div class="card">
+        <div class="title-row">
+            <h2>Shock Evaluation Wizard</h2>
+            <span class="chip">Critical Care • Step-by-step</span>
+        </div>
+        <p class="subtitle">
+            A bedside helper to suggest the most likely shock phenotype (septic, cardiogenic, hypovolemic, obstructive, anaphylactic)
+            based on vitals, history, exam/POCUS, and labs. This supports — not replaces — clinical judgment.
+        </p>
+
+        <div class="stepper">
+            <div class="step-pill active" id="step-pill-1"><span>1</span> Vitals</div>
+            <div class="step-pill" id="step-pill-2"><span>2</span> History</div>
+            <div class="step-pill" id="step-pill-3"><span>3</span> Exam & POCUS</div>
+            <div class="step-pill" id="step-pill-4"><span>4</span> Labs</div>
+            <div class="step-pill" id="step-pill-5"><span>5</span> Result</div>
+        </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="card" id="step-1">
+        <div class="title-row">
+            <h2>Step 1 – Vitals & Basic Data</h2>
+            <span class="chip">Start here</span>
+        </div>
+        <p class="subtitle">Enter what you know; leave anything blank if unavailable.</p>
+
+        <div class="grid-2">
+            <div>
+                <label for="sbp">Systolic BP (mmHg)</label>
+                <input type="number" id="sbp" placeholder="e.g., 80">
+            </div>
+            <div>
+                <label for="map">MAP (mmHg)</label>
+                <input type="number" id="map" placeholder="e.g., 60">
+            </div>
+            <div>
+                <label for="hr">Heart Rate (bpm)</label>
+                <input type="number" id="hr" placeholder="e.g., 120">
+            </div>
+            <div>
+                <label for="temp">Temperature (°C)</label>
+                <input type="number" id="temp" step="0.1" placeholder="e.g., 38.5">
+            </div>
+            <div>
+                <label for="rr">Respiratory Rate (breaths/min)</label>
+                <input type="number" id="rr" placeholder="e.g., 26">
+            </div>
+            <div>
+                <label for="spo2">SpO₂ (%)</label>
+                <input type="number" id="spo2" placeholder="e.g., 92">
+            </div>
+            <div>
+                <label for="lactate">Lactate (mmol/L)</label>
+                <input type="number" id="lactate" step="0.1" placeholder="e.g., 4.2">
+            </div>
+            <div>
+                <label for="mental">Mental Status</label>
+                <select id="mental">
+                    <option value="">Select...</option>
+                    <option value="alert">Alert</option>
+                    <option value="altered">Altered</option>
+                    <option value="obtunded">Obtunded / Unresponsive</option>
+                </select>
+            </div>
+        </div>
+
+        <p class="helper-text">
+            Severe hypotension (MAP &lt; 65) and lactate ≥ 4 suggest high-risk shock.
+        </p>
+
+        <div class="buttons-row">
+            <span></span>
+            <div class="buttons-right">
+                <button class="btn-primary" onclick="goToStep(2)">Next: History ➜</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="card hidden" id="step-2">
+        <div class="title-row">
+            <h2>Step 2 – History Clues</h2>
+            <span class="chip">Context</span>
+        </div>
+        <p class="subtitle">
+            Check all that apply. These clues help weigh septic, hemorrhagic, cardiogenic, obstructive, or anaphylactic patterns.
+        </p>
+
+        <div class="section-label">Infection / Sepsis</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-fever">
+                <span class="dot"></span>
+                <span class="text">Fever / suspected infection</span>
+                <span class="badge badge-septic">septic</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-recent-surgery">
+                <span class="dot"></span>
+                <span class="text">Recent surgery</span>
+                <span class="badge badge-septic">septic</span>
+            </label>
+        </div>
+
+        <div class="section-label">Cardiac / Ischemia</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-chest-pain">
+                <span class="dot"></span>
+                <span class="text">Chest pain / ACS suspicion</span>
+                <span class="badge badge-cardio">cardio</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-chf">
+                <span class="dot"></span>
+                <span class="text">Known cardiomyopathy / CHF</span>
+                <span class="badge badge-cardio">cardio</span>
+            </label>
+        </div>
+
+        <div class="section-label">Hypovolemia / Hemorrhage</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-trauma">
+                <span class="dot"></span>
+                <span class="text">Trauma / major bleeding</span>
+                <span class="badge badge-hypo">hypovolemic</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-gi-bleed">
+                <span class="dot"></span>
+                <span class="text">GI bleed suspicion</span>
+                <span class="badge badge-hypo">hypovolemic</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-vomiting">
+                <span class="dot"></span>
+                <span class="text">Vomiting / diarrhea / volume loss</span>
+                <span class="badge badge-hypo">hypovolemic</span>
+            </label>
+        </div>
+
+        <div class="section-label">PE / Obstructive Risk</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-pe-sx">
+                <span class="dot"></span>
+                <span class="text">PE symptoms (pleuritic pain, dyspnea)</span>
+                <span class="badge badge-obstr">obstructive</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-cancer">
+                <span class="dot"></span>
+                <span class="text">Cancer / hypercoagulable state</span>
+                <span class="badge badge-obstr">obstructive</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-recent-immob">
+                <span class="dot"></span>
+                <span class="text">Recent immobility / long travel</span>
+                <span class="badge badge-obstr">obstructive</span>
+            </label>
+        </div>
+
+        <div class="section-label">Anaphylaxis / Allergy</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-anaphylaxis">
+                <span class="dot"></span>
+                <span class="text">Rash / airway swelling / anaphylaxis</span>
+                <span class="badge badge-septic">distributive</span>
+            </label>
+        </div>
+
+        <div class="section-label">Renal / Dialysis</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="hx-esrd">
+                <span class="dot"></span>
+                <span class="text">ESRD / dialysis</span>
+            </label>
+        </div>
+
+        <div class="buttons-row">
+            <button class="btn-secondary" onclick="goToStep(1)">⬅ Back</button>
+            <div class="buttons-right">
+                <button class="btn-primary" onclick="goToStep(3)">Next: Exam & POCUS ➜</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="card hidden" id="step-3">
+        <div class="title-row">
+            <h2>Step 3 – Exam & POCUS</h2>
+            <span class="chip">At the bedside</span>
+        </div>
+        <p class="subtitle">
+            A quick gestalt of perfusion, echo, IVC, and lung findings. Check whatever applies.
+        </p>
+
+        <div class="section-label">Perfusion / Extremities</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-warm">
+                <span class="dot"></span>
+                <span class="text">Warm extremities</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-cold">
+                <span class="dot"></span>
+                <span class="text">Cool / mottled extremities</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-caprefill">
+                <span class="dot"></span>
+                <span class="text">Cap refill &gt; 3 sec</span>
+            </label>
+        </div>
+
+        <div class="section-label">Cardiac POCUS</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-lv-poor">
+                <span class="dot"></span>
+                <span class="text">LV poor squeeze</span>
+                <span class="badge badge-cardio">cardio</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-rv-strain">
+                <span class="dot"></span>
+                <span class="text">RV strain / dilated RV</span>
+                <span class="badge badge-obstr">PE</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-effusion">
+                <span class="dot"></span>
+                <span class="text">Pericardial effusion</span>
+                <span class="badge badge-obstr">tamponade</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-tamponade">
+                <span class="dot"></span>
+                <span class="text">Tamponade physiology</span>
+                <span class="badge badge-obstr">obstructive</span>
+            </label>
+        </div>
+
+        <div class="section-label">IVC / Volume</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-ivc-collapsible">
+                <span class="dot"></span>
+                <span class="text">IVC small / collapsible</span>
+                <span class="badge badge-hypo">hypovolemic</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-ivc-plethoric">
+                <span class="dot"></span>
+                <span class="text">IVC large / plethoric</span>
+                <span class="badge badge-cardio">cardio/obstructive</span>
+            </label>
+        </div>
+
+        <div class="section-label">Lungs</div>
+        <div class="pill-group">
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-blines">
+                <span class="dot"></span>
+                <span class="text">Diffuse B-lines (pulm edema)</span>
+                <span class="badge badge-cardio">cardio</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-lungs-normal">
+                <span class="dot"></span>
+                <span class="text">Lungs relatively clear</span>
+            </label>
+            <label class="pill-checkbox">
+                <input type="checkbox" id="ex-no-sliding">
+                <span class="dot"></span>
+                <span class="text">Absent lung sliding (tension PTX)</span>
+                <span class="badge badge-obstr">obstructive</span>
+            </label>
+        </div>
+
+        <div class="buttons-row">
+            <button class="btn-secondary" onclick="goToStep(2)">⬅ Back</button>
+            <div class="buttons-right">
+                <button class="btn-primary" onclick="goToStep(4)">Next: Labs ➜</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="card hidden" id="step-4">
+        <div class="title-row">
+            <h2>Step 4 – Labs & Cardiac Markers</h2>
+            <span class="chip">Optional but helpful</span>
+        </div>
+        <p class="subtitle">
+            These refine the shock phenotype. Leave blank if not available.
+        </p>
+
+        <div class="grid-3">
+            <div>
+                <label for="wbc">WBC (×10⁹/L)</label>
+                <input type="number" id="wbc" step="0.1" placeholder="e.g., 16">
+            </div>
+            <div>
+                <label for="hgb">Hemoglobin (g/dL)</label>
+                <input type="number" id="hgb" step="0.1" placeholder="e.g., 6.8">
+            </div>
+            <div>
+                <label for="creat">Creatinine (mg/dL)</label>
+                <input type="number" id="creat" step="0.1" placeholder="e.g., 2.1">
+            </div>
+            <div>
+                <label for="trop">Troponin (high-sensitivity)</label>
+                <input type="number" id="trop" step="0.1" placeholder="e.g., 120">
+            </div>
+            <div>
+                <label for="bnp">BNP / NT-proBNP</label>
+                <input type="number" id="bnp" step="1" placeholder="e.g., 2500">
+            </div>
+        </div>
+
+        <p class="helper-text">
+            Low hemoglobin with trauma/GI bleed suggests hemorrhagic shock; elevated troponin and BNP suggest cardiogenic shock.
+        </p>
+
+        <div class="buttons-row">
+            <button class="btn-secondary" onclick="goToStep(3)">⬅ Back</button>
+            <div class="buttons-right">
+                <button class="btn-primary" onclick="computeShock()">Classify Shock ➜</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 5 / RESULTS -->
+    <div class="card hidden results-main" id="step-5">
+        <div class="title-row">
+            <h2>Step 5 – Classification & Action Plan</h2>
+            <span class="chip">Decision support</span>
+        </div>
+
+        <div id="results-summary">
+            <!-- Filled by JS -->
+        </div>
+
+        <div class="buttons-row">
+            <button class="btn-secondary" onclick="goToStep(4)">⬅ Back</button>
+            <div class="buttons-right">
+                <button class="btn-secondary" onclick="resetForm()">Reset Wizard</button>
+                <button class="btn-primary" onclick="copyPlan()">📋 Copy Plan</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    let currentStep = 1;
+    let lastPlanText = "";
+
+    function goToStep(step) {
+        // Hide all steps
+        for (let i = 1; i <= 5; i++) {
+            const stepDiv = document.getElementById("step-" + i);
+            if (stepDiv) stepDiv.classList.add("hidden");
+            const pill = document.getElementById("step-pill-" + i);
+            if (pill) pill.classList.remove("active");
+        }
+        // Show chosen step
+        const newStepDiv = document.getElementById("step-" + step);
+        if (newStepDiv) newStepDiv.classList.remove("hidden");
+        const newPill = document.getElementById("step-pill-" + step);
+        if (newPill) newPill.classList.add("active");
+        currentStep = step;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function readNumber(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const v = parseFloat(el.value);
+        return isNaN(v) ? null : v;
+    }
+
+    function checked(id) {
+        const el = document.getElementById(id);
+        return el ? el.checked : false;
+    }
+
+    function computeShock() {
+        // Basic values
+        const sbp = readNumber("sbp");
+        const map = readNumber("map");
+        const hr = readNumber("hr");
+        const temp = readNumber("temp");
+        const lact = readNumber("lactate");
+        const spo2 = readNumber("spo2");
+        const mental = document.getElementById("mental").value;
+
+        const wbc = readNumber("wbc");
+        const hgb = readNumber("hgb");
+        const creat = readNumber("creat");
+        const trop = readNumber("trop");
+        const bnp = readNumber("bnp");
+
+        // Scores
+        let scores = {
+            septic: 0,
+            cardiogenic: 0,
+            hypovolemic: 0,
+            obstructive: 0,
+            anaphylactic: 0
+        };
+
+        let rationale = [];
+        let missing = [];
+
+        // Severity
+        let severeFlag = false;
+        if ((map !== null && map < 65) || (sbp !== null && sbp < 90)) {
+            rationale.push("Hypotension (MAP < 65 or SBP < 90) suggests shock.");
+            severeFlag = true;
+        }
+        if (lact !== null && lact >= 4) {
+            rationale.push("Lactate ≥ 4 mmol/L indicates high severity shock.");
+            severeFlag = true;
+        }
+        if (mental === "altered" || mental === "obtunded") {
+            rationale.push("Altered mental status suggests poor perfusion.");
+        }
+
+        // Temp-related
+        if (temp !== null) {
+            if (temp >= 38) {
+                scores.septic += 2;
+                rationale.push("Fever favors septic/distributive shock.");
+            } else if (temp < 36) {
+                scores.septic += 1;
+                rationale.push("Hypothermia in shock may represent severe sepsis.");
+            }
+        }
+
+        // HR
+        if (hr !== null) {
+            if (hr > 100) {
+                rationale.push("Tachycardia could reflect distributive, hypovolemic, or compensatory shock.");
+            } else if (hr < 60) {
+                scores.cardiogenic += 1;
+                rationale.push("Relative bradycardia with hypotension can favor cardiogenic or conduction abnormalities.");
+            }
+        }
+
+        // SpO2
+        if (spo2 !== null && spo2 < 90) {
+            rationale.push("Hypoxemia → consider cardiogenic vs obstructive vs ARDS.");
+        }
+
+        // HISTORY
+        if (checked("hx-fever")) {
+            scores.septic += 2;
+            rationale.push("History of fever/infection points toward septic shock.");
+        }
+        if (checked("hx-recent-surgery")) {
+            scores.septic += 1;
+            rationale.push("Recent surgery increases risk for sepsis or bleeding.");
+        }
+        if (checked("hx-chest-pain")) {
+            scores.cardiogenic += 2;
+            rationale.push("Chest pain/ACS suspicion favors cardiogenic shock.");
+        }
+        if (checked("hx-chf")) {
+            scores.cardiogenic += 2;
+            rationale.push("Known CHF/cardiomyopathy supports cardiogenic component.");
+        }
+        if (checked("hx-trauma")) {
+            scores.hypovolemic += 3;
+            rationale.push("Trauma/major bleeding strongly favors hypovolemic shock.");
+        }
+        if (checked("hx-gi-bleed")) {
+            scores.hypovolemic += 3;
+            rationale.push("GI bleed suspicion strongly favors hypovolemic shock.");
+        }
+        if (checked("hx-vomiting")) {
+            scores.hypovolemic += 2;
+            rationale.push("Vomiting/diarrhea suggests volume depletion and hypovolemia.");
+        }
+        if (checked("hx-pe-sx")) {
+            scores.obstructive += 2;
+            rationale.push("PE symptoms increase probability of obstructive (PE) shock.");
+        }
+        if (checked("hx-cancer")) {
+            scores.obstructive += 1;
+            rationale.push("Cancer/hypercoagulable state adds weight toward PE/obstructive shock.");
+        }
+        if (checked("hx-recent-immob")) {
+            scores.obstructive += 1;
+            rationale.push("Recent immobility/long travel increases PE risk.");
+        }
+        if (checked("hx-anaphylaxis")) {
+            scores.anaphylactic += 3;
+            scores.septic += 1; // distributive
+            rationale.push("Anaphylaxis features point to distributive (anaphylactic) shock.");
+        }
+        if (checked("hx-esrd")) {
+            rationale.push("ESRD/dialysis may complicate volume and cardiogenic status.");
+        }
+
+        // EXAM & POCUS
+        if (checked("ex-warm")) {
+            scores.septic += 1;
+            scores.anaphylactic += 1;
+            rationale.push("Warm extremities suggest distributive shock (septic/anaphylactic) in early phases.");
+        }
+        if (checked("ex-cold") || checked("ex-caprefill")) {
+            scores.hypovolemic += 1;
+            scores.cardiogenic += 1;
+            scores.obstructive += 1;
+            rationale.push("Cool, poorly perfused extremities suggest hypovolemic, cardiogenic, or obstructive shock.");
+        }
+        if (checked("ex-lv-poor")) {
+            scores.cardiogenic += 3;
+            rationale.push("LV poor squeeze on echo strongly supports cardiogenic shock.");
+        }
+        if (checked("ex-rv-strain")) {
+            scores.obstructive += 3;
+            rationale.push("RV strain is highly suggestive of PE-related obstructive shock.");
+        }
+        if (checked("ex-effusion")) {
+            scores.obstructive += 2;
+            rationale.push("Pericardial effusion raises concern for tamponade (obstructive shock).");
+        }
+        if (checked("ex-tamponade")) {
+            scores.obstructive += 4;
+            rationale.push("Tamponade physiology on echo essentially defines obstructive tamponade shock.");
+        }
+        if (checked("ex-ivc-collapsible")) {
+            scores.hypovolemic += 2;
+            rationale.push("Small/collapsible IVC is consistent with low intravascular volume.");
+        }
+        if (checked("ex-ivc-plethoric")) {
+            scores.cardiogenic += 1;
+            scores.obstructive += 1;
+            rationale.push("Plethoric IVC suggests elevated right-sided pressures (cardiogenic or obstructive).");
+        }
+        if (checked("ex-blines")) {
+            scores.cardiogenic += 2;
+            rationale.push("Diffuse B-lines suggest pulmonary edema and cardiogenic component.");
+        }
+        if (checked("ex-no-sliding")) {
+            scores.obstructive += 3;
+            rationale.push("Absent lung sliding could indicate tension pneumothorax (obstructive).");
+        }
+
+        // LABS
+        if (wbc !== null) {
+            if (wbc > 12 || wbc < 4) {
+                scores.septic += 1;
+                rationale.push("Abnormal WBC with infection picture supports sepsis.");
+            }
+        } else {
+            missing.push("WBC");
+        }
+
+        if (hgb !== null) {
+            if (hgb < 7.0 && (checked("hx-trauma") || checked("hx-gi-bleed"))) {
+                scores.hypovolemic += 3;
+                rationale.push("Very low Hgb with trauma/GI bleed strongly supports hemorrhagic shock.");
+            } else if (hgb < 9) {
+                scores.hypovolemic += 1;
+                rationale.push("Low Hgb may contribute to anemia/volume-related shock.");
+            }
+        } else {
+            missing.push("Hemoglobin");
+        }
+
+        if (creat !== null && creat > 1.5 && checked("hx-vomiting")) {
+            scores.hypovolemic += 1;
+            rationale.push("Elevated creatinine plus volume loss suggests prerenal hypovolemic component.");
+        } else if (creat === null) {
+            missing.push("Creatinine");
+        }
+
+        if (trop !== null && trop > 0) {
+            scores.cardiogenic += 2;
+            rationale.push("Elevated troponin indicates myocardial injury and cardiogenic component.");
+        } else if (trop === null) {
+            missing.push("Troponin");
+        }
+
+        if (bnp !== null && bnp > 1000) {
+            scores.cardiogenic += 2;
+            rationale.push("Markedly elevated BNP favors cardiogenic shock/heart failure exacerbation.");
+        } else if (bnp === null) {
+            missing.push("BNP/NT-proBNP");
+        }
+
+        // Determine primary and secondary types
+        const typesOrder = ["septic", "anaphylactic", "hypovolemic", "cardiogenic", "obstructive"];
+        const typeLabels = {
+            septic: "Septic / Distributive Shock",
+            anaphylactic: "Anaphylactic (Distributive) Shock",
+            hypovolemic: "Hypovolemic / Hemorrhagic Shock",
+            cardiogenic: "Cardiogenic Shock",
+            obstructive: "Obstructive Shock"
+        };
+
+        let sortable = [];
+        for (const k in scores) {
+            sortable.push({ type: k, score: scores[k] });
+        }
+        sortable.sort((a, b) => b.score - a.score);
+
+        let primary = null;
+        let secondary = [];
+        if (sortable[0].score <= 0) {
+            primary = null;
+        } else {
+            primary = sortable[0].type;
+            for (let i = 1; i < sortable.length; i++) {
+                if (sortable[i].score > 0 && sortable[i].score >= sortable[0].score - 1) {
+                    secondary.push(sortable[i].type);
+                }
+            }
+        }
+
+        // Determine obstructive subtype
+        let obstructiveHint = "";
+        if (primary === "obstructive" || secondary.includes("obstructive")) {
+            if (checked("ex-rv-strain") || checked("hx-pe-sx")) {
+                obstructiveHint = "Pattern suggests PE-related obstructive shock.";
+            } else if (checked("ex-tamponade") || checked("ex-effusion")) {
+                obstructiveHint = "Pattern suggests pericardial tamponade.";
+            } else if (checked("ex-no-sliding")) {
+                obstructiveHint = "Pattern suggests tension pneumothorax.";
+            } else {
+                obstructiveHint = "Obstructive physiology suspected; clarify with focused imaging.";
+            }
+        }
+
+        // Build severity pill
+        let severityHtml = "";
+        if (severeFlag) {
+            severityHtml = '<span class="badge-severity">High-risk shock</span>';
+        } else if (map !== null || sbp !== null) {
+            severityHtml = '<span class="status-pill ok">Stable-ish hemodynamics – still monitor closely</span>';
+        }
+
+        // Build rationale list HTML
+        if (rationale.length === 0) {
+            rationale.push("Insufficient data to derive a clear pattern. Consider adding vitals, POCUS, and labs.");
+        }
+
+        let rationaleHtml = "<ul class='results-list'>";
+        rationale.forEach(r => rationaleHtml += "<li>" + r + "</li>");
+        rationaleHtml += "</ul>";
+
+        // Missing data
+        let missingHtml = "";
+        if (missing.length > 0) {
+            missingHtml = "<div class='results-section-title'>Helpful additional data</div><ul class='results-list'>";
+            missing.forEach(m => missingHtml += "<li>" + m + "</li>");
+            missingHtml += "</ul>";
+        }
+
+        // Construct plan based on primary type
+        let planLines = [];
+        let mainLabel = primary ? typeLabels[primary] : "Undifferentiated Shock";
+
+        if (!primary) {
+            planLines.push("• Pattern is not clearly dominated by a single shock type.");
+            planLines.push("• Ensure airway, breathing, and circulation are stabilized.");
+            planLines.push("• Obtain bedside ultrasound (cardiac, IVC, lungs) if not already done.");
+            planLines.push("• Consider broad labs, EKG, and chest imaging.");
+        } else {
+            switch (primary) {
+                case "septic":
+                    planLines.push("• Begin or continue broad-spectrum antibiotics as soon as possible.");
+                    planLines.push("• Give initial 30 mL/kg balanced crystalloid if not contraindicated.");
+                    planLines.push("• Start norepinephrine and titrate to MAP ≥ 65 mmHg.");
+                    planLines.push("• Obtain blood cultures, source imaging (CXR, CT, ultrasound) and pursue source control.");
+                    planLines.push("• Reassess lactate every 2–4 hours and adjust resuscitation.");
+                    break;
+                case "anaphylactic":
+                    planLines.push("• Administer intramuscular epinephrine immediately (if not already given).");
+                    planLines.push("• Secure airway early if concern for edema or obstruction.");
+                    planLines.push("• Aggressive IV fluids (crystalloids) for hypotension.");
+                    planLines.push("• Consider IV epinephrine infusion for persistent shock.");
+                    planLines.push("• Add antihistamines and corticosteroids as adjuncts.");
+                    break;
+                case "hypovolemic":
+                    planLines.push("• Control bleeding or fluid losses (pressure, surgery, endoscopy, treat diarrhea/vomiting).");
+                    planLines.push("• Give isotonic crystalloid boluses; in hemorrhagic shock, activate massive transfusion if indicated.");
+                    planLines.push("• Avoid starting vasopressors before adequate volume resuscitation unless crashing.");
+                    planLines.push("• Monitor urine output and serial lactates.");
+                    break;
+                case "cardiogenic":
+                    planLines.push("• Avoid large fluid boluses; use cautious small aliquots if preload responsive.");
+                    planLines.push("• Start norepinephrine for hypotension; add inotrope (e.g., dobutamine) if low output state.");
+                    planLines.push("• Obtain urgent EKG, cardiac biomarkers, and echo; consult cardiology early.");
+                    planLines.push("• Evaluate for acute coronary syndrome or mechanical complications.");
+                    break;
+                case "obstructive":
+                    planLines.push("• Identify and treat the underlying obstruction emergently:");
+                    planLines.push("   – Suspected PE: anticoagulation, consider systemic thrombolysis or catheter-directed therapy.");
+                    planLines.push("   – Suspected tamponade: prepare for pericardiocentesis.");
+                    planLines.push("   – Suspected tension pneumothorax: immediate needle decompression and chest tube.");
+                    planLines.push("• Support blood pressure with norepinephrine while definitive treatment is arranged.");
+                    planLines.push("• Minimize unnecessary intubation or positive-pressure ventilation in tamponade until ready for drainage.");
+                    break;
+            }
+        }
+
+        // Secondary types
+        let secondaryHtml = "";
+        if (secondary.length > 0) {
+            secondaryHtml = "<div class='results-section-title'>Possible additional contributors</div>";
+            secondaryHtml += "<div>";
+            secondary.forEach(t => {
+                secondaryHtml += "<span class='tag'><span class='dot'></span>" + typeLabels[t] + "</span>";
+            });
+            secondaryHtml += "</div>";
+            planLines.push("");
+            planLines.push("Mixed shock is possible – consider treating both the primary and secondary contributors.");
+        }
+
+        if (obstructiveHint) {
+            planLines.push("");
+            planLines.push(obstructiveHint);
+        }
+
+        // Build final plan text (for display + clipboard)
+        lastPlanText = mainLabel + " – Suggested Actions:\n" + planLines.join("\n");
+
+        const planHtml = "<div class='plan-box' id='plan-box'>" + lastPlanText.replace(/\n/g, "<br>") + "</div>";
+
+        // Build summary header
+        let headerHtml = "";
+        if (primary) {
+            headerHtml += "<div class='results-section-title'>Most likely shock type</div>";
+            headerHtml += "<div class='badge-primary-type'>" + mainLabel + (severeFlag ? "<span class='badge-severity'>High severity</span>" : "") + "</div>";
+        } else {
+            headerHtml += "<div class='results-section-title'>Most likely shock type</div>";
+            headerHtml += "<div class='status-pill danger'>Undifferentiated shock – pattern not clear, escalate evaluation and monitoring.</div>";
+        }
+
+        // Compose all results
+        const resultsDiv = document.getElementById("results-summary");
+        resultsDiv.innerHTML =
+            headerHtml +
+            '<div class="results-section-title">Why this pattern?</div>' +
+            rationaleHtml +
+            secondaryHtml +
+            missingHtml +
+            '<div class="results-section-title">Action plan (editable, then copy)</div>' +
+            planHtml +
+            '<p class="helper-text">This tool is for education/support and does not replace clinical judgment or local protocols.</p>';
+
+        goToStep(5);
+    }
+
+    function copyPlan() {
+        if (!lastPlanText) {
+            alert("No plan available to copy yet. Please run the classifier first.");
+            return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(lastPlanText)
+                .then(() => alert("Plan copied to clipboard."))
+                .catch(() => fallbackCopy());
+        } else {
+            fallbackCopy();
+        }
+    }
+
+    function fallbackCopy() {
+        const temp = document.createElement("textarea");
+        temp.value = lastPlanText;
+        document.body.appendChild(temp);
+        temp.select();
+        try {
+            document.execCommand("copy");
+            alert("Plan copied to clipboard.");
+        } catch (e) {
+            alert("Could not copy automatically. You can manually select and copy the plan.");
+        }
+        document.body.removeChild(temp);
+    }
+
+    function resetForm() {
+        // Clear all inputs and checkboxes
+        const inputs = document.querySelectorAll("input[type='number'], input[type='text']");
+        inputs.forEach(i => i.value = "");
+        const selects = document.querySelectorAll("select");
+        selects.forEach(s => s.value = "");
+        const checks = document.querySelectorAll("input[type='checkbox']");
+        checks.forEach(c => c.checked = false);
+        lastPlanText = "";
+        document.getElementById("results-summary").innerHTML = "";
+        goToStep(1);
+    }
+</script>
+
+</body>
+</html>
