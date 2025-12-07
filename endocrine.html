@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Endocrine Tools</title>
+
+<style>
+:root{
+  --bg1:#fff8e1;
+  --bg2:#ffecb3;
+  --card:#ffffffee;
+  --accent:#f57f17;
+  --accent2:#e65100;
+  --muted:#6b6b6b;
+  --border:#ffe082;
+  --radius:16px;
+}
+
+/* Shared layout as others */
+body{
+  margin:0;font-family:Inter,Arial,sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+}
+.home-btn{position:fixed;top:15px;right:15px;background:var(--accent);
+color:white;padding:10px 18px;border-radius:10px;text-decoration:none;
+font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.home-btn:hover{background:var(--accent2);}
+header{text-align:center;padding:32px 12px;}
+header .icon{font-size:45px;}
+header h1{margin:10px 0;color:var(--accent2);}
+header p{color:var(--muted);}
+.grid{max-width:1100px;margin:0 auto;padding:20px;display:grid;
+gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+.card{background:var(--card);padding:22px;border-radius:var(--radius);
+border:1px solid var(--border);box-shadow:0 4px 14px rgba(0,0,0,0.12);}
+.card h2{margin:0;color:var(--accent2);}
+.card p{margin:8px 0;color:var(--muted);}
+.btn{background:var(--accent);padding:10px 14px;color:white;text-decoration:none;
+border-radius:10px;font-weight:600;}
+.btn:hover{background:var(--accent2);}
+</style>
+</head>
+
+<body>
+
+<a class="home-btn" href="index.html">Home</a>
+
+<header>
+  <div class="icon">🧪</div>
+  <h1>Endocrine & Metabolic Tools</h1>
+  <p>DKA, acid-base, metabolic calculations.</p>
+</header>
+
+<div class="grid">
+
+  <div class="card">
+    <h2>DKA Tool</h2>
+    <p>AG, pH, ketones, insulin, potassium, and EMR summary.</p>
+    <a class="btn" href="endocrine/dka.html">Open</a>
+  </div>
+
+  <div class="card">
+    <h2>Free Water Deficit (Future)</h2>
+    <p>Hypernatremia correction tool.</p>
+    <a class="btn" href="#">Coming Soon</a>
+  </div>
+
+  <div class="card">
+    <h2>Acid-Base Hub (Future)</h2>
+    <p>ABG interpretation & metabolic logic.</p>
+    <a class="btn" href="#">Coming Soon</a>
+  </div>
+
+</div>
+
+</body>
+</html>
