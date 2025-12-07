@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARDS Severity & Diagnosis Tool</title>
+
+<style>
+    :root {
+        --bg: #e0f7fa;
+        --card: #ffffff;
+        --accent: #00838f;
+        --accent-soft: rgba(0, 131, 143, 0.08);
+        --text-main: #0f172a;
+        --muted: #607d8b;
+        --danger: #c62828;
+        --warning: #ef6c00;
+        --success: #2e7d32;
+        --radius: 14px;
+        --shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+        --pad: 14px;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top left, #e0f7fa 0, #f1f5f9 40%, #e3f2fd 100%);
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: 960px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 18px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.4rem;
+        margin: 0;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+
+    .nav-buttons a {
+        text-decoration: none;
+        color: var(--accent);
+        background: rgba(255,255,255,0.9);
+        padding: 6px 12px;
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(15,23,42,0.08);
+    }
+
+    .card {
+        background: white;
+        padding: var(--pad);
+        border-radius: var(--radius);
+        box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        margin-bottom: 12px;
+    }
+
+    label {
+        font-size: 0.82rem;
+        color: var(--muted);
+    }
+
+    input, select {
+        width: 100%;
+        padding: 7px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(148,163,184,0.7);
+        font-size: 0.9rem;
+        background: #f9fafb;
+    }
+
+    .btn-primary {
+        padding: 10px 16px;
+        background: linear-gradient(135deg, #00acc1, #00838f);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        font-size: 1rem;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        min-height: 140px;
+        border-radius: 10px;
+        margin-top: 8px;
+        border: 1px solid rgba(148,163,184,0.7);
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin: 4px 4px 8px 0;
+    }
+
+    .badge-good { background: rgba(46,125,50,0.15); color: var(--success); }
+    .badge-warning { background: rgba(239,108,0,0.15); color: var(--warning); }
+    .badge-danger { background: rgba(198,40,40,0.2); color: var(--danger); }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+<header>
+    <div>
+        <h1>🫁 ARDS Severity & Diagnosis</h1>
+        <div class="subtitle">Berlin Criteria + PF Ratio (PEEP ≥5)</div>
+    </div>
+    <div class="nav-buttons">
+        <a href="../pulmonary.html">↩️ Pulmonary</a>
+        <a href="../index.html">🏠 Home</a>
+    </div>
+</header>
+
+<!-- INPUT CARD -->
+<div class="card">
+    <h3>Inputs</h3>
+
+    <label>FiO₂ (%)</label>
+    <input type="number" id="fio2" placeholder="e.g. 60">
+
+    <label style="margin-top:8px;">PaO₂ (mmHg) <small>(preferred)</small></label>
+    <input type="number" id="pao2" placeholder="e.g. 70">
+
+    <label style="margin-top:8px;">SpO₂ (%) <small>(optional surrogate)</small></label>
+    <input type="number" id="spo2" placeholder="If PaO₂ unavailable">
+
+    <label style="margin-top:8px;">PEEP / CPAP level (cmH₂O)</label>
+    <input type="number" id="peep" placeholder="e.g. 8">
+
+    <label style="margin-top:8px;">Timing (within 1 week of insult/worsening)?</label>
+    <select id="timing">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label style="margin-top:8px;">Bilateral opacities on CXR/CT?</label>
+    <select id="bilateral">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+    </select>
+
+    <label style="margin-top:8px;">Respiratory failure not fully explained by volume overload/cardiac failure?</label>
+    <select id="origin">
+        <option value="yes">Yes (ARDS possible)</option>
+        <option value="no">No (think cardiogenic edema)</option>
+    </select>
+
+    <button class="btn-primary" onclick="calculateARDS()">Calculate ARDS</button>
+
+    <div id="error" style="color:var(--danger); margin-top:6px;"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="card">
+    <h3>Results</h3>
+
+    <div id="badges"></div>
+
+    <p id="oxygen"></p>
+    <p id="diagnosis"></p>
+    <p id="severity"></p>
+
+    <h4>Interpretation</h4>
+    <div id="interpretation"></div>
+</div>
+
+<!-- A&P -->
+<div class="card">
+    <h3>Assessment & Plan (Copy-ready)</h3>
+    <textarea id="ap"></textarea>
+    <button class="btn-primary" onclick="copyAP()">Copy to Clipboard</button>
+</div>
+
+</div>
+
+<script>
+function calculateARDS() {
+    let fio2 = parseFloat(document.getElementById("fio2").value);
+    let pao2 = parseFloat(document.getElementById("pao2").value);
+    let spo2 = parseFloat(document.getElementById("spo2").value);
+    let peep = parseFloat(document.getElementById("peep").value);
+
+    let timing = document.getElementById("timing").value;
+    let bilateral = document.getElementById("bilateral").value;
+    let origin = document.getElementById("origin").value;
+
+    let errorDiv = document.getElementById("error");
+    errorDiv.innerHTML = "";
+
+    if (!fio2 || fio2 < 21) {
+        errorDiv.innerHTML = "Enter FiO₂ (%) ≥ 21";
+        return;
+    }
+    if (!pao2 && !spo2) {
+        errorDiv.innerHTML = "Enter PaO₂ or SpO₂";
+        return;
+    }
+    if (!peep) {
+        errorDiv.innerHTML = "Enter PEEP";
+        return;
+    }
+
+    const fio2Frac = fio2 / 100;
+    let pf = pao2 ? pao2 / fio2Frac : null;
+
+    // SpO2 surrogate PF ratio (very rough)
+    let sfr = spo2 ? spo2 / fio2Frac : null;
+
+    // Build result sections
+    const badges = document.getElementById("badges");
+    badges.innerHTML = "";
+
+    function addBadge(text, type) {
+        let span = document.createElement("span");
+        span.className = "badge " + type;
+        span.innerHTML = text;
+        badges.appendChild(span);
+    }
+
+    if (pf && pf >= 300) addBadge("PF ≥ 300 (No ARDS)", "badge-good");
+    if (pf && pf < 300 && pf >= 200) addBadge("PF 200–299 (Mild ARDS)", "badge-warning");
+    if (pf && pf < 200 && pf >= 100) addBadge("PF 100–199 (Moderate ARDS)", "badge-warning");
+    if (pf && pf < 100) addBadge("PF <100 (Severe ARDS)", "badge-danger");
+
+    if (!pao2 && spo2) addBadge(`SpO₂/FiO₂ surrogate: ${Math.round(sfr)}`, "badge-warning");
+
+    let diagnosis = "Does NOT meet full ARDS diagnostic criteria";
+    let severity = "–";
+
+    let meetsAll =
+        timing === "yes" &&
+        bilateral === "yes" &&
+        origin === "yes" &&
+        peep >= 5 &&
+        pf &&
+        pf < 300;
+
+    if (meetsAll) diagnosis = "Meets ARDS diagnostic criteria (Berlin Definition)";
+
+    if (meetsAll && pf) {
+        if (pf < 100) severity = "Severe ARDS";
+        else if (pf < 200) severity = "Moderate ARDS";
+        else if (pf < 300) severity = "Mild ARDS";
+    }
+
+    // Display
+    document.getElementById("oxygen").innerHTML =
+        pao2 ?
+        `PF Ratio: <strong>${Math.round(pf)}</strong>` :
+        `Surrogate S/F ratio: <strong>${Math.round(sfr)}</strong>`;
+
+    document.getElementById("diagnosis").innerHTML =
+        `Diagnostic status: <strong>${diagnosis}</strong>`;
+
+    document.getElementById("severity").innerHTML =
+        severity !== "–" ? `Severity: <strong>${severity}</strong>` : "";
+
+    // Interpretation text
+    let interp = `
+        <ul>
+            <li>Timing: ${timing === "yes" ? "Acute (within 1 week)" : "Not acute"}</li>
+            <li>Bilateral opacities: ${bilateral}</li>
+            <li>Non-cardiogenic: ${origin}</li>
+            <li>PEEP: ${peep} cmH₂O</li>
+            <li>FiO₂: ${fio2}%</li>
+        </ul>
+    `;
+    document.getElementById("interpretation").innerHTML = interp;
+
+    // A&P generator
+    let ap = [];
+    ap.push("ARDS Evaluation:");
+    ap.push(`- FiO₂ ${fio2}%, PEEP ${peep} cmH₂O.`);
+    
+    if (pao2) ap.push(`- PaO₂ ${pao2} mmHg → PF ratio ≈ ${Math.round(pf)}.`);
+    else ap.push(`- No PaO₂ available; S/F ratio ≈ ${Math.round(sfr)}.`);
+
+    ap.push(`- Bilateral opacities: ${bilateral}.`);
+    ap.push(`- Timing acute within 1 week: ${timing}.`);
+    ap.push(`- Not fully explained by cardiac failure: ${origin}.`);
+
+    if (meetsAll) ap.push(`- Interpretation: Meets ARDS diagnostic criteria (${severity}).`);
+    else ap.push(`- Interpretation: Does NOT meet full ARDS criteria.`);
+
+    ap.push("");
+    ap.push("Plan:");
+    ap.push("- Continue lung-protective ventilation (VT 4–6 mL/kg PBW).");
+    ap.push("- Target plateau pressure ≤ 30 cmH₂O, driving pressure < 15 if possible.");
+    ap.push("- Apply PEEP/FiO₂ per ARDSnet or institutional protocol.");
+    ap.push("- Consider early proning if PF <150.");
+    ap.push("- Evaluate for treatable causes: pneumonia, sepsis, aspiration, trauma.");
+    ap.push("- Monitor gas exchange, hemodynamics, and compliance trends.");
+
+    document.getElementById("ap").value = ap.join("\n");
+}
+
+function copyAP() {
+    let text = document.getElementById("ap").value;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+}
+</script>
+
+</body>
+</html>
