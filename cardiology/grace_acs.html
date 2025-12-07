@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ACS Risk Helper (GRACE-style)</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent: #f97316;
+      --accent-soft: rgba(249,115,22,0.18);
+      --muted: #9ca3af;
+      --border: rgba(148,163,184,0.4);
+      --radius: 16px;
+      --pad: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, rgba(248,113,22,0.25), #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 14px;
+    }
+    main { width: 100%; max-width: 860px; }
+    header { margin-bottom: 14px; }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h1 span.icon { font-size: 1.4rem; }
+    header p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(15,23,42,0.97), rgba(15,23,42,1));
+      border-radius: var(--radius);
+      padding: var(--pad);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.7);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.18), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,0.2), transparent 55%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .card-inner { position: relative; z-index: 1; }
+    h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #fed7aa;
+      border: 1px solid rgba(248,250,252,0.07);
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin: 0 0 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    form {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+    }
+    label { font-size: 0.8rem; }
+    input[type="number"], select {
+      margin-top: 3px;
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.45);
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      font-size: 0.85rem;
+    }
+    .helper {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn-row { margin-top: 6px; }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 13px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: radial-gradient(circle at 0 0, #fed7aa, #fb923c 40%, #ea580c 100%);
+      color: #111827;
+      box-shadow: 0 10px 24px rgba(248,113,22,0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 30px rgba(248,113,22,0.65);
+    }
+    .result {
+      margin-top: 8px;
+      padding: 8px 9px;
+      border-radius: 11px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.98);
+      font-size: 0.8rem;
+    }
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .risk-low { color: #4ade80; }
+    .risk-int { color: #facc15; }
+    .risk-high { color: #f97373; }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .chip {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background: rgba(15,23,42,0.95);
+    }
+    footer {
+      margin-top: 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1><span class="icon">📊</span> ACS Risk Helper (GRACE-style)</h1>
+      <p>Uses standard GRACE variables to roughly classify ACS risk. Educational only – not an official GRACE calculator.</p>
+    </header>
+
+    <section class="card">
+      <div class="card-inner">
+        <h2>
+          GRACE-style Inputs
+          <span class="badge">ACS</span>
+        </h2>
+        <p class="subtitle">Fill out for NSTEMI/UA or STEMI patients to get a simplified low / intermediate / high risk category.</p>
+
+        <form id="acs-form">
+          <div class="inline">
+            <div class="field" style="flex:1 1 120px;">
+              <label for="age">Age (years)</label>
+              <input id="age" type="number" min="18" max="110" value="65">
+            </div>
+            <div class="field" style="flex:1 1 120px;">
+              <label for="sbp">Systolic BP (mmHg)</label>
+              <input id="sbp" type="number" min="50" max="260" value="120">
+            </div>
+            <div class="field" style="flex:1 1 120px;">
+              <label for="hr">Heart rate (bpm)</label>
+              <input id="hr" type="number" min="20" max="220" value="80">
+            </div>
+          </div>
+
+          <div class="inline">
+            <div class="field" style="flex:1 1 120px;">
+              <label for="creat">Creatinine (mg/dL)</label>
+              <input id="creat" type="number" min="0.1" max="10" step="0.1" value="1.0">
+              <div class="helper">Use baseline or presentation value.</div>
+            </div>
+            <div class="field" style="flex:1 1 120px;">
+              <label for="killip">Killip class</label>
+              <select id="killip">
+                <option value="1">Class I – no HF signs</option>
+                <option value="2">Class II – S3, rales</option>
+                <option value="3">Class III – frank pulmonary edema</option>
+                <option value="4">Class IV – cardiogenic shock</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline">
+            <div class="field" style="flex:1 1 140px;">
+              <label for="stdev">ST-segment deviation</label>
+              <select id="stdev">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1 1 140px;">
+              <label for="markers">Elevated cardiac markers</label>
+              <select id="markers">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline">
+            <div class="field" style="flex:1 1 160px;">
+              <label for="arrest">Cardiac arrest at admission</label>
+              <select id="arrest">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1 1 160px;">
+              <label for="stemi">Presentation</label>
+              <select id="stemi">
+                <option value="nstemi">NSTEMI / UA</option>
+                <option value="stemi">STEMI</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit">Assess ACS risk</button>
+          </div>
+        </form>
+
+        <div id="result" class="result" aria-live="polite">
+          <div class="result-title">Result will appear here.</div>
+          <div>Enter values and click “Assess ACS risk”.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      This is a simplified ACS risk helper using GRACE-style variables. It does not reproduce the official GRACE mortality percentages. Always use your institution’s ACS calculator/guidelines and clinical judgement.
+    </footer>
+  </main>
+
+  <script>
+    function scoreACS(data) {
+      let score = 0;
+
+      // Age contribution
+      if (data.age >= 80) score += 25;
+      else if (data.age >= 70) score += 18;
+      else if (data.age >= 60) score += 12;
+      else if (data.age >= 50) score += 6;
+
+      // SBP – low SBP worse
+      if (data.sbp < 80) score += 25;
+      else if (data.sbp < 100) score += 18;
+      else if (data.sbp < 120) score += 10;
+      else if (data.sbp < 140) score += 4;
+
+      // HR – tachycardia worse
+      if (data.hr > 140) score += 20;
+      else if (data.hr > 110) score += 14;
+      else if (data.hr > 90) score += 8;
+      else if (data.hr > 70) score += 4;
+
+      // Creatinine – renal dysfunction
+      if (data.creat >= 3.0) score += 20;
+      else if (data.creat >= 2.0) score += 14;
+      else if (data.creat >= 1.4) score += 8;
+
+      // Killip class
+      if (data.killip === 2) score += 10;
+      if (data.killip === 3) score += 20;
+      if (data.killip === 4) score += 30;
+
+      // ST deviation
+      if (data.stdev) score += 10;
+
+      // Positive markers
+      if (data.markers) score += 12;
+
+      // Cardiac arrest at presentation
+      if (data.arrest) score += 25;
+
+      // STEMI slightly higher baseline
+      if (data.presentation === "stemi") score += 10;
+
+      return score;
+    }
+
+    function categoryACS(score) {
+      // Rough categories, not official GRACE thresholds
+      if (score < 40) {
+        return {
+          label: "Low risk",
+          css: "risk-low",
+          comment: "Short-term mortality risk likely low if no other high-risk features. Usual ACS care and guideline-directed therapy."
+        };
+      } else if (score < 80) {
+        return {
+          label: "Intermediate risk",
+          css: "risk-int",
+          comment: "Intermediate risk. Many patients in this group benefit from early invasive evaluation depending on clinical context and guidelines."
+        };
+      } else {
+        return {
+          label: "High risk",
+          css: "risk-high",
+          comment: "High risk of complications/mortality. Consider early invasive strategy, higher level of monitoring, and aggressive guideline-directed therapy."
+        };
+      }
+    }
+
+    document.getElementById("acs-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = {
+        age: Number(document.getElementById("age").value || 0),
+        sbp: Number(document.getElementById("sbp").value || 0),
+        hr: Number(document.getElementById("hr").value || 0),
+        creat: Number(document.getElementById("creat").value || 0),
+        killip: Number(document.getElementById("killip").value || 1),
+        stdev: document.getElementById("stdev").value === "1",
+        markers: document.getElementById("markers").value === "1",
+        arrest: document.getElementById("arrest").value === "1",
+        presentation: document.getElementById("stemi").value
+      };
+      const score = scoreACS(data);
+      const cat = categoryACS(score);
+      const chips = [];
+
+      if (data.age >= 70) chips.push("Older age");
+      if (data.sbp < 100) chips.push("Low SBP");
+      if (data.hr > 110) chips.push("Tachycardia");
+      if (data.creat >= 1.4) chips.push("Renal dysfunction");
+      if (data.killip > 1) chips.push("Killip class ≥II");
+      if (data.stdev) chips.push("ST deviation");
+      if (data.markers) chips.push("Positive markers");
+      if (data.arrest) chips.push("Cardiac arrest at admission");
+      if (data.presentation === "stemi") chips.push("STEMI");
+
+      const box = document.getElementById("result");
+      box.innerHTML = `
+        <div class="result-title">Simplified ACS score: <strong>${score}</strong></div>
+        <div class="${cat.css}"><strong>${cat.label}</strong></div>
+        <div>${cat.comment}</div>
+        <div class="chip-row">
+          ${chips.length ? chips.map(c => `<span class="chip">${c}</span>`).join("") : "<span class='chip'>No major adverse features selected</span>"}
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
