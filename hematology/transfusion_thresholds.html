@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transfusion Thresholds Tool</title>
+
+<style>
+:root {
+    --primary: #7b1fa2;
+    --primary-dark: #4a148c;
+    --bg1: #f6f2f9;
+    --bg2: #ffffff;
+    --text-dark: #2c003e;
+    --radius: 14px;
+    --card-shadow: rgba(0,0,0,0.15);
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--bg1), #fafafa);
+}
+
+h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--primary-dark);
+    font-size: 26px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #5f4375;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Nav buttons */
+.nav-btn {
+    position: fixed;
+    top: 15px;
+    padding: 8px 16px;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    z-index: 1000;
+    transition: 0.2s;
+}
+.nav-btn:hover { background: var(--primary-dark); }
+.left { left: 15px; }
+.right { right: 15px; }
+
+.container {
+    max-width: 950px;
+    margin: auto;
+    background: var(--bg2);
+    padding: 25px;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 20px var(--card-shadow);
+}
+
+.section-title {
+    margin-top: 25px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--text-dark);
+    font-size: 17px;
+}
+
+.grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 9px 10px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 1px solid #c7b8d9;
+    background: #faf7ff;
+    font-size: 14px;
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    color: white;
+    border-radius: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: 0.2s;
+}
+button:hover { transform: scale(1.02); }
+
+.result {
+    margin-top: 22px;
+    padding: 18px;
+    background: #f3e5f5;
+    border-left: 6px solid var(--primary);
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.emr-box {
+    margin-top: 20px;
+    padding: 18px;
+    background: #ede7f6;
+    border-left: 6px solid var(--primary-dark);
+    border-radius: 10px;
+}
+
+.copy-btn {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<a href="hematology.html" class="nav-btn left">← Hematology</a>
+<a href="index.html" class="nav-btn right">Home</a>
+
+<h1>🩸 Transfusion Thresholds Tool</h1>
+<div class="subtitle">Guideline-based thresholds for RBCs, platelets, FFP, and cryo with copy-ready A&P.</div>
+
+<div class="container">
+
+    <div class="section-title">Patient Information</div>
+    <div class="grid">
+        <div>
+            <label>Hemoglobin (g/dL)</label>
+            <input type="number" id="hb" step="0.1">
+        </div>
+        <div>
+            <label>Platelets (K/µL)</label>
+            <input type="number" id="plt">
+        </div>
+        <div>
+            <label>INR</label>
+            <input type="number" id="inr" step="0.1">
+        </div>
+        <div>
+            <label>Fibrinogen (mg/dL)</label>
+            <input type="number" id="fib">
+        </div>
+    </div>
+
+    <div class="section-title">Clinical Scenario</div>
+    <div class="grid">
+        <div>
+            <label>Active bleeding?</label>
+            <select id="bleeding">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes, active major bleeding</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Cardiac disease / ACS?</label>
+            <select id="cardiac">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (CAD/ACS)</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Neurosurgery or CNS bleeding?</label>
+            <select id="cns">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (CNS)</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Upcoming procedure?</label>
+            <select id="proc">
+                <option value="">-- Select --</option>
+                <option value="none">No procedure</option>
+                <option value="minor">Minor procedure</option>
+                <option value="major">Major surgery</option>
+                <option value="lp">Lumbar puncture</option>
+                <option value="central">Central line insertion</option>
+                <option value="endoscopy">Endoscopy with biopsy</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="assessTTT()">Assess Transfusion Needs</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <div id="emrBox" class="emr-box" style="display:none;">
+        <h3>Assessment & Plan (Copy Ready)</h3>
+        <pre id="emrText" style="white-space:pre-wrap;"></pre>
+        <button class="copy-btn" onclick="copyEMR()">Copy to Clipboard</button>
+    </div>
+</div>
+
+<script>
+function num(id){
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v)?null:v;
+}
+function val(id){
+    const v = document.getElementById(id).value;
+    return v===""?null:v;
+}
+
+function assessTTT() {
+
+    const hb  = num("hb");
+    const plt = num("plt");
+    const inr = num("inr");
+    const fib = num("fib");
+
+    const bleeding = val("bleeding");
+    const cardiac  = val("cardiac");
+    const cns      = val("cns");
+    const proc     = val("proc");
+
+    let out = "";
+    let A = [];
+    let P = [];
+    let missing = [];
+
+    /* ======================= RBC Transfusion ======================= */
+
+    if (hb !== null) {
+        out += `<b>Hemoglobin:</b> ${hb} g/dL<br>`;
+
+        if (hb < 7) {
+            A.push("Severe anemia (Hb <7)");
+            P.push("Transfuse PRBCs to maintain Hb ≥7 g/dL.");
+        } else if (hb < 8 && cardiac==="yes") {
+            A.push("Anemia with CAD/ACS (Hb <8).");
+            P.push("Consider transfusion to Hb ≥8 g/dL.");
+        } else if (bleeding==="yes" && hb < 8) {
+            A.push("Active bleeding with anemia.");
+            P.push("Transfuse PRBCs to maintain Hb generally ≥8 g/dL during active bleeding.");
+        } else {
+            out += "RBC transfusion not indicated purely by Hb level.<br>";
+        }
+    } else missing.push("Hemoglobin");
+
+    /* ======================= Platelet Transfusion ======================= */
+    if (plt !== null) {
+        out += `<br><b>Platelets:</b> ${plt} K/µL<br>`;
+
+        if (cns==="yes") {
+            if (plt < 100) {
+                A.push("Platelets below CNS bleeding/neurosurgery threshold.");
+                P.push("Transfuse to keep platelets ≥100 K/µL.");
+            }
+        } else if (bleeding==="yes") {
+            if (plt < 50) {
+                A.push("Platelets below threshold for active bleeding.");
+                P.push("Transfuse platelets to ≥50 K/µL.");
+            }
+        } else if (proc==="lp" || proc==="major") {
+            if (plt < 50) {
+                A.push("Platelets below invasive procedure threshold.");
+                P.push("Transfuse platelets to ≥50 K/µL.");
+            }
+        } else if (proc==="central" || proc==="endoscopy") {
+            if (plt < 20) {
+                A.push("Platelets below line/biopsy threshold.");
+                P.push("Transfuse to ≥20–50 K/µL depending on institutional protocol.");
+            }
+        } else if (plt < 10) {
+            A.push("Severe thrombocytopenia (<10).");
+            P.push("Prophylactic platelet transfusion to prevent spontaneous bleeding.");
+        }
+
+    } else missing.push("Platelet count");
+
+    /* ======================= FFP / INR ======================= */
+    if (inr !== null) {
+        out += `<br><b>INR:</b> ${inr}<br>`;
+
+        if (bleeding==="yes") {
+            if (inr > 1.5) {
+                A.push("Coagulopathy during active bleeding.");
+                P.push("Give FFP (or PCC depending on institutional protocol).");
+            }
+        } else if (proc==="major" || proc==="lp") {
+            if (inr > 1.5) {
+                A.push("INR above threshold for high-risk procedure.");
+                P.push("Consider FFP to correct INR prior to procedure.");
+            }
+        }
+    } else missing.push("INR");
+
+    /* ======================= Cryoprecipitate ======================= */
+    if (fib !== null) {
+        out += `<br><b>Fibrinogen:</b> ${fib} mg/dL<br>`;
+
+        if (fib < 150) {
+            A.push("Low fibrinogen in bleeding/critical patient.");
+            P.push("Give cryoprecipitate (or fibrinogen concentrate) to maintain ≥150–200 mg/dL.");
+        }
+    } else missing.push("Fibrinogen");
+
+    /* ======================= Procedure Threshold Guide ======================= */
+    out += `
+    <br><b>Procedure Threshold Summary:</b><br>
+    • Lumbar puncture / major surgery → Platelets ≥50 K/µL<br>
+    • CNS bleeding / neurosurgery → Platelets ≥100 K/µL<br>
+    • Central line / endoscopy w/ biopsy → Platelets ≥20–50 K/µL<br>
+    • Fibrinogen for procedures → ≥150 mg/dL<br><br>
+    `;
+
+    /* ======================= Missing Data ======================= */
+
+    if (missing.length > 0) {
+        out += "<b>Missing Information:</b><ul>";
+        missing.forEach(m => out += `<li>${m}</li>`);
+        out += "</ul>";
+    }
+
+    if (A.length === 0) {
+        A.push("Transfusion review—no indications detected based on provided data.");
+    }
+
+    if (P.length === 0) {
+        P.push("Continue monitoring labs and clinical status.");
+    }
+
+    /* ======================= EMR Output ======================= */
+
+    let emr = "Assessment:\n";
+    A.forEach(a => emr += `• ${a}\n`);
+
+    emr += "\nPlan:\n";
+    P.forEach(p => emr += `• ${p}\n`);
+
+    if (missing.length > 0) {
+        emr += "\nMissing Information:\n";
+        missing.forEach(m => emr += `• ${m}\n`);
+    }
+
+    document.getElementById("result").innerHTML = out;
+    document.getElementById("result").style.display = "block";
+    document.getElementById("emrText").textContent = emr;
+    document.getElementById("emrBox").style.display = "block";
+}
+
+function copyEMR(){
+    navigator.clipboard.writeText(
+        document.getElementById("emrText").textContent
+    );
+}
+</script>
+
+</body>
+</html>
