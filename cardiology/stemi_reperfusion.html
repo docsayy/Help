@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>STEMI Reperfusion Helper</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --accent: #f97316;
+      --accent-soft: rgba(239,68,68,0.18);
+      --muted: #9ca3af;
+      --border: rgba(148,163,184,0.4);
+      --radius: 16px;
+      --pad: 14px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, rgba(248,113,22,0.25), #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 14px;
+    }
+    main { width: 100%; max-width: 880px; }
+    header { margin-bottom: 14px; }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h1 span.icon { font-size: 1.4rem; }
+    header p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 880px) {
+      .grid { grid-template-columns: 2fr 1.6fr; }
+    }
+    .card {
+      background: linear-gradient(135deg, rgba(15,23,42,0.97), rgba(15,23,42,1));
+      border-radius: var(--radius);
+      padding: var(--pad);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.75);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background:
+        radial-gradient(circle at 0 0, rgba(248,113,113,0.2), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(250,204,21,0.2), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .card-inner { position: relative; z-index: 1; }
+    h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #fee2e2;
+      border: 1px solid rgba(248,250,252,0.1);
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin: 0 0 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    form {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+    }
+    label { font-size: 0.8rem; }
+    input[type="number"], select {
+      margin-top: 3px;
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.45);
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      font-size: 0.85rem;
+    }
+    .helper {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .inline { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn-row { margin-top: 6px; }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 13px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: radial-gradient(circle at 0 0, #fed7aa, #fb923c 40%, #ef4444 100%);
+      color: #111827;
+      box-shadow: 0 10px 26px rgba(248,113,22,0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 14px 32px rgba(248,113,22,0.7);
+    }
+    .result {
+      margin-top: 8px;
+      padding: 8px 9px;
+      border-radius: 11px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.98);
+      font-size: 0.8rem;
+    }
+    .result-title { font-weight: 600; margin-bottom: 3px; }
+    .risk-low { color: #4ade80; }
+    .risk-int { color: #facc15; }
+    .risk-high { color: #f97373; }
+    ul { margin: 4px 0 0 18px; padding: 0; font-size: 0.78rem; }
+    li { margin-bottom: 2px; }
+    footer {
+      margin-top: 12px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1><span class="icon">⏱️</span> STEMI Reperfusion Helper</h1>
+      <p>Quick wizard for PCI vs fibrinolysis strategy in STEMI. Educational only – always follow local STEMI protocol.</p>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            STEMI Inputs
+            <span class="badge">Door-to-balloon</span>
+          </h2>
+          <p class="subtitle">Helps decide between primary PCI and fibrinolysis in true STEMI presentation.</p>
+
+          <form id="stemi-form">
+            <div class="inline">
+              <div class="field" style="flex:1 1 140px;">
+                <label for="symptomTime">Symptom onset (hours ago)</label>
+                <input id="symptomTime" type="number" min="0" max="48" step="0.5" value="2">
+              </div>
+              <div class="field" style="flex:1 1 140px;">
+                <label for="doorBalloon">Expected door-to-balloon time (min)</label>
+                <input id="doorBalloon" type="number" min="0" max="480" value="80">
+                <div class="helper">From now until PCI device across lesion.</div>
+              </div>
+            </div>
+
+            <div class="inline">
+              <div class="field" style="flex:1 1 160px;">
+                <label for="doorNeedle">Expected door-to-needle time (min)</label>
+                <input id="doorNeedle" type="number" min="0" max="480" value="30">
+                <div class="helper">From now until fibrinolytic bolus.</div>
+              </div>
+              <div class="field" style="flex:1 1 160px;">
+                <label for="transfer">Transfer to PCI center?</label>
+                <select id="transfer">
+                  <option value="no">No – PCI on site</option>
+                  <option value="yes">Yes – needs transfer</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="shock">Cardiogenic shock or severe instability?</label>
+              <select id="shock">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="contra">Absolute contraindication to fibrinolysis?</label>
+              <select id="contra">
+                <option value="no">No</option>
+                <option value="yes">Yes (e.g., prior ICH, major bleed, aortic dissection suspicion)</option>
+              </select>
+            </div>
+
+            <div class="btn-row">
+              <button type="submit">Suggest reperfusion strategy</button>
+            </div>
+          </form>
+
+          <div id="result" class="result" aria-live="polite">
+            <div class="result-title">Result will appear here.</div>
+            <div>Enter times and key features, then click “Suggest reperfusion strategy”.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-inner">
+          <h2>
+            Quick Reminders
+            <span class="badge">Checklist</span>
+          </h2>
+          <p class="subtitle">General STEMI reperfusion principles – adjust to local protocol and drug availability.</p>
+          <ul>
+            <li>Primary PCI preferred when it can be performed quickly by experienced team.</li>
+            <li>Many guidelines favor PCI if door-to-balloon can be achieved within ~90 min (or ~120 min from first medical contact).</li>
+            <li>Fibrinolysis may be considered if STEMI within 12 hours of onset, PCI will be substantially delayed, and no contraindications.</li>
+            <li>Patients in cardiogenic shock or severe HF generally benefit from PCI rather than lytics if possible.</li>
+            <li>Always check absolute / relative contraindications to fibrinolysis before giving lytics.</li>
+          </ul>
+          <p class="subtitle" style="margin-top:10px;">Common fibrinolytic dosing examples (verify locally):</p>
+          <ul>
+            <li>Tenecteplase: weight-based single IV bolus (e.g., 30–50 mg depending on weight).</li>
+            <li>Adjunctive anticoagulation (e.g., heparin) and antiplatelet therapy required per protocol.</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <footer>
+      This tool is for educational support only and simplifies STEMI reperfusion decision logic. Always follow your cath-lab, cardiology, and hospital STEMI pathways and drug protocols.
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("stemi-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const symptomHrs = Number(document.getElementById("symptomTime").value || 0);
+      const dtb = Number(document.getElementById("doorBalloon").value || 999);
+      const dtn = Number(document.getElementById("doorNeedle").value || 999);
+      const transfer = document.getElementById("transfer").value === "yes";
+      const shock = document.getElementById("shock").value === "yes";
+      const contra = document.getElementById("contra").value === "yes";
+
+      let recommendation = "";
+      let category = "risk-low";
+      let title = "Suggested approach";
+
+      if (shock || contra) {
+        // Shock or absolute contraindication to lytics -> PCI
+        category = "risk-high";
+        recommendation = "Primary PCI is preferred if at all available, especially in cardiogenic shock or with contraindication to fibrinolysis. Activate cath lab / transfer urgently.";
+      } else if (symptomHrs > 12) {
+        category = "risk-int";
+        recommendation = "Presentation >12 hours from onset – benefit of fibrinolysis is reduced. Consider PCI based strategy and individualize based on ongoing ischemia, hemodynamics, and guideline recommendations.";
+      } else {
+        const pciGood = dtb <= 90 || (!transfer && dtb <= 120);
+        const lyticsMuchSooner = dtn + 30 < dtb; // lytics significantly earlier
+
+        if (pciGood) {
+          category = "risk-low";
+          recommendation = "Door-to-balloon time appears acceptable – primary PCI strategy is usually preferred when rapidly available in experienced centers.";
+        } else if (lyticsMuchSooner && dtn <= 30 && !contra && symptomHrs <= 12) {
+          category = "risk-int";
+          recommendation = "PCI appears delayed while fibrinolysis can be given quickly with no absolute contraindications – many guidelines support lytics followed by early routine angiography (pharmaco-invasive strategy).";
+        } else {
+          category = "risk-int";
+          recommendation = "Times are suboptimal for standard targets. Discuss urgently with cardiology / STEMI team to choose best reperfusion strategy and expedite transfer or PCI.";
+        }
+      }
+
+      const extra = [];
+      if (transfer) extra.push("Transfer required.");
+      if (shock) extra.push("Cardiogenic shock / severe instability.");
+      if (contra) extra.push("Possible absolute contraindication to fibrinolysis.");
+      if (symptomHrs <= 3) extra.push("Very early presentation (≤3 h) – time is myocardium.");
+
+      const box = document.getElementById("result");
+      box.innerHTML = `
+        <div class="result-title">${title}</div>
+        <div class="${category}"><strong>${recommendation}</strong></div>
+        ${extra.length ? `<ul>${extra.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+      `;
+    });
+  </script>
+</body>
+</html>
