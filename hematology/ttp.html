@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TTP (Thrombotic Thrombocytopenic Purpura) Tool</title>
+
+<style>
+    :root {
+        --primary: #7b1fa2;
+        --primary-dark: #4a148c;
+        --bg1: #f6f2f9;
+        --bg2: #ffffff;
+        --text-dark: #2c003e;
+        --card-shadow: rgba(0,0,0,0.15);
+        --radius: 14px;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: linear-gradient(135deg, var(--bg1), #fafafa);
+    }
+
+    h1 {
+        text-align: center;
+        color: var(--primary-dark);
+        font-size: 26px;
+        margin-top: 40px;
+    }
+
+    .subtitle {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #5f4375;
+    }
+
+    /* Nav buttons */
+    .nav-btn {
+        position: fixed;
+        top: 15px;
+        padding: 8px 16px;
+        background: var(--primary);
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        z-index: 1000;
+        transition: 0.2s;
+    }
+    .nav-btn:hover { background: var(--primary-dark); }
+
+    .left { left: 15px; }
+    .right { right: 15px; }
+
+    /* Card container */
+    .container {
+        max-width: 900px;
+        margin: auto;
+        background: var(--bg2);
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: 0 8px 20px var(--card-shadow);
+    }
+
+    .section-title {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: var(--text-dark);
+        font-size: 16px;
+    }
+
+    .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(230px,1fr));
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-top: 6px;
+        border-radius: 10px;
+        border: 1px solid #c7b8d9;
+        background: #faf7ff;
+        font-size: 14px;
+    }
+
+    button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border: none;
+        color: white;
+        border-radius: 12px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    button:hover { transform: scale(1.02); }
+
+    .result {
+        margin-top: 25px;
+        padding: 18px;
+        background: #f3e5f5;
+        border-left: 6px solid var(--primary);
+        border-radius: 10px;
+    }
+
+    .emr-box {
+        margin-top: 25px;
+        padding: 20px;
+        background: #ede7f6;
+        border-left: 6px solid var(--primary-dark);
+        border-radius: 10px;
+    }
+
+    .copy-btn {
+        margin-top: 10px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: var(--primary-dark);
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<a href="hematology.html" class="nav-btn left">← Hematology</a>
+<a href="index.html" class="nav-btn right">Home</a>
+
+<h1>🧬 TTP (Thrombotic Thrombocytopenic Purpura) Tool</h1>
+<div class="subtitle">PLASMIC score + MAHA detection + TTP red flags with copy-ready A&P.</div>
+
+<div class="container">
+
+    <div class="section-title">CBC & Hemolysis Markers</div>
+    <div class="grid">
+        <div>
+            <label>Platelets (K/µL)</label>
+            <input type="number" id="plt" />
+        </div>
+        <div>
+            <label>Hemoglobin (g/dL)</label>
+            <input type="number" id="hb" />
+        </div>
+        <div>
+            <label>Reticulocyte Count (%)</label>
+            <input type="number" id="retic" />
+        </div>
+        <div>
+            <label>LDH (U/L)</label>
+            <input type="number" id="ldh" />
+        </div>
+        <div>
+            <label>Haptoglobin (mg/dL)</label>
+            <input type="number" id="haptoglobin" />
+        </div>
+        <div>
+            <label>Peripheral smear: schistocytes?</label>
+            <select id="schisto">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes</option>
+                <option value="no">No / not seen</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="section-title">Organ Injury / Coagulation</div>
+    <div class="grid">
+        <div>
+            <label>Creatinine (mg/dL)</label>
+            <input type="number" id="cr" />
+        </div>
+        <div>
+            <label>INR</label>
+            <input type="number" id="inr" step="0.1" />
+        </div>
+        <div>
+            <label>MCV (fL)</label>
+            <input type="number" id="mcv" />
+        </div>
+        <div>
+            <label>Neurologic symptoms? (AMS, seizure, stroke)</label>
+            <select id="neuro">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div>
+            <label>Hemolysis labs available?</label>
+            <select id="hemolysisLabs">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (LDH↑ + Hapto↓)</option>
+                <option value="no">No / incomplete</option>
+            </select>
+        </div>
+        <div>
+            <label>Active cancer?</label>
+            <select id="cancer">
+                <option value="">-- Select --</option>
+                <option value="yes">Yes (active malignancy)</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="runTTP()">Assess for TTP</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <div id="emrBox" class="emr-box" style="display:none;">
+        <h3>Assessment & Plan (Copy-Ready)</h3>
+        <pre id="emrText" style="white-space:pre-wrap;"></pre>
+        <button class="copy-btn" onclick="copyEMR()">Copy to Clipboard</button>
+    </div>
+
+</div>
+
+<script>
+function n(id){
+    let v=parseFloat(document.getElementById(id).value);
+    return isNaN(v)?null:v;
+}
+function yn(id){
+    let v=document.getElementById(id).value;
+    return v===""?null:(v==="yes");
+}
+
+function runTTP(){
+    const plt=n("plt");
+    const hb=n("hb");
+    const retic=n("retic");
+    const ldh=n("ldh");
+    const hapto=n("haptoglobin");
+    const schisto=yn("schisto");
+    const cr=n("cr");
+    const inr=n("inr");
+    const mcv=n("mcv");
+    const neuro=yn("neuro");
+    const hemoLabs=yn("hemolysisLabs");
+    const cancer=yn("cancer");
+
+    let out="";
+    let A=[]; 
+    let P=[];
+    let missing=[];
+
+    /* ================================
+       MAHA detection
+    =================================*/
+    let MAHA=false;
+
+    if ((ldh!==null && ldh>250) ||
+        (hapto!==null && hapto<30) ||
+        (schisto===true))
+    {
+        MAHA=true;
+        out+="<b>MAHA features detected</b> (hemolysis / schistocytes).<br>";
+        A.push("Microangiopathic hemolytic anemia");
+    }
+
+    /* ================================
+       PLASMIC Score
+       (0-7)
+    =================================*/
+    let score=0;
+
+    // Platelets <30
+    if (plt!==null && plt<30) score++;
+
+    // Hemolysis labs
+    if (hemoLabs===true) score++;
+
+    // No active cancer
+    if (cancer===false) score++;
+
+    // No transplant
+    // (not included—no input needed, assume 'no' per tool, score++)
+    score++;
+
+    // MCV <90
+    if (mcv!==null && mcv<90) score++;
+
+    // INR <1.5
+    if (inr!==null && inr<1.5) score++;
+
+    // Creatinine <2.0
+    if (cr!==null && cr<2) score++;
+
+    out+=`<br><b>PLASMIC Score: ${score} / 7</b><br>`;
+
+    if (score>=6){
+        out+="High-risk PLASMIC score → <b>Very high suspicion for TTP</b>.<br>";
+        A.push("High PLASMIC score (≥6) – high-risk TTP");
+        P.push("Initiate emergent plasma exchange (PLEX) if available.");
+        P.push("Start corticosteroids (e.g., methylprednisolone).");
+        P.push("Send ADAMTS13 activity but do NOT delay treatment.");
+        P.push("Avoid platelet transfusions unless life-threatening bleeding.");
+        P.push("Consider caplacizumab if available.");
+    }
+    else if (score===5){
+        out+="Intermediate PLASMIC score → possible TTP.<br>";
+        A.push("Intermediate PLASMIC score – possible TTP");
+        P.push("Urgent hematology consult and ADAMTS13 testing.");
+        P.push("If MAHA + thrombocytopenia + neuro/renal injury, treat as TTP until ruled out.");
+    }
+    else {
+        out+="Low PLASMIC score → TTP less likely.<br>";
+        A.push("Low PLASMIC score – TTP less likely");
+        P.push("Evaluate for DIC, HUS, severe hypertension, sepsis, malignancy-related TMA.");
+    }
+
+    /* ================================
+       TTP red flags
+    =================================*/
+    if (plt!==null && plt<30 && MAHA){
+        A.push("Thrombocytopenia + MAHA → classic TTP pattern");
+    }
+
+    if (neuro===true){
+        out+="Neurologic involvement present → supports TTP.<br>";
+        A.push("Neurologic symptoms concerning for TTP");
+        P.push("Monitor closely for neurologic deterioration; ICU likely.");
+    }
+
+    if (cr!==null && cr>2.5){
+        out+="Severe renal impairment → may suggest HUS variant, but TTP still possible.<br>";
+        A.push("Renal injury – consider TTP vs HUS");
+    }
+
+    /* ================================
+       DIC EXCLUSION
+    =================================*/
+    if (inr!==null && inr>1.5){
+        out+="INR >1.5 → <b>not typical</b> for TTP; consider DIC.<br>";
+        A.push("Coagulopathy → consider DIC");
+    }
+
+    /* ================================
+       Missing labs & suggestions
+    =================================*/
+    if (plt===null) missing.push("Platelet count");
+    if (hb===null) missing.push("Hemoglobin");
+    if (ldh===null) missing.push("LDH");
+    if (hapto===null) missing.push("Haptoglobin");
+    if (schisto===null) missing.push("Smear for schistocytes");
+    if (inr===null) missing.push("INR/PT");
+    if (cr===null) missing.push("Creatinine");
+    if (mcv===null) missing.push("MCV");
+
+    if (missing.length>0){
+        out+="<br><b>Missing / suggested labs:</b><ul>";
+        missing.forEach(m=>{ out+=`<li>${m}</li>`; });
+        out+="</ul>";
+    }
+
+    /* ================================
+       EMR OUTPUT
+    =================================*/
+    let emr="Assessment:\n";
+    A.forEach(a=>{ emr+=`• ${a}\n`; });
+
+    emr+="\nPlan:\n";
+    P.forEach(p=>{ emr+=`• ${p}\n`; });
+
+    if (missing.length>0){
+        emr+="\nMissing/Needed:\n";
+        missing.forEach(m=>{ emr+=`• ${m}\n`; });
+    }
+
+    document.getElementById("result").innerHTML=out;
+    document.getElementById("result").style.display="block";
+
+    document.getElementById("emrText").textContent=emr;
+    document.getElementById("emrBox").style.display="block";
+}
+
+function copyEMR(){
+    navigator.clipboard.writeText(
+        document.getElementById("emrText").textContent
+    );
+}
+</script>
+
+</body>
+</html>
