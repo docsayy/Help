@@ -1,128 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medical Decision Tools</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medical Decision Support</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f0f6ff;
-    padding: 20px;
-    margin: 0;
-}
-h1 {
-    text-align: center;
-    color: #003d7a;
-    margin-bottom: 25px;
-}
-.menu-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-.tool-btn {
-    display: block;
-    background: #003d7a;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    border-radius: 12px;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.tool-btn:hover {
-    background: #005bb7;
-}
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f9fc;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #003b70;
+        margin-bottom: 25px;
+    }
+
+    .system-section {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .system-title {
+        font-size: 24px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: #003b70;
+    }
+
+    .system-title img {
+        width: 30px;
+        height: 30px;
+    }
+
+    .tool-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 12px;
+    }
+
+    a.tool-btn {
+        text-decoration: none;
+        padding: 14px;
+        background: #eaf3ff;
+        color: #003b70;
+        border-radius: 10px;
+        font-weight: bold;
+        text-align: center;
+        border: 1px solid #d8e7ff;
+        transition: 0.2s;
+    }
+
+    a.tool-btn:hover {
+        background: #d4e7ff;
+    }
+
+    /* POCUS + Critical Care main buttons */
+    .special-buttons {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+        gap: 15px;
+    }
+
+    a.special-btn {
+        background: #fff;
+        border: 2px solid #003b70;
+        color: #003b70;
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    a.special-btn:hover {
+        background: #003b70;
+        color: white;
+    }
 </style>
-
-<script>
-// Load usage
-function loadUsage() {
-    return JSON.parse(localStorage.getItem("toolUsage") || "{}");
-}
-
-// Save usage
-function saveUsage(data) {
-    localStorage.setItem("toolUsage", JSON.stringify(data));
-}
-
-// Record click
-function recordUsage(tool) {
-    const usage = loadUsage();
-    usage[tool] = (usage[tool] || 0) + 1;
-    saveUsage(usage);
-}
-
-// Sort on page load
-function sortMenu() {
-    const container = document.querySelector(".menu-container");
-    const buttons = Array.from(container.children);
-    const usage = loadUsage();
-
-    buttons.sort((a, b) => {
-        const aKey = a.getAttribute("data-tool");
-        const bKey = b.getAttribute("data-tool");
-        return (usage[bKey] || 0) - (usage[aKey] || 0);
-    });
-
-    buttons.forEach(btn => container.appendChild(btn));
-}
-
-document.addEventListener("DOMContentLoaded", sortMenu);
-</script>
 
 </head>
 <body>
 
-<h1>Medical Decision Tools</h1>
+<h1>Medical Decision Support</h1>
 
-<div class="menu-container">
-
-    <a href="pocus/index.html"
-       class="tool-btn"
-       data-tool="pocus"
-       onclick="recordUsage('pocus')">POCUS</a>
-
-    <a href="cardiology.html"
-       class="tool-btn"
-       data-tool="cardiology"
-       onclick="recordUsage('cardiology')">Cardiology</a>
-
-    <a href="pulmonary.html"
-       class="tool-btn"
-       data-tool="pulmonary"
-       onclick="recordUsage('pulmonary')">Pulmonary</a>
-
-    <a href="renal.html"
-       class="tool-btn"
-       data-tool="renal"
-       onclick="recordUsage('renal')">Renal</a>
-
-    <a href="endocrine.html"
-       class="tool-btn"
-       data-tool="endocrine"
-       onclick="recordUsage('endocrine')">Endocrine</a>
-
-    <a href="hematology.html"
-       class="tool-btn"
-       data-tool="hematology"
-       onclick="recordUsage('hematology')">Hematology</a>
-
-    <a href="infectious.html"
-       class="tool-btn"
-       data-tool="infectious"
-       onclick="recordUsage('infectious')">Infectious Disease</a>
-
-    <a href="critical.html"
-       class="tool-btn"
-       data-tool="criticalcare"
-       onclick="recordUsage('criticalcare')">Critical Care</a>
-
+<!-- ────────────────── CARDIOLOGY ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/heart.png" alt=""> Cardiology
+    </div>
+    <a class="tool-btn" href="cardiology.html">Cardiology Home</a>
 </div>
+
+<!-- ────────────────── PULMONARY ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/lungs.png" alt=""> Pulmonary
+    </div>
+    <a class="tool-btn" href="pulmonary.html">Pulmonary Home</a>
+</div>
+
+<!-- ────────────────── RENAL ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/kidney.png" alt=""> Renal
+    </div>
+    <a class="tool-btn" href="renal.html">Renal Home</a>
+</div>
+
+<!-- ────────────────── HEMATOLOGY ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/blood.png" alt=""> Hematology
+    </div>
+    <a class="tool-btn" href="hematology.html">Hematology Home</a>
+</div>
+
+<!-- ────────────────── ENDOCRINE ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/endocrine.png" alt=""> Endocrine
+    </div>
+    <a class="tool-btn" href="endocrine.html">Endocrine Home</a>
+</div>
+
+<!-- ────────────────── INFECTIOUS DISEASE ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/microbe.png" alt=""> Infectious Disease
+    </div>
+    <a class="tool-btn" href="infectious.html">Infectious Disease Home</a>
+</div>
+
+<!-- ────────────────── EMR Tools ────────────────── -->
+<div class="system-section">
+    <div class="system-title">
+        <img src="icons/emr.png" alt=""> EMR Tools
+    </div>
+    <a class="tool-btn" href="emr.html">EMR Orders & Templates</a>
+</div>
+
+<!-- ────────────────── SPECIAL MAIN BUTTONS ────────────────── -->
+<div class="special-buttons">
+    <a class="special-btn" href="critical.html">Critical Care</a>
+    <a class="special-btn" href="pocus/index.html">POCUS</a>
+</div>
+
+<br><br>
 
 </body>
 </html>
