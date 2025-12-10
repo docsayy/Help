@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ECG Systematic Interpreter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --cardiology-main: #e53935;
+      --cardiology-light: #ffebee;
+      --cardiology-accent: #c62828;
+      --bg: #fdfdfd;
+      --text-main: #222;
+      --text-muted: #555;
+      --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: linear-gradient(135deg, #fff, #ffeef0);
+      color: var(--text-main);
+      padding: 16px;
+    }
+
+    .page {
+      max-width: 1150px;
+      margin: 0 auto 32px;
+      background: rgba(255,255,255,0.96);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      padding: 20px 16px 24px;
+    }
+
+    @media (min-width: 768px) {
+      .page {
+        padding: 28px 32px 32px;
+      }
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .title-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--cardiology-light);
+      color: var(--cardiology-accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background 0.15s ease, color 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--cardiology-main);
+      color: #fff;
+      box-shadow: 0 3px 8px rgba(229,57,53,0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(229,57,53,0.4);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--cardiology-accent);
+      border: 1px solid rgba(198,40,40,0.18);
+    }
+
+    .btn-ghost:hover {
+      background: var(--cardiology-light);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 16px 16px 18px;
+      margin-bottom: 12px;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .panel h3 {
+      margin: 10px 0 6px;
+      font-size: 0.95rem;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--cardiology-main);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .group {
+      margin-bottom: 10px;
+    }
+
+    .group label {
+      font-size: 0.85rem;
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .inline-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
+      border-radius: var(--radius-pill);
+      font-size: 0.78rem;
+      border: 1px solid #e0e0e0;
+      cursor: pointer;
+      background: #fafafa;
+    }
+
+    .chip input {
+      margin: 0;
+    }
+
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 0.86rem;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--cardiology-main);
+      box-shadow: 0 0 0 2px rgba(229,57,53,0.18);
+    }
+
+    textarea {
+      min-height: 200px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .summary-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .helper-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: #777;
+      text-align: right;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .row .col-half {
+      flex: 1 1 150px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="title-block">
+        <div class="title-pill">❤️ ECG Interpreter</div>
+        <h1>ECG Systematic Interpreter</h1>
+        <p class="subtitle">
+          Fill this from top to bottom following your cookbook steps. The tool
+          generates a concise interpretation you can copy into the chart.
+        </p>
+      </div>
+      <div class="nav-buttons">
+        <a href="../index.html" class="btn btn-ghost">🏠 Home</a>
+        <a href="../cardiology.html" class="btn btn-ghost">⬅ Back to Cardiology</a>
+        <a href="ekg_guide.html" class="btn btn-primary">📚 Open ECG Guide</a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- LEFT: INPUT FORM -->
+      <div>
+        <!-- Rhythm & Rate -->
+        <div class="panel">
+          <h2><span><span class="step-badge">1–2</span> Rhythm &amp; rate</span></h2>
+
+          <div class="group">
+            <label for="rhythm">Rhythm</label>
+            <select id="rhythm">
+              <option value="">Select...</option>
+              <option value="Sinus rhythm">Sinus rhythm</option>
+              <option value="Atrial fibrillation">Atrial fibrillation</option>
+              <option value="Atrial flutter">Atrial flutter</option>
+              <option value="Supraventricular tachycardia">Supraventricular tachycardia</option>
+              <option value="Junctional rhythm">Junctional rhythm</option>
+              <option value="Ventricular rhythm">Ventricular rhythm</option>
+              <option value="Paced rhythm">Paced rhythm</option>
+              <option value="Irregular rhythm, unclassified">Irregular rhythm, unclassified</option>
+            </select>
+            <div class="helper-text">
+              If sinus, the tool will mention “sinus rhythm” in the first sentence.
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="group col-half">
+              <label for="rate">Heart rate (beats / min)</label>
+              <input id="rate" type="number" min="0" max="300" placeholder="e.g. 78" />
+            </div>
+            <div class="group col-half">
+              <label for="regularity">Regularity</label>
+              <select id="regularity">
+                <option value="">Select...</option>
+                <option value="regular">Regular</option>
+                <option value="irregularly irregular">Irregularly irregular</option>
+                <option value="regularly irregular">Regularly irregular</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Axis & P waves & PR -->
+        <div class="panel">
+          <h2><span><span class="step-badge">3–5</span> P waves, PR, axis</span></h2>
+
+          <div class="group">
+            <label>Atrial findings</label>
+            <div class="inline-options">
+              <label class="chip">
+                <input type="checkbox" id="p-normal" /> Normal P waves
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="rae" />
+                Right atrial enlargement
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="lae" />
+                Left atrial enlargement
+              </label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="group col-half">
+              <label for="pr">PR interval</label>
+              <select id="pr">
+                <option value="">Normal / abnormal?</option>
+                <option value="normal PR interval">Normal PR interval</option>
+                <option value="first-degree AV block (prolonged PR interval)">
+                  Prolonged PR (1° AV block)
+                </option>
+                <option value="short PR interval suggesting pre-excitation">
+                  Short PR (pre-excitation pattern)
+                </option>
+              </select>
+            </div>
+            <div class="group col-half">
+              <label for="axis">QRS axis</label>
+              <select id="axis">
+                <option value="">Select...</option>
+                <option value="normal axis">Normal axis</option>
+                <option value="left axis deviation">Left axis deviation</option>
+                <option value="right axis deviation">Right axis deviation</option>
+                <option value="extreme axis deviation">Extreme / northwest axis</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- QRS width, blocks, hypertrophy -->
+        <div class="panel">
+          <h2><span><span class="step-badge">6–8</span> QRS, blocks, voltage</span></h2>
+
+          <div class="row">
+            <div class="group col-half">
+              <label for="qrs-width">QRS duration</label>
+              <select id="qrs-width">
+                <option value="">Select...</option>
+                <option value="narrow QRS complex">Narrow (&lt; 0.10 s)</option>
+                <option value="slightly prolonged QRS complex">
+                  Borderline (0.10–0.12 s)
+                </option>
+                <option value="wide QRS complex">Wide (≥ 0.12 s)</option>
+              </select>
+            </div>
+            <div class="group col-half">
+              <label for="bundle">Conduction / bundle branch pattern</label>
+              <select id="bundle">
+                <option value="">None / not specified</option>
+                <option value="right bundle branch block pattern">
+                  Right bundle branch block
+                </option>
+                <option value="left bundle branch block pattern">
+                  Left bundle branch block
+                </option>
+                <option value="nonspecific intraventricular conduction delay">
+                  Nonspecific IVCD
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Hypertrophy &amp; voltage</label>
+            <div class="inline-options">
+              <label class="chip">
+                <input type="checkbox" id="lvh" /> LVH criteria present
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="rvh" /> RVH pattern
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="low-voltage" /> Low QRS voltage
+              </label>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Additional conduction findings</label>
+            <div class="inline-options">
+              <label class="chip">
+                <input type="checkbox" id="bifasc-lad" />
+                RBBB + LAD (possible bifascicular block)
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="bifasc-rad" />
+                RBBB + RAD (possible bifascicular block)
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="avb-2" />
+                2° AV block
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="avb-3" />
+                3° (complete) AV block
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Infarct & ST-T -->
+        <div class="panel">
+          <h2><span><span class="step-badge">9–10</span> Infarction &amp; ST–T</span></h2>
+
+          <div class="group">
+            <label>Infarction / scar patterns</label>
+            <div class="inline-options">
+              <label class="chip">
+                <input type="checkbox" id="old-inf-inferior" />
+                Old inferior infarct pattern
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="old-inf-anterior" />
+                Old anterior / anteroseptal infarct pattern
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="old-inf-lateral" />
+                Old lateral infarct pattern
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="posterior-mi" />
+                Posterior MI pattern (mirror changes)
+              </label>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>ST–T abnormalities (acute / subacute)</label>
+            <div class="inline-options">
+              <label class="chip">
+                <input type="checkbox" id="stemi-like" />
+                STEMI-type localized ST elevation
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="nste-ischemia" />
+                ST depression / T inversion consistent with ischemia
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="global-peri" />
+                Diffuse ST elevation / PR changes (pericarditis-like)
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="lbhv-strain" />
+                LVH with strain-type ST–T changes
+              </label>
+              <label class="chip">
+                <input type="checkbox" id="nonspecific-st" />
+                Nonspecific ST–T abnormalities
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- QT & Electrolytes -->
+        <div class="panel">
+          <h2><span><span class="step-badge">11</span> QT &amp; electrolytes</span></h2>
+          <div class="row">
+            <div class="group col-half">
+              <label for="qt">QT interval impression</label>
+              <select id="qt">
+                <option value="">Select...</option>
+                <option value="normal QT interval">Normal QT interval</option>
+                <option value="prolonged QT interval">Prolonged QT interval</option>
+                <option value="shortened QT interval">Shortened QT interval</option>
+              </select>
+            </div>
+            <div class="group col-half">
+              <label>Electrolyte patterns (if present)</label>
+              <div class="inline-options">
+                <label class="chip">
+                  <input type="checkbox" id="hyperk-pattern" />
+                  Hyperkalemia-type T waves
+                </label>
+                <label class="chip">
+                  <input type="checkbox" id="hypok-pattern" />
+                  Hypokalemia-type ST–T / U waves
+                </label>
+                <label class="chip">
+                  <input type="checkbox" id="hypocalc-pattern" />
+                  Hypocalcemia (explaining long QT)
+                </label>
+                <label class="chip">
+                  <input type="checkbox" id="hypercalc-pattern" />
+                  Hypercalcemia (explaining short QT)
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Free text -->
+        <div class="panel">
+          <h2>Free notes (optional)</h2>
+          <div class="group">
+            <label for="notes">Anything else you want appended to the report</label>
+            <textarea id="notes" placeholder="e.g. Compare with prior ECG from 2024-03-01; no significant interval change."></textarea>
+          </div>
+        </div>
+
+        <div class="panel">
+          <button class="btn btn-primary" type="button" onclick="generateReport()">
+            🧾 Generate Interpretation
+          </button>
+          <span class="helper-text">
+            The generated text will appear on the right side and can be edited
+            before copying.
+          </span>
+        </div>
+      </div>
+
+      <!-- RIGHT: OUTPUT -->
+      <div>
+        <div class="panel">
+          <div class="summary-header">
+            <h2>Generated Interpretation</h2>
+            <div class="nav-buttons">
+              <button class="btn btn-ghost" type="button" onclick="copyReport()">
+                📋 Copy to Clipboard
+              </button>
+            </div>
+          </div>
+          <textarea id="report" placeholder="Fill the form on the left and click &quot;Generate Interpretation&quot;."></textarea>
+          <div class="helper-text">
+            You can tweak the text here before copying into your note.
+          </div>
+        </div>
+
+        <p class="footer-note">
+          Workflow hint: read the ECG using the guide page, tick items here as you go,
+          then paste the interpretation into your chart.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generateReport() {
+      const parts = [];
+
+      // Rhythm & rate
+      const rhythm = document.getElementById("rhythm").value;
+      const rateValue = document.getElementById("rate").value;
+      const regularity = document.getElementById("regularity").value;
+
+      let firstSentence = "";
+
+      if (rhythm) {
+        firstSentence += rhythm.toLowerCase().startsWith("sinus")
+          ? "Sinus rhythm"
+          : rhythm;
+      }
+
+      if (rateValue) {
+        if (firstSentence.length > 0) firstSentence += " at ";
+        else firstSentence += "Heart rate ";
+        firstSentence += rateValue + " bpm";
+      }
+
+      if (regularity) {
+        if (firstSentence.length > 0) firstSentence += ", ";
+        firstSentence += regularity;
+      }
+
+      if (firstSentence.length > 0) {
+        firstSentence += ".";
+        parts.push(firstSentence);
+      }
+
+      // Axis, PR, P waves
+      const axis = document.getElementById("axis").value;
+      const pr = document.getElementById("pr").value;
+
+      const pNormal = document.getElementById("p-normal").checked;
+      const rae = document.getElementById("rae").checked;
+      const lae = document.getElementById("lae").checked;
+
+      const pFindings = [];
+      if (pNormal) pFindings.push("normal P waves");
+      if (rae) pFindings.push("features of right atrial enlargement");
+      if (lae) pFindings.push("features of left atrial enlargement");
+
+      const secondBits = [];
+      if (axis) secondBits.push(axis);
+      if (pr) secondBits.push(pr);
+      if (pFindings.length > 0) secondBits.push(pFindings.join(", "));
+
+      if (secondBits.length > 0) {
+        parts.push(capitalize(secondBits.join("; ")) + ".");
+      }
+
+      // QRS, blocks, hypertrophy
+      const qrsWidth = document.getElementById("qrs-width").value;
+      const bundle = document.getElementById("bundle").value;
+
+      const lvh = document.getElementById("lvh").checked;
+      const rvh = document.getElementById("rvh").checked;
+      const lowVoltage = document.getElementById("low-voltage").checked;
+
+      const bifascLad = document.getElementById("bifasc-lad").checked;
+      const bifascRad = document.getElementById("bifasc-rad").checked;
+      const avb2 = document.getElementById("avb-2").checked;
+      const avb3 = document.getElementById("avb-3").checked;
+
+      const qrsBits = [];
+      if (qrsWidth) qrsBits.push(qrsWidth);
+      if (bundle) qrsBits.push(bundle);
+
+      const voltBits = [];
+      if (lvh) voltBits.push("voltage criteria for LVH");
+      if (rvh) voltBits.push("RVH pattern");
+      if (lowVoltage) voltBits.push("low QRS voltage");
+
+      if (voltBits.length > 0) qrsBits.push(voltBits.join(", "));
+
+      const conductionBits = [];
+      if (bifascLad) conductionBits.push("possible bifascicular block (RBBB + LAD)");
+      if (bifascRad) conductionBits.push("possible bifascicular block (RBBB + RAD)");
+      if (avb2) conductionBits.push("second-degree AV block");
+      if (avb3) conductionBits.push("third-degree (complete) AV block");
+
+      if (conductionBits.length > 0) qrsBits.push(conductionBits.join(", "));
+
+      if (qrsBits.length > 0) {
+        parts.push(capitalize(qrsBits.join("; ")) + ".");
+      }
+
+      // Infarct & ST-T
+      const infarctFindings = [];
+      if (document.getElementById("old-inf-inferior").checked)
+        infarctFindings.push("old inferior infarct pattern");
+      if (document.getElementById("old-inf-anterior").checked)
+        infarctFindings.push("old anterior / anteroseptal infarct pattern");
+      if (document.getElementById("old-inf-lateral").checked)
+        infarctFindings.push("old lateral infarct pattern");
+      if (document.getElementById("posterior-mi").checked)
+        infarctFindings.push("posterior MI pattern (mirror changes in V1–V3)");
+
+      const sttFindings = [];
+      if (document.getElementById("stemi-like").checked)
+        sttFindings.push("STEMI-type localized ST elevation; correlate clinically and with troponin");
+      if (document.getElementById("nste-ischemia").checked)
+        sttFindings.push("ST depression / T-wave inversion consistent with ischemia (NSTEMI / unstable angina)");
+      if (document.getElementById("global-peri").checked)
+        sttFindings.push("diffuse ST elevation / PR changes suggestive of pericarditis or myopericarditis");
+      if (document.getElementById("lbhv-strain").checked)
+        sttFindings.push("ST–T changes consistent with LVH strain pattern");
+      if (document.getElementById("nonspecific-st").checked)
+        sttFindings.push("nonspecific ST–T abnormalities");
+
+      const ischBits = [];
+      if (infarctFindings.length > 0)
+        ischBits.push(infarctFindings.join(", "));
+      if (sttFindings.length > 0)
+        ischBits.push(sttFindings.join("; "));
+
+      if (ischBits.length > 0) {
+        parts.push(capitalize(ischBits.join("; ")) + ".");
+      }
+
+      // QT & electrolytes
+      const qt = document.getElementById("qt").value;
+      const hyperk = document.getElementById("hyperk-pattern").checked;
+      const hypok = document.getElementById("hypok-pattern").checked;
+      const hypocalc = document.getElementById("hypocalc-pattern").checked;
+      const hypercalc = document.getElementById("hypercalc-pattern").checked;
+
+      const qtBits = [];
+      if (qt) qtBits.push(qt);
+
+      const elecBits = [];
+      if (hyperk) elecBits.push("T-wave pattern compatible with hyperkalemia");
+      if (hypok) elecBits.push("changes compatible with hypokalemia (U waves / ST depression)");
+      if (hypocalc) elecBits.push("long QT possibly related to hypocalcemia");
+      if (hypercalc) elecBits.push("short QT possibly related to hypercalcemia");
+
+      if (elecBits.length > 0) qtBits.push(elecBits.join(", "));
+
+      if (qtBits.length > 0) {
+        parts.push(capitalize(qtBits.join("; ")) + ".");
+      }
+
+      // Free notes
+      const notes = document.getElementById("notes").value.trim();
+      if (notes.length > 0) {
+        parts.push(notes);
+      }
+
+      const report = parts.join("\n");
+      document.getElementById("report").value =
+        report || "No fields selected yet. Fill the form on the left first.";
+    }
+
+    function copyReport() {
+      const textarea = document.getElementById("report");
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      try {
+        document.execCommand("copy");
+      } catch (e) {
+        // ignore; older browsers may not support execCommand
+      }
+    }
+
+    function capitalize(text) {
+      if (!text) return "";
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+  </script>
+</body>
+</html>
