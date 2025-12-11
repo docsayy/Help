@@ -1,116 +1,504 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cardiology – Clinical Tools</title>
+  <meta charset="UTF-8" />
+  <title>Cardiology Tools – Clinical Helper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --cardiology-main: #e53935;
+      --cardiology-light: #ffebee;
+      --cardiology-accent: #c62828;
+      --bg: #fdfdfd;
+      --text-main: #222;
+      --text-muted: #555;
+      --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+    }
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #ffffff;
-    margin: 20px;
-    color: #111;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-h1 {
-    color: #f97316;
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #ffebee 0, #fdfdfd 45%, #fafafa 100%);
+      color: var(--text-main);
+      padding: 16px;
+    }
 
-.section-title {
-    margin-top: 26px;
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #f97316;
-}
+    header {
+      max-width: 1100px;
+      margin: 0 auto 18px auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
 
-.tool-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-    gap: 12px;
-    margin-top: 12px;
-}
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-.tool-btn {
-    display: block;
-    padding: 14px;
-    background: #f97316;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    transition: 0.15s;
-}
+    h1 {
+      font-size: 2rem;
+      margin: 0;
+      color: var(--cardiology-accent);
+      letter-spacing: 0.03em;
+    }
 
-.tool-btn:hover {
-    background: #fb923c;
-}
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 560px;
+    }
 
-.home-btn {
-    display: inline-block;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    background: #f97316;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-}
-</style>
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(0,0,0,0.06);
+      background: white;
+      color: var(--cardiology-accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .nav-links a.primary {
+      background: var(--cardiology-main);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto 40px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--card-shadow);
+      padding: 18px 18px 14px 18px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--cardiology-accent);
+    }
+
+    .section-title-pill {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--cardiology-light);
+      color: var(--cardiology-accent);
+    }
+
+    .section-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .tool-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(229, 57, 53, 0.06);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .tool-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #c62828;
+    }
+
+    .tool-tagline {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .tool-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tool-chip {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--cardiology-light);
+      color: var(--cardiology-accent);
+      white-space: nowrap;
+    }
+
+    .tool-link {
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: var(--cardiology-main);
+      color: #fff;
+      cursor: pointer;
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .tool-link span {
+      font-size: 0.9em;
+    }
+
+    .coming-soon {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    ul.coming-list {
+      margin: 6px 0 0 18px;
+      padding: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+      header {
+        align-items: flex-start;
+      }
+      .subtitle {
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <div class="title-block">
+      <h1>Cardiology Tools</h1>
+      <div class="subtitle">
+        Rapid bedside helpers for ACS, heart failure, arrhythmias, blood pressure
+        management, and interpretation of ECG/echo findings. Built for ICU / ED workflow.
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="primary">← Home</a>
+      <a href="critical.html">Critical Care</a>
+      <a href="pulmonary.html">Pulmonary</a>
+      <a href="hematology.html">Hematology</a>
+    </nav>
+  </header>
 
-<a href="../index.html" class="home-btn">🏠 Home</a>
+  <main>
+    <!-- Acute chest pain / ACS -->
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          Acute Chest Pain & ACS
+          <span class="section-title-pill">ED / ICU</span>
+        </div>
+        <div class="section-note">
+          Triage, troponin interpretation, and cardiogenic shock support.
+        </div>
+      </div>
 
-<h1>Cardiology Tools</h1>
-<p>Select one of the tools below. More cardiology calculators will be added over time.</p>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Chest Pain / ACS Triage</div>
+            <div class="tool-tagline">
+              Structured ED/ICU approach to ST-elevation, NSTEMI, and unstable angina
+              with initial orders and consult triggers.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">ACS workflow</div>
+            <a class="tool-link" href="cardiology/chest_pain_acs.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
 
-<!-- CHEST PAIN TOOLS -->
-<div class="section-title">Chest Pain & ACS</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/chest_pain_scores.html">HEART + TIMI Score</a>
-    <a class="tool-btn" href="cardiology/grace_acs.html">GRACE ACS Risk</a>
-    <a class="tool-btn" href="cardiology/stemi_reperfusion.html">STEMI Reperfusion Tool</a>
-</div>
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Troponin / ACS Interpreter</div>
+            <div class="tool-tagline">
+              Helps distinguish type 1 MI, type 2 MI, and non-ischemic troponin elevation
+              using trend + clinical context.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Troponin logic</div>
+            <a class="tool-link" href="cardiology/troponin_interpreter.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
 
-<!-- ARRHYTHMIA TOOLS -->
-<div class="section-title">Atrial Fibrillation</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/afib_risk.html">CHA₂DS₂-VASc + HAS-BLED</a>
-    <a class="tool-btn" href="cardiology/af_rate_rhythm.html">AF Rate vs Rhythm Helper</a>
-</div>
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Cardiogenic Shock Helper</div>
+            <div class="tool-tagline">
+              Classifies shock phenotype and suggests inotrope/vasopressor strategy,
+              afterload reduction, and escalation steps.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Shock</div>
+            <a class="tool-link" href="cardiology/cardiogenic_shock.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- PREVENTION -->
-<div class="section-title">Cardiovascular Prevention</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/ascvd.html">ASCVD 10-Year Risk</a>
-    <a class="tool-btn" href="cardiology/statin_selector.html">Statin Selector</a>
-</div>
+    <!-- Chronic HF & BP tools -->
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          Heart Failure & Blood Pressure
+          <span class="section-title-pill">Inpatient / Outpatient</span>
+        </div>
+        <div class="section-note">
+          Diuresis strategy, GDMT, and BP regimen selection.
+        </div>
+      </div>
 
-<!-- HEART FAILURE -->
-<div class="section-title">Heart Failure</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/hf_gdmt.html">HF GDMT Initiation Tool</a>
-    <a class="tool-btn" href="cardiology/nyha_class.html">NYHA Class Calculator</a>
-</div>
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Heart Failure Admission Tool</div>
+            <div class="tool-tagline">
+              Guides assessment of volume status, IV diuretic dosing, escalation,
+              and discharge planning check-list.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">HF management</div>
+            <a class="tool-link" href="cardiology/heart_failure_tool.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
 
-<!-- BLOOD PRESSURE -->
-<div class="section-title">Hypertension Management</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/bp_selector.html">BP Medication Selector</a>
-</div>
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">BP Medication Selector</div>
+            <div class="tool-tagline">
+              Chooses antihypertensive regimen based on comorbidities (CKD, HF, CAD),
+              race/ethnicity considerations, and current meds.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Hypertension</div>
+            <a class="tool-link" href="cardiology/bp_med_selector.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
 
-<!-- EKG -->
-<div class="section-title">Electrocardiography</div>
-<div class="tool-grid">
-    <a class="tool-btn" href="cardiology/ekg_guide.html">EKG Stepwise Guide</a>
-    <a class="tool-btn" href="cardiology/ekg_interpreter.html">EKG Interpreter</a>
-</div>
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Cardiovascular Risk / Prevention</div>
+            <div class="tool-tagline">
+              ASCVD risk framing, statin intensity suggestions, and other
+              secondary-prevention measures.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Prevention</div>
+            <a class="tool-link" href="cardiology/risk_scores.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <!-- Arrhythmias -->
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          Arrhythmias & Anticoagulation
+          <span class="section-title-pill">Rhythm tools</span>
+        </div>
+        <div class="section-note">
+          AF, bradycardia, and wide complex tachycardia support.
+        </div>
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Atrial Fibrillation Tool</div>
+            <div class="tool-tagline">
+              CHA<sub>2</sub>DS<sub>2</sub>-VASc, HAS-BLED, rate vs rhythm strategy,
+              and anticoagulation suggestions with copyable plan text.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">AFib</div>
+            <a class="tool-link" href="cardiology/afib_tool.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Bradycardia / Pacing Helper</div>
+            <div class="tool-tagline">
+              Classifies AV block, flags red-flag features, and suggests atropine,
+              transcutaneous, or transvenous pacing steps.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Bradyarrhythmia</div>
+            <a class="tool-link" href="cardiology/brady_pacing_tool.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Wide Complex Tachycardia Helper</div>
+            <div class="tool-tagline">
+              VT vs SVT with aberrancy hints, stability checks, and cardioversion vs
+              medication suggestions.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Tachyarrhythmia</div>
+            <a class="tool-link" href="cardiology/wct_tool.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ECG / Echo / Scores -->
+    <section class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          ECG, Echocardiography & Scores
+          <span class="section-title-pill">Interpretation</span>
+        </div>
+        <div class="section-note">
+          Structured reading guides and risk calculations.
+        </div>
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">ECG Stepwise Guide</div>
+            <div class="tool-tagline">
+              Systematic interpretation (rate, rhythm, axis, intervals, ischemia,
+              hypertrophy) with example images.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">ECG</div>
+            <a class="tool-link" href="cardiology/ecg_stepwise.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Echocardiography Interpreter</div>
+            <div class="tool-tagline">
+              Enter key echo values (LVEF, LV size, RV, valves, PASP, etc.) and get
+              a narrative read with reasoning close to a cardiology report.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Echo</div>
+            <a class="tool-link" href="cardiology/echo_interpreter.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div>
+            <div class="tool-name">Cardiology Risk Scores Hub</div>
+            <div class="tool-tagline">
+              Collection of TIMI, GRACE, CHA<sub>2</sub>DS<sub>2</sub>-VASc and other
+              commonly used risk scores in one place.
+            </div>
+          </div>
+          <div class="tool-footer">
+            <div class="tool-chip">Risk scores</div>
+            <a class="tool-link" href="cardiology/risk_scores.html">
+              Open <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="coming-soon">
+        Coming soon (no links yet, just ideas you mentioned / might want):
+      </div>
+      <ul class="coming-list">
+        <li>Valve lesion severity and management helper (AS, MR, AR, MS).</li>
+        <li>Peri-operative cardiac risk assessment.</li>
+        <li>Outpatient syncope evaluation checklist.</li>
+      </ul>
+    </section>
+  </main>
 </body>
 </html>
