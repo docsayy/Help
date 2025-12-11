@@ -1,289 +1,116 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cardiology Tools – Clinical Helper</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cardiology – Clinical Tools</title>
 
-  <style>
-    :root {
-      --bg: #f8fafc;               /* very light background */
-      --card: #ffffff;
-      --surface: #ffffff;
-      --accent: #e63946;           /* cardiology soft red */
-      --accent-soft: rgba(230, 57, 70, 0.15);
-      --muted: #52525b;
-      --border: rgba(0,0,0,0.12);
-      --radius: 14px;
-      --pad: 14px;
-      color-scheme: light;
-    }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    margin: 20px;
+    color: #111;
+}
 
-    * { box-sizing: border-box; }
+h1 {
+    color: #f97316;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: #1e293b;
-      display: flex;
-      justify-content: center;
-      padding: 16px;
-    }
+.section-title {
+    margin-top: 26px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #f97316;
+}
 
-    .shell {
-      width: 100%;
-      max-width: 1040px;
-    }
+.tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
+.tool-btn {
+    display: block;
+    padding: 14px;
+    background: #f97316;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.15s;
+}
 
-    .system-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle at 40% 30%, #ffddd8, #ff9c8f 60%, #e63946);
-      color: #ffffff;
-      font-size: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
+.tool-btn:hover {
+    background: #fb923c;
+}
 
-    header h1 {
-      font-size: 1.7rem;
-      margin: 0;
-      color: #1e293b;
-    }
-
-    header p {
-      margin: 2px 0 0;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-      font-size: 0.75rem;
-    }
-
-    .tag {
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: #ffffff;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    @media (min-width: 720px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (min-width: 1040px) {
-      .grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: var(--pad);
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    .card-inner {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      height: 100%;
-    }
-
-    .card h2 {
-      margin: 0;
-      font-size: 1.05rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #1e293b;
-    }
-
-    .badge {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 3px 7px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid rgba(0,0,0,0.08);
-      white-space: nowrap;
-    }
-
-    .card p {
-      margin: 0;
-      font-size: 0.83rem;
-      color: var(--muted);
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 4px 0 8px;
-    }
-
-    .pill {
-      font-size: 0.72rem;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      color: #1e293b;
-      background: #ffffff;
-    }
-
-    .btn {
-      margin-top: auto;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      border: none;
-      padding: 7px 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-decoration: none;
-      background: linear-gradient(135deg, #ffb4a8, #ff8473 60%, #e63946);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(230,57,70,0.35);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.06);
-      box-shadow: 0 6px 16px rgba(230,57,70,0.45);
-    }
-
-    .btn .icon {
-      font-size: 1rem;
-    }
-
-    footer {
-      margin-top: 18px;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-align: center;
-    }
-  </style>
+.home-btn {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #f97316;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+</style>
 </head>
 
 <body>
-  <main class="shell">
 
-    <header>
-      <div class="system-icon">❤️</div>
-      <div>
-        <h1>Cardiology Tools</h1>
-        <p>ACS, arrhythmia, HF & prevention — cardiology tools in a bright theme.</p>
-        <div class="tag-row">
-          <span class="tag">Bright mode</span>
-          <span class="tag">Cardiology theme</span>
-          <span class="tag">Clinical tools</span>
-        </div>
-      </div>
-    </header>
+<a href="../index.html" class="home-btn">🏠 Home</a>
 
-    <section class="grid">
+<h1>Cardiology Tools</h1>
+<p>Select one of the tools below. More cardiology calculators will be added over time.</p>
 
-      <!-- ⭐ NEW: ECG Stepwise Guide -->
-      <article class="card">
-        <div class="card-inner">
-          <h2>
-            ECG Stepwise Guide
-            <span class="badge">Teaching</span>
-          </h2>
-          <p>Full step-by-step ECG interpretation tutorial with diagrams, snippets, and structured learning.</p>
-          <div class="pill-row">
-            <span class="pill">ECG basics</span>
-            <span class="pill">Intervals</span>
-            <span class="pill">Axis & MI</span>
-          </div>
-          <a class="btn" href="cardiology/ekg_guide.html">
-            <span class="icon">📘</span>
-            <span>Open Guide</span>
-          </a>
-        </div>
-      </article>
+<!-- CHEST PAIN TOOLS -->
+<div class="section-title">Chest Pain & ACS</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="chest_pain_scores.html">HEART + TIMI Score</a>
+    <a class="tool-btn" href="grace_acs.html">GRACE ACS Risk</a>
+    <a class="tool-btn" href="stemi_reperfusion.html">STEMI Reperfusion Tool</a>
+</div>
 
-      <!-- ⭐ NEW: ECG Interpreter Tool -->
-      <article class="card">
-        <div class="card-inner">
-          <h2>
-            ECG Interpreter
-            <span class="badge">Interactive</span>
-          </h2>
-          <p>Structured ECG interpreter with rhythm, axis, intervals, hypertrophy, MI & electrolyte evaluation.</p>
-          <div class="pill-row">
-            <span class="pill">Report generator</span>
-            <span class="pill">Axis</span>
-            <span class="pill">Hypertrophy</span>
-          </div>
-          <a class="btn" href="cardiology/ekg_interpreter.html">
-            <span class="icon">🧠</span>
-            <span>Open Interpreter</span>
-          </a>
-        </div>
-      </article>
+<!-- ARRHYTHMIA TOOLS -->
+<div class="section-title">Atrial Fibrillation</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="afib_risk.html">CHA₂DS₂-VASc + HAS-BLED</a>
+    <a class="tool-btn" href="af_rate_rhythm.html">AF Rate vs Rhythm Helper</a>
+</div>
 
-      <!-- EXISTING CARDS BELOW (unchanged except styling) -->
+<!-- PREVENTION -->
+<div class="section-title">Cardiovascular Prevention</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="ascvd.html">ASCVD 10-Year Risk</a>
+    <a class="tool-btn" href="statin_selector.html">Statin Selector</a>
+</div>
 
-      <!-- 1. Chest Pain Scores -->
-      <article class="card">
-        <div class="card-inner">
-          <h2>Chest Pain Scores <span class="badge">HEART + TIMI</span></h2>
-          <p>ED chest pain / UA-NSTEMI risk stratification using HEART and TIMI scores.</p>
-          <div class="pill-row">
-            <span class="pill">HEART</span>
-            <span class="pill">TIMI</span>
-          </div>
-          <a class="btn" href="cardiology/chest_pain_scores.html">
-            <span class="icon">📈</span> Open chest pain tool
-          </a>
-        </div>
-      </article>
+<!-- HEART FAILURE -->
+<div class="section-title">Heart Failure</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="hf_gdmt.html">HF GDMT Initiation Tool</a>
+    <a class="tool-btn" href="nyha_class.html">NYHA Class Calculator</a>
+</div>
 
-      <!-- The rest of your original cards remain IDENTICAL. -->
-      <!-- I removed nothing; only restyled them to bright mode. -->
-      <!-- (To save space, I am not repeating all cards here, but your final export will include all of them.) -->
+<!-- BLOOD PRESSURE -->
+<div class="section-title">Hypertension Management</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="bp_selector.html">BP Medication Selector</a>
+</div>
 
-      <!-- … (insert all your remaining original cards here, unchanged except styling) … -->
+<!-- EKG -->
+<div class="section-title">Electrocardiography</div>
+<div class="tool-grid">
+    <a class="tool-btn" href="ekg_guide.html">EKG Stepwise Guide</a>
+    <a class="tool-btn" href="ekg_interpreter.html">EKG Interpreter</a>
+</div>
 
-    </section>
-
-    <footer>
-      Educational support only — confirm with the latest ACC/AHA/ESC guidelines.
-    </footer>
-
-  </main>
 </body>
 </html>
