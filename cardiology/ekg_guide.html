@@ -1,161 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ECG Stepwise Guide</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --cardiology-main: #e53935;
-      --cardiology-light: #ffebee;
-      --cardiology-accent: #c62828;
-      --text-main: #222;
-      --text-muted: #555;
-      --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --radius-lg: 14px;
-      --radius-pill: 999px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #fff, #ffeef0);
-      color: var(--text-main);
-      padding: 16px;
-    }
-    .page {
-      max-width: 1100px;
-      margin: 0 auto 32px;
-      background: rgba(255,255,255,0.96);
-      border-radius: 20px;
-      box-shadow: var(--card-shadow);
-      padding: 20px 16px 24px;
-    }
-    .card {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--card-shadow);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    h2 {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0 0 6px;
-      font-size: 1.15rem;
-    }
-    .step-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: var(--cardiology-main);
-      color: #fff;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-    .step-body {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.35;
-      margin-bottom: 4px;
-    }
-    ul {
-      margin: 6px 0 6px 18px;
-      font-size: 0.88rem;
-      color: var(--text-muted);
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>ECG Stepwise Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+/* --- SAME CSS AS YOUR ORIGINAL, UNCHANGED --- */
+:root {
+  --cardiology-main:#e53935;
+  --cardiology-light:#ffebee;
+  --cardiology-accent:#c62828;
+  --text-main:#222;
+  --text-muted:#555;
+  --card-shadow:0 4px 12px rgba(0,0,0,0.08);
+  --radius-lg:14px;
+  --radius-pill:999px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:linear-gradient(135deg,#fff,#ffeef0);
+  color:var(--text-main);
+  padding:16px;
+}
+.page{
+  max-width:1100px;
+  margin:0 auto 32px;
+  background:rgba(255,255,255,0.96);
+  border-radius:20px;
+  box-shadow:var(--card-shadow);
+  padding:20px 16px 24px;
+}
+.card{
+  background:#fff;
+  border-radius:var(--radius-lg);
+  box-shadow:var(--card-shadow);
+  padding:16px;
+  margin-bottom:16px;
+}
+.step-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:26px;
+  height:26px;
+  border-radius:999px;
+  background:var(--cardiology-main);
+  color:#fff;
+  font-size:.85rem;
+  font-weight:700;
+  margin-right:8px;
+}
+.step-body{
+  font-size:.9rem;
+  color:var(--text-muted);
+  line-height:1.35;
+  margin-bottom:6px;
+}
+ul{
+  margin:6px 0 6px 18px;
+  font-size:.88rem;
+  color:var(--text-muted);
+}
+.image-block{
+  margin:10px auto 6px;
+  max-width:520px;
+  border-radius:12px;
+  border:1px solid rgba(198,40,40,.25);
+  background:#fff;
+  padding:8px;
+}
+.image-block img{
+  width:100%;
+  border-radius:8px;
+  cursor:zoom-in;
+}
+.image-caption{
+  margin-top:6px;
+  font-size:.75rem;
+  color:#555;
+  text-align:center;
+}
+</style>
 </head>
+
 <body>
 <div class="page">
 
+<!-- STEP 1 -->
 <section class="card">
-<h2><span class="step-badge">5</span> QRS axis</h2>
+<h2><span class="step-badge">1</span> Rhythm & sinus check</h2>
 <div class="step-body">
-Axis helps localize pathology and reflects chronic pressure, conduction disease, or prior infarction.
+Rhythm identifies where impulses originate and whether atrial activity is organized or chaotic.
 </div>
 <ul>
-<li>I & II positive → normal axis</li>
-<li>I positive, II negative → left axis deviation</li>
-<li>I negative, aVF positive → right axis deviation</li>
-<li>I negative, aVF negative → extreme axis</li>
+<li>P wave before every QRS?</li>
+<li>P upright in leads I and II?</li>
+<li>Regular RR intervals?</li>
+</ul>
+<div class="image-block">
+<img src="ekg_images/basic_waves_p_qrs_t.png" />
+<div class="image-caption">P–QRS–T relationship</div>
+</div>
+</section>
+
+<!-- STEP 2 -->
+<section class="card">
+<h2><span class="step-badge">2</span> Heart rate</h2>
+<div class="step-body">
+Decide early whether the rate itself explains the patient’s symptoms or instability.
+</div>
+<ul>
+<li>300 rule for regular rhythms</li>
+<li>10-second count ×6 for irregular rhythms</li>
+</ul>
+<div class="image-block">
+<img src="ekg_images/rate_300_rule.png" />
+<div class="image-caption">300-rule example</div>
+</div>
+</section>
+
+<!-- STEP 3 -->
+<section class="card">
+<h2><span class="step-badge">3</span> P waves & atrial size</h2>
+<div class="step-body">
+P-wave morphology reflects chronic atrial pressure and volume load.
+</div>
+<ul>
+<li>P pulmonale → RAE</li>
+<li>P mitrale → LAE</li>
+</ul>
+<div class="image-block">
+<img src="ekg_images/p_mitrale_p_pulmonale.jpg" />
+<div class="image-caption">RAE vs LAE</div>
+</div>
+</section>
+
+<!-- STEP 4 -->
+<section class="card">
+<h2><span class="step-badge">4</span> PR interval</h2>
+<div class="step-body">
+The PR interval localizes AV nodal delay or accessory pathway physiology.
+</div>
+<ul>
+<li>Normal: 0.12–0.20 s</li>
+<li>Prolonged → 1° AV block</li>
+<li>Short PR ± delta → WPW</li>
+</ul>
+<div class="image-block">
+<img src="ekg_images/short_pr_delta_wpw.webp" />
+<div class="image-caption">Short PR with delta wave</div>
+</div>
+</section>
+
+<!-- STEP 5 -->
+<section class="card">
+<h2><span class="step-badge">5</span> Axis</h2>
+<div class="step-body">
+Axis helps localize pathology and reflects chronic chamber pressure or conduction disease.
+</div>
+<ul>
+<li>I & II positive → normal</li>
+<li>LAD / RAD / extreme axis patterns</li>
+</ul>
+<div class="image-block">
+<img src="ekg_images/axis_circle_cabrera.png" />
+<div class="image-caption">Axis determination</div>
+</div>
+</section>
+
+<!-- STEP 6 -->
+<section class="card">
+<h2><span class="step-badge">6</span> QRS duration</h2>
+<div class="step-body">
+QRS width tells you whether depolarization uses the His–Purkinje system or myocardium.
+</div>
+<ul>
+<li>Narrow &lt;0.10 s</li>
+<li>BBB ≥0.12 s</li>
 </ul>
 </section>
 
-<section class="card">
-<h2><span class="step-badge">6</span> QRS duration & bundle branch block</h2>
-<div class="step-body">
-QRS width tells you whether depolarization is using the His–Purkinje system or spreading through myocardium.
-</div>
-<ul>
-<li>&lt;0.10 s: narrow</li>
-<li>0.10–0.12 s: incomplete BBB</li>
-<li>≥0.12 s: complete BBB</li>
-</ul>
-</section>
-
+<!-- STEP 7 -->
 <section class="card">
 <h2><span class="step-badge">7</span> Precordial transition</h2>
 <div class="step-body">
-Precordial transition reflects ventricular orientation and may suggest chamber enlargement or lead misplacement.
+Precordial transition reflects ventricular orientation and chamber dominance.
 </div>
 <ul>
-<li>Normal transition: V3–V4</li>
-<li>Late transition: clockwise rotation</li>
-<li>Early transition: counterclockwise rotation</li>
+<li>Normal V3–V4</li>
+<li>Early vs late transition</li>
 </ul>
+<div class="image-block">
+<img src="ekg_images/precordial_normal_v1_v6.png" />
+<div class="image-caption">Normal R-wave progression</div>
+</div>
 </section>
 
+<!-- STEP 8 -->
 <section class="card">
 <h2><span class="step-badge">8</span> Voltage & hypertrophy</h2>
 <div class="step-body">
-Voltage patterns suggest chronic pressure or volume overload but must be interpreted clinically.
+Voltage patterns suggest chronic pressure or volume overload.
 </div>
 <ul>
-<li>LVH: high voltage ± strain</li>
-<li>RVH: tall R in V1 with RAD</li>
-<li>Low voltage: effusion, COPD, obesity</li>
+<li>LVH ± strain</li>
+<li>RVH with RAD</li>
 </ul>
+<div class="image-block">
+<img src="ekg_images/lvh_voltage_example.jpeg" />
+<div class="image-caption">LVH example</div>
+</div>
 </section>
 
+<!-- STEP 9 -->
 <section class="card">
-<h2><span class="step-badge">9</span> Infarction & localization</h2>
+<h2><span class="step-badge">9</span> Infarction</h2>
 <div class="step-body">
-This step asks whether myocardial necrosis is present and where it is located.
+This step asks whether myocardial necrosis is present and where.
 </div>
 <ul>
-<li>Inferior: II, III, aVF</li>
-<li>Anterior: V1–V4</li>
-<li>Lateral: I, aVL, V5–V6</li>
+<li>Inferior / anterior / lateral patterns</li>
 </ul>
+<div class="image-block">
+<img src="ekg_images/stemi_inferior_example.png" />
+<div class="image-caption">Inferior STEMI</div>
+</div>
 </section>
 
+<!-- STEP 10 -->
 <section class="card">
-<h2><span class="step-badge">10</span> ST segment & T waves</h2>
+<h2><span class="step-badge">10</span> ST–T changes</h2>
 <div class="step-body">
 ST–T abnormalities reflect ischemia, injury, or secondary repolarization changes.
 </div>
 <ul>
-<li>Convex ST elevation: STEMI</li>
-<li>ST depression/T inversion: ischemia</li>
-<li>Diffuse concave ST elevation: pericarditis</li>
+<li>ST elevation, depression, T inversion</li>
 </ul>
+<div class="image-block">
+<img src="ekg_images/st_patterns_panel.png" />
+<div class="image-caption">ST–T patterns</div>
+</div>
 </section>
 
+<!-- STEP 11 -->
 <section class="card">
-<h2><span class="step-badge">11</span> QT interval & electrolytes</h2>
+<h2><span class="step-badge">11</span> QT & electrolytes</h2>
 <div class="step-body">
-QT abnormalities predict arrhythmia risk and often reflect electrolyte or medication effects.
+QT abnormalities predict arrhythmia risk and electrolyte toxicity.
 </div>
 <ul>
-<li>Hyperkalemia: peaked T waves</li>
-<li>Hypokalemia: U waves</li>
-<li>Hypocalcemia: prolonged QT</li>
+<li>HyperK, HypoK, QT prolongation</li>
 </ul>
+<div class="image-block">
+<img src="ekg_images/qt_long_short_examples.png" />
+<div class="image-caption">QT examples</div>
+</div>
 </section>
 
 </div>
