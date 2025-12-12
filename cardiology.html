@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cardiology – Medical Decision Support</title>
+<style>
+:root{
+  --bg:#fff6f6;
+  --card:#ffffff;
+  --accent:#c62828;
+  --accent-soft:#ffebee;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#f2c9c9;
+  --shadow:0 6px 18px rgba(0,0,0,0.08);
+  --r:16px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background: radial-gradient(circle at top, var(--accent-soft) 0%, var(--bg) 48%, #ffffff 100%);
+  color:var(--text);
+}
+header{
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+h1{margin:0;font-size:26px;color:var(--accent)}
+.subtitle{margin-top:4px;font-size:14px;color:var(--muted);max-width:900px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  text-decoration:none;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:14px;
+  border:1px solid var(--border);
+}
+.btn.primary{background:var(--accent);color:white;border:none;box-shadow:0 3px 10px rgba(198,40,40,.25)}
+.btn.secondary{background:white;color:var(--accent)}
+main{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 20px 30px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap:18px;
+}
+.category{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  padding:16px;
+}
+.category h2{
+  margin:0 0 10px;
+  font-size:18px;
+  color:var(--accent);
+}
+.category p{
+  margin:0 0 12px;
+  font-size:13px;
+  color:var(--muted);
+}
+.tool{
+  display:block;
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid #f1d0d0;
+  background:#fffafa;
+  margin-bottom:8px;
+  font-weight:700;
+  color:#111827;
+}
+.tool:hover{
+  background:var(--accent-soft);
+  border-color:var(--accent);
+}
+footer{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  padding:10px 20px 20px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Cardiology</h1>
+    <div class="subtitle">
+      Decision-focused cardiology tools for inpatient, outpatient, and critical care use.
+      Organized by clinical workflow rather than anatomy.
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn secondary" href="index.html">🏠 Home</a>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <div class="category">
+      <h2>Chest Pain & ACS</h2>
+      <p>Risk stratification and reperfusion decision support.</p>
+      <a class="tool" href="cardiology/chest_pain_scores.html">HEART & TIMI – Chest Pain Scores</a>
+      <a class="tool" href="cardiology/grace_acs.html">GRACE ACS Risk Calculator</a>
+      <a class="tool" href="cardiology/stemi_reperfusion.html">STEMI Reperfusion Strategy</a>
+    </div>
+
+    <div class="category">
+      <h2>Arrhythmias (Atrial Fibrillation)</h2>
+      <p>Stroke prevention and rhythm vs rate strategy.</p>
+      <a class="tool" href="cardiology/af_risk.html">CHA₂DS₂‑VASc – Stroke Risk</a>
+      <a class="tool" href="cardiology/af_rate_rhythm.html">AF Rate vs Rhythm Control Helper</a>
+    </div>
+
+    <div class="category">
+      <h2>Heart Failure</h2>
+      <p>Functional classification and guideline-based management.</p>
+      <a class="tool" href="cardiology/nyha_class.html">NYHA Functional Class</a>
+      <a class="tool" href="cardiology/hf_gdmt.html">Heart Failure GDMT Framework</a>
+    </div>
+
+    <div class="category">
+      <h2>Imaging (Echocardiography)</h2>
+      <p>Structured echo interpretation with reasoning.</p>
+      <a class="tool" href="cardiology/tte_interpreter.html">TTE Interpreter / Echo Read Tool</a>
+    </div>
+
+    <div class="category">
+      <h2>ECG</h2>
+      <p>Stepwise ECG reading and interpretation.</p>
+      <a class="tool" href="cardiology/ekg_guide.html">ECG Stepwise Guide</a>
+      <a class="tool" href="cardiology/ekg_interpreter.html">ECG Interpreter</a>
+    </div>
+
+    <div class="category">
+      <h2>Prevention & Lipids</h2>
+      <p>ASCVD risk estimation and statin selection.</p>
+      <a class="tool" href="cardiology/ascvd.html">ASCVD Risk Calculator</a>
+      <a class="tool" href="cardiology/statin_selector.html">Statin Selection Tool</a>
+    </div>
+
+    <div class="category">
+      <h2>Hypertension</h2>
+      <p>Blood pressure treatment selection.</p>
+      <a class="tool" href="cardiology/bp_selector.html">BP Medication Selector</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  Cardiology tools are designed for clinical decision support — always integrate patient context and guidelines.
+</footer>
+
+</body>
+</html>
