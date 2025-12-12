@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TTE Interpreter / Echo Read Tool – Cardiology</title>
+<style>
+:root{
+  --bg:#fff6f6; --panel:#ffffff; --accent:#c62828; --accent2:#e53935;
+  --soft:#ffebee; --muted:#5f6368; --text:#1f2937;
+  --ok:#1b5e20; --warn:#b26a00; --bad:#b71c1c;
+  --border:#f2c9c9; --shadow:0 6px 18px rgba(0,0,0,0.08);
+  --r:16px; --pill:999px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background: radial-gradient(circle at top, var(--soft) 0%, var(--bg) 48%, #ffffff 100%);
+  color:var(--text);
+}
+header{padding:18px 18px 10px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+.title{display:flex; gap:12px; align-items:center;}
+.logo{
+  width:44px;height:44px;border-radius:14px;
+  background: linear-gradient(145deg, var(--accent), var(--accent2));
+  box-shadow: var(--shadow);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:900;letter-spacing:.5px;
+}
+h1{margin:0;font-size:20px}
+.subtitle{margin:2px 0 0;color:var(--muted);font-size:13px;max-width:820px;line-height:1.35}
+.top-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:none; cursor:pointer; padding:10px 12px; border-radius: var(--pill);
+  background: var(--accent); color:white; font-weight:800;
+  box-shadow: 0 3px 10px rgba(198,40,40,0.25);
+  text-decoration:none; display:inline-flex; align-items:center; gap:8px; user-select:none;
+}
+.btn.secondary{background:#fff;color:var(--accent);border:1px solid var(--border);box-shadow:none;font-weight:900}
+.btn.ghost{background:transparent;color:var(--accent);border:1px dashed var(--border);box-shadow:none;font-weight:900}
+main{padding:0 18px 24px; max-width:1200px; margin:0 auto;}
+.grid{display:grid; grid-template-columns: 1.05fr .95fr; gap:16px; align-items:start;}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.card{
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--r);
+  box-shadow:var(--shadow); padding:14px;
+}
+.card h2{margin:0 0 10px; font-size:16px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.chip{font-size:12px;padding:6px 10px;border-radius:var(--pill);background:var(--soft);border:1px solid var(--border);color:var(--accent);font-weight:900}
+.section{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+.section:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.section-title h3{margin:0;font-size:14px}
+.hint{font-size:12px;color:var(--muted);line-height:1.35}
+.fields{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+.field{grid-column:span 6;display:flex;flex-direction:column;gap:6px}
+.field.small{grid-column:span 4}
+.field.tiny{grid-column:span 3}
+.field.wide{grid-column:span 12}
+label{font-size:12px;color:#374151;font-weight:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+label .req{font-size:11px;padding:3px 8px;border-radius:var(--pill);background:rgba(198,40,40,.10);border:1px solid rgba(198,40,40,.25);color:var(--accent);font-weight:950}
+label .opt{font-size:11px;padding:3px 8px;border-radius:var(--pill);background:#f6f7f8;border:1px solid #e7eaee;color:#4b5563;font-weight:950}
+input[type="number"], select, textarea{
+  width:100%; padding:10px; border-radius:12px; border:1px solid #e7baba; background:#fff; outline:none; font-size:14px;
+}
+textarea{min-height:72px; resize:vertical;}
+input[type="number"]:focus, select:focus, textarea:focus{border-color:rgba(198,40,40,.55); box-shadow:0 0 0 4px rgba(198,40,40,.08)}
+.req-input{background:#fff2f2;border-color:rgba(198,40,40,.55)}
+.checkline{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px;border-radius:14px;
+  border:1px solid #f0d0d0;background:#fffafa;
+}
+.checkline label{font-weight:900;color:#111827;margin-right:auto}
+.check{display:flex;align-items:center;gap:8px;font-size:13px;color:#1f2937;margin-right:10px;user-select:none}
+.check input{transform:scale(1.05);accent-color:var(--accent)}
+.pillnote{font-size:12px;color:var(--muted);padding:8px 10px;border-radius:var(--r);background:#fffafa;border:1px dashed var(--border);line-height:1.35}
+.output h2{margin-bottom:8px}
+.impression{border-radius:14px;padding:12px;border:1px solid var(--border);background:linear-gradient(180deg,#fff8f8,#fff)}
+.impression .line{font-size:15px;font-weight:950;color:#111827;line-height:1.35}
+.impression .meta{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.35}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.badge{font-size:12px;padding:6px 10px;border-radius:var(--pill);border:1px solid;font-weight:950;display:inline-flex;align-items:center;gap:8px}
+.badge.ok{background:#e8f5e9;border-color:#b7dfbb;color:var(--ok)}
+.badge.warn{background:#fff8e1;border-color:#f0d49b;color:var(--warn)}
+.badge.bad{background:#ffebee;border-color:#f3b1b5;color:var(--bad)}
+.kv{margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:560px){.kv{grid-template-columns:1fr}}
+.kv .box{border-radius:14px;border:1px solid #f1d0d0;background:#fffafa;padding:10px}
+.kv .k{font-size:12px;color:var(--muted);font-weight:900}
+.kv .v{margin-top:3px;font-size:14px;font-weight:950}
+.details{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+.details h3{margin:0 0 6px;font-size:14px}
+.details ul{margin:8px 0 0 18px;padding:0}
+.details li{margin:6px 0;color:#111827;line-height:1.35}
+.reason{color:#374151;font-weight:800}
+.copywrap{margin-top:10px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}
+.copyhdr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;background:#fff7f7;border-bottom:1px solid var(--border)}
+.copyhdr .t{font-weight:950;color:#111827}
+.copyhdr .small{font-size:12px;color:var(--muted);font-weight:800}
+pre{margin:0;padding:12px;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12.5px;line-height:1.35}
+footer{max-width:1200px;margin:0 auto;padding:0 18px 26px;color:var(--muted);font-size:12px;line-height:1.35}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tinywarn{margin-top:10px;padding:10px 12px;border-radius:14px;border:1px solid #f0d49b;background:#fff8e1;color:#5b4600;font-weight:800}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <div class="logo">TTE</div>
+    <div>
+      <h1>TTE Interpreter / Echo Read Tool</h1>
+      <div class="subtitle">
+        Enter whatever you have. Missing values are OK — the tool degrades confidence rather than breaking.
+        Essential inputs are highlighted. Output includes: one-line impression, structured findings with reasoning, and a copy-to-clipboard summary.
+      </div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <a class="btn secondary" href="../index.html">🏠 Home</a>
+    <a class="btn secondary" href="../cardiology.html">↩︎ Back to Cardiology</a>
+    <button class="btn ghost" id="btnFillExample" type="button">✨ Example</button>
+    <button class="btn" id="btnInterpret" type="button">🧠 Interpret</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+
+    <div class="card">
+      <h2>Inputs <span class="chip">Works with missing values</span></h2>
+
+      <div class="section">
+        <div class="section-title"><h3>Study context</h3><div class="hint">Optional, but helps the narrative.</div></div>
+        <div class="fields">
+          <div class="field small">
+            <label>Patient sex <span class="opt">optional</span></label>
+            <select id="sex"><option value="">—</option><option value="M">Male</option><option value="F">Female</option></select>
+          </div>
+          <div class="field small">
+            <label>BSA (m²) <span class="opt">optional</span></label>
+            <input id="bsa" type="number" step="0.01" min="0" placeholder="e.g., 1.92" />
+          </div>
+          <div class="field wide">
+            <label>Indication / clinical question <span class="opt">optional</span></label>
+            <textarea id="indication" placeholder="e.g., Dyspnea, r/o HF; murmur; syncope; AF; pre-op..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Left Ventricle (LV) systolic & structure</h3><div class="hint">EF + LV size + wall thickness are core framing variables.</div></div>
+        <div class="fields">
+          <div class="field tiny"><label>LVEF (%) <span class="req">essential</span></label><input id="lvef" class="req-input" type="number" step="1" min="0" max="90" placeholder="e.g., 55" /></div>
+          <div class="field tiny"><label>LVEDD (cm) <span class="opt">optional</span></label><input id="lvedd" type="number" step="0.1" min="0" placeholder="e.g., 5.2" /></div>
+          <div class="field tiny"><label>LVESD (cm) <span class="opt">optional</span></label><input id="lvesd" type="number" step="0.1" min="0" placeholder="e.g., 3.4" /></div>
+          <div class="field tiny"><label>IVSd (cm) <span class="opt">optional</span></label><input id="ivsd" type="number" step="0.1" min="0" placeholder="e.g., 1.1" /></div>
+          <div class="field tiny"><label>PWd (cm) <span class="opt">optional</span></label><input id="pwd" type="number" step="0.1" min="0" placeholder="e.g., 1.0" /></div>
+          <div class="field wide">
+            <div class="checkline">
+              <label>Regional wall motion abnormality (RWMA) <span class="opt">optional</span></label>
+              <span class="check"><input id="rwma" type="checkbox" />Present</span>
+              <span class="check"><input id="rwma_unknown" type="checkbox" />Not assessed/unknown</span>
+            </div>
+          </div>
+        </div>
+        <div class="pillnote"><b>LVH quick heuristic:</b> if IVSd or PWd ≥ 1.2 cm → suggests LVH (context-dependent).</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Diastology (filling pressures)</h3><div class="hint">We synthesize E/A, e′, E/e′, LA size, and TR velocity — and label uncertainty.</div></div>
+        <div class="fields">
+          <div class="field tiny"><label>Mitral E (cm/s) <span class="opt">optional</span></label><input id="E" type="number" step="1" min="0" placeholder="e.g., 80" /></div>
+          <div class="field tiny"><label>Mitral A (cm/s) <span class="opt">optional</span></label><input id="A" type="number" step="1" min="0" placeholder="e.g., 60" /></div>
+          <div class="field tiny"><label>e′ septal (cm/s) <span class="opt">optional</span></label><input id="eprime_s" type="number" step="0.1" min="0" placeholder="e.g., 6.0" /></div>
+          <div class="field tiny"><label>e′ lateral (cm/s) <span class="opt">optional</span></label><input id="eprime_l" type="number" step="0.1" min="0" placeholder="e.g., 10.0" /></div>
+          <div class="field tiny"><label>E/e′ (avg) <span class="opt">optional</span></label><input id="Ee" type="number" step="0.1" min="0" placeholder="e.g., 13.5" /></div>
+          <div class="field tiny"><label>LA volume index (mL/m²) <span class="opt">optional</span></label><input id="lavi" type="number" step="1" min="0" placeholder="e.g., 42" /></div>
+          <div class="field tiny"><label>TR Vmax (m/s) <span class="opt">optional</span></label><input id="trv" type="number" step="0.01" min="0" placeholder="e.g., 2.9" /></div>
+        </div>
+        <div class="pillnote"><b>Elevated filling pressure markers (heuristic):</b> E/e′ &gt; 14, LAVI &gt; 34, TR Vmax &gt; 2.8 m/s.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Right heart & pulmonary pressures</h3><div class="hint">TAPSE/S′ for RV function; TRV + IVC for PASP estimate.</div></div>
+        <div class="fields">
+          <div class="field tiny"><label>TAPSE (cm) <span class="opt">optional</span></label><input id="tapse" type="number" step="0.1" min="0" placeholder="e.g., 1.8" /></div>
+          <div class="field tiny"><label>RV S′ (cm/s) <span class="opt">optional</span></label><input id="rvs" type="number" step="0.1" min="0" placeholder="e.g., 10.5" /></div>
+          <div class="field small"><label>RV size <span class="opt">optional</span></label>
+            <select id="rv_size"><option value="">—</option><option value="normal">Normal</option><option value="mild">Mildly dilated</option><option value="moderate">Moderately dilated</option><option value="severe">Severely dilated</option></select>
+          </div>
+          <div class="field small"><label>IVC size/collapse (RAP estimate) <span class="opt">optional</span></label>
+            <select id="ivc">
+              <option value="">—</option>
+              <option value="small">IVC ≤2.1 cm, collapses &gt;50% (RAP ~3)</option>
+              <option value="mid">Intermediate / indeterminate (RAP ~8)</option>
+              <option value="large">IVC &gt;2.1 cm, collapses &lt;50% (RAP ~15)</option>
+            </select>
+          </div>
+        </div>
+        <div class="pillnote"><b>RV dysfunction heuristic:</b> TAPSE &lt; 1.7 cm or S′ &lt; 9.5 cm/s suggests reduced RV systolic function (if measured).</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Valves (as available)</h3><div class="hint">Enter numbers if you have them; otherwise choose qualitative severity.</div></div>
+        <div class="fields">
+          <div class="field wide">
+            <div class="checkline">
+              <label>Aortic Stenosis (AS)</label>
+              <span class="check"><input id="as_none" type="checkbox" />None/trace</span>
+              <span class="check"><input id="as_mild" type="checkbox" />Mild</span>
+              <span class="check"><input id="as_mod" type="checkbox" />Moderate</span>
+              <span class="check"><input id="as_sev" type="checkbox" />Severe</span>
+            </div>
+          </div>
+          <div class="field tiny"><label>AS Vmax (m/s) <span class="opt">optional</span></label><input id="as_vmax" type="number" step="0.01" min="0" placeholder="e.g., 3.8" /></div>
+          <div class="field tiny"><label>AS mean grad (mmHg) <span class="opt">optional</span></label><input id="as_mg" type="number" step="1" min="0" placeholder="e.g., 38" /></div>
+          <div class="field tiny"><label>AVA (cm²) <span class="opt">optional</span></label><input id="as_ava" type="number" step="0.01" min="0" placeholder="e.g., 0.9" /></div>
+
+          <div class="field wide">
+            <div class="checkline">
+              <label>Mitral Regurgitation (MR)</label>
+              <span class="check"><input id="mr_none" type="checkbox" />None/trace</span>
+              <span class="check"><input id="mr_mild" type="checkbox" />Mild</span>
+              <span class="check"><input id="mr_mod" type="checkbox" />Moderate</span>
+              <span class="check"><input id="mr_sev" type="checkbox" />Severe</span>
+            </div>
+          </div>
+          <div class="field tiny"><label>EROA (cm²) <span class="opt">optional</span></label><input id="mr_eroa" type="number" step="0.01" min="0" placeholder="e.g., 0.30" /></div>
+          <div class="field tiny"><label>Regurg vol (mL) <span class="opt">optional</span></label><input id="mr_rvol" type="number" step="1" min="0" placeholder="e.g., 55" /></div>
+          <div class="field tiny"><label>Vena contracta (cm) <span class="opt">optional</span></label><input id="mr_vc" type="number" step="0.01" min="0" placeholder="e.g., 0.65" /></div>
+
+          <div class="field small"><label>Aortic regurgitation (AR) <span class="opt">optional</span></label>
+            <select id="ar_qual"><option value="">—</option><option value="none">None/trace</option><option value="mild">Mild</option><option value="moderate">Moderate</option><option value="severe">Severe</option></select>
+          </div>
+          <div class="field small"><label>Tricuspid regurgitation (TR) <span class="opt">optional</span></label>
+            <select id="tr_qual"><option value="">—</option><option value="none">None/trace</option><option value="mild">Mild</option><option value="moderate">Moderate</option><option value="severe">Severe</option></select>
+          </div>
+          <div class="field small"><label>Mitral stenosis (MS) <span class="opt">optional</span></label>
+            <select id="ms_qual"><option value="">—</option><option value="none">None</option><option value="mild">Mild</option><option value="moderate">Moderate</option><option value="severe">Severe</option></select>
+          </div>
+        </div>
+        <div class="pillnote"><b>AS numeric cutoffs:</b> mild (Vmax 2.6–2.9, MG &lt;20, AVA &gt;1.5), moderate (Vmax 3.0–3.9, MG 20–39, AVA 1.0–1.5), severe (Vmax ≥4.0, MG ≥40, AVA ≤1.0). Discordance → lower confidence.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Pericardium / effusion</h3><div class="hint">If tamponade is suspected clinically, don’t let a tool talk you out of it.</div></div>
+        <div class="fields">
+          <div class="field small"><label>Effusion size <span class="opt">optional</span></label>
+            <select id="effusion"><option value="">—</option><option value="none">None</option><option value="small">Small</option><option value="moderate">Moderate</option><option value="large">Large</option></select>
+          </div>
+          <div class="field small"><label>Tamponade physiology noted? <span class="opt">optional</span></label>
+            <select id="tamponade"><option value="">—</option><option value="no">No</option><option value="yes">Yes / concerning features</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><h3>Free-text (snippets / caveats)</h3><div class="hint">Optional. Included in narrative.</div></div>
+        <div class="fields">
+          <div class="field wide"><label>Notes <span class="opt">optional</span></label><textarea id="notes" placeholder="e.g., technically limited study; poor windows; contrast used; AF during exam; comparison to prior..."></textarea></div>
+        </div>
+      </div>
+
+      <div class="tinywarn">Clinical decision support only. Integrate symptoms, vitals, ECG, labs, and exam.</div>
+    </div>
+
+    <div class="card output">
+      <h2>Interpretation <span class="chip" id="confidenceChip">No interpretation yet</span></h2>
+
+      <div class="impression">
+        <div class="line" id="oneLine">Click <b>Interpret</b> to generate an echo-style read.</div>
+        <div class="meta" id="metaLine">Summary, key numbers, and reasoning will appear here.</div>
+        <div class="badges" id="badges"></div>
+      </div>
+
+      <div class="kv" id="kv"></div>
+
+      <div class="details" id="details" style="display:none;">
+        <h3>Findings with reasoning</h3>
+        <div class="hint">Each domain includes the key logic used to reach the conclusion.</div>
+        <div id="detailBlocks"></div>
+      </div>
+
+      <div class="copywrap" id="copywrap" style="display:none;">
+        <div class="copyhdr">
+          <div>
+            <div class="t">Copy-to-clipboard summary</div>
+            <div class="small">Short, honest, and paste-ready.</div>
+          </div>
+          <button class="btn" id="btnCopy" type="button">📋 Copy</button>
+        </div>
+        <pre id="copyText"></pre>
+      </div>
+
+      <div class="section" style="margin-top:12px;">
+        <div class="row">
+          <button class="btn secondary" id="btnReset" type="button">Reset</button>
+          <button class="btn ghost" id="btnExportJson" type="button">Export JSON</button>
+          <button class="btn ghost" id="btnImportJson" type="button">Import JSON</button>
+          <input id="jsonFile" type="file" accept="application/json" style="display:none" />
+        </div>
+        <div class="hint" style="margin-top:8px;">JSON export/import lets you reuse a template or move values between machines.</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <b>Clinical caveat:</b> Echo interpretation depends on loading conditions, rhythm, and technical quality. This tool uses common heuristics and labels uncertainty rather than inventing precision.
+</footer>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  function num(id){
+    const v = $(id).value;
+    if(v === "" || v === null || typeof v === "undefined") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  function val(id){ return $(id).value || ""; }
+  function checked(id){ return $(id).checked; }
+  function fmt(n, d=1){
+    if(n === null || n === undefined || !Number.isFinite(n)) return "—";
+    return d===0 ? String(Math.round(n)) : n.toFixed(d);
+  }
+
+  function enforceSingleCheckbox(prefix){
+    const ids = [prefix+"_none", prefix+"_mild", prefix+"_mod", prefix+"_sev"];
+    ids.forEach(id => {
+      const el = $(id);
+      if(!el) return;
+      el.addEventListener("change", () => {
+        if(el.checked){
+          ids.forEach(other => { if(other !== id) $(other).checked = false; });
+        }
+      });
+    });
+  }
+  enforceSingleCheckbox("as");
+  enforceSingleCheckbox("mr");
+
+  $("rwma_unknown").addEventListener("change", () => { if($("rwma_unknown").checked) $("rwma").checked = false; });
+  $("rwma").addEventListener("change", () => { if($("rwma").checked) $("rwma_unknown").checked = false; });
+
+  function getQualFromCheckbox(prefix){
+    let out = "";
+    const map = [["none", prefix+"_none"], ["mild", prefix+"_mild"], ["moderate", prefix+"_mod"], ["severe", prefix+"_sev"]];
+    map.forEach(([k,id]) => { if($(id).checked) out = k; });
+    return out;
+  }
+
+  // Core interpreters return {title, conclusion, badge, confidence(0-2), reasons[]}
+  function interpretLV(){
+    const ef = num("lvef");
+    const lvedd = num("lvedd");
+    const ivsd = num("ivsd");
+    const pwd  = num("pwd");
+    const rwma = checked("rwma");
+    const rwmaUnk = checked("rwma_unknown");
+
+    // Systolic
+    let syst = {title:"LV systolic function", conclusion:"", badge:"warn", confidence:0, reasons:[]};
+    if(ef !== null){
+      syst.confidence += 2;
+      if(ef < 30){ syst.conclusion = "Severely reduced"; syst.badge="bad"; }
+      else if(ef < 40){ syst.conclusion = "Moderately reduced"; syst.badge="warn"; }
+      else if(ef < 50){ syst.conclusion = "Mildly reduced"; syst.badge="warn"; }
+      else { syst.conclusion = "Normal / preserved"; syst.badge="ok"; }
+      syst.reasons.push(`EF ${fmt(ef,0)}%`);
+    } else {
+      syst.conclusion = "Unable to quantify (EF missing)";
+      syst.reasons.push("EF not provided");
+    }
+    if(rwma){ syst.reasons.push("RWMA present"); syst.confidence += 1; if(syst.badge==="ok") syst.badge="warn"; }
+    else if(rwmaUnk){ syst.reasons.push("RWMA not assessed/unknown"); }
+
+    // LV size (rough)
+    let size = {title:"LV size", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+    if(lvedd !== null){
+      size.confidence += 1;
+      size.reasons.push(`LVEDD ${fmt(lvedd,1)} cm`);
+      // coarse cutoffs without BSA indexing
+      if(lvedd < 3.9) { size.conclusion = "Small"; size.badge="warn"; }
+      else if(lvedd <= 5.9) { size.conclusion = "Normal range (rough)"; size.badge="ok"; }
+      else { size.conclusion = "Dilated"; size.badge="warn"; }
+    } else {
+      size.conclusion = "Unable to assess (LVEDD missing)";
+      size.reasons.push("LVEDD not provided");
+    }
+
+    // LVH heuristic
+    let lvh = {title:"LV hypertrophy", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+    const maxWT = Math.max(ivsd ?? -1, pwd ?? -1);
+    if(ivsd !== null || pwd !== null){
+      lvh.confidence += 1;
+      lvh.reasons.push(`IVSd ${fmt(ivsd,1)} cm; PWd ${fmt(pwd,1)} cm`);
+      if(maxWT >= 1.2){ lvh.conclusion="Suggests LVH"; lvh.badge="warn"; }
+      else if(maxWT > 0){ lvh.conclusion="No LVH by wall thickness"; lvh.badge="ok"; }
+      else { lvh.conclusion="Indeterminate"; }
+    } else {
+      lvh.conclusion="Unable to assess (wall thickness missing)";
+      lvh.reasons.push("IVSd/PWd not provided");
+    }
+
+    return {syst, size, lvh};
+  }
+
+  function interpretDiastology(){
+    const E = num("E"), A = num("A");
+    const eS = num("eprime_s"), eL = num("eprime_l");
+    const Ee = num("Ee");
+    const lavi = num("lavi");
+    const trv = num("trv");
+    const ef = num("lvef");
+
+    let dd = {title:"Diastolic function / filling pressure", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+
+    // Derivatives
+    let EA = null;
+    if(E !== null && A !== null && A !== 0) EA = E / A;
+
+    let eAvg = null;
+    if(eS !== null && eL !== null) eAvg = (eS + eL) / 2;
+    else if(eS !== null) eAvg = eS;
+    else if(eL !== null) eAvg = eL;
+
+    let EeCalc = null;
+    if(E !== null && eAvg !== null && eAvg !== 0) EeCalc = E / eAvg;
+
+    const EeUse = (Ee !== null) ? Ee : EeCalc;
+
+    if(EA !== null) dd.reasons.push(`E/A ${fmt(EA,2)}`);
+    if(eAvg !== null) dd.reasons.push(`e′ (avg/available) ${fmt(eAvg,1)} cm/s`);
+    if(EeUse !== null) dd.reasons.push(`E/e′ ${fmt(EeUse,1)}`);
+    if(lavi !== null) dd.reasons.push(`LAVI ${fmt(lavi,0)} mL/m²`);
+    if(trv !== null) dd.reasons.push(`TR Vmax ${fmt(trv,2)} m/s`);
+
+    // Elevated filling pressure marker count
+    let markers = 0, markerTotal = 0;
+    function countMarker(cond, label){
+      markerTotal += 1;
+      if(cond){ markers += 1; dd.reasons.push(label); }
+    }
+    if(EeUse !== null){ dd.confidence += 1; countMarker(EeUse > 14, "↑ Filling pressure: E/e′ > 14"); }
+    if(lavi !== null){ dd.confidence += 1; countMarker(lavi > 34, "Chronic pressure/volume: LAVI > 34"); }
+    if(trv !== null){ dd.confidence += 1; countMarker(trv > 2.8, "↑ Pulm pressure signal: TR Vmax > 2.8"); }
+
+    // Grade logic (simplified; honest)
+    if(markerTotal === 0){
+      dd.conclusion = "Unable to grade (insufficient diastology data)";
+      dd.badge = "warn";
+      return dd;
+    }
+
+    // If EF reduced, likely DD present; use markers for filling pressure
+    if(ef !== null && ef < 50){
+      dd.conclusion = (markers >= 2) ? "Diastolic dysfunction with elevated filling pressures likely" :
+                      (markers === 1) ? "Diastolic dysfunction likely; filling pressure uncertain" :
+                      "Diastolic dysfunction likely; no strong evidence of high filling pressure";
+      dd.badge = (markers >= 2) ? "warn" : "ok";
+      dd.confidence += 1;
+      return dd;
+    }
+
+    // Preserved EF: marker-based
+    if(markers >= 2){
+      dd.conclusion = "Elevated LV filling pressures likely (diastolic dysfunction)";
+      dd.badge = "warn";
+    } else if(markers === 1){
+      dd.conclusion = "Possible diastolic dysfunction; overall indeterminate";
+      dd.badge = "warn";
+    } else {
+      dd.conclusion = "No strong evidence of elevated filling pressures (limited data)";
+      dd.badge = "ok";
+    }
+    return dd;
+  }
+
+  function interpretRV(){
+    const tapse = num("tapse");
+    const rvs = num("rvs");
+    const rvSize = val("rv_size");
+    const trv = num("trv");
+    const ivc = val("ivc");
+
+    let rvf = {title:"RV systolic function", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+
+    if(tapse !== null){ rvf.confidence += 1; rvf.reasons.push(`TAPSE ${fmt(tapse,1)} cm`); }
+    if(rvs !== null){ rvf.confidence += 1; rvf.reasons.push(`S′ ${fmt(rvs,1)} cm/s`); }
+
+    let dys = 0, have = 0;
+    if(tapse !== null){ have++; if(tapse < 1.7) dys++; }
+    if(rvs !== null){ have++; if(rvs < 9.5) dys++; }
+
+    if(have === 0){
+      rvf.conclusion = "Unable to assess (TAPSE/S′ missing)";
+      rvf.badge = "warn";
+    } else if(dys >= 1){
+      rvf.conclusion = "Reduced RV systolic function suggested";
+      rvf.badge = "warn";
+    } else {
+      rvf.conclusion = "Normal RV systolic function by available metrics";
+      rvf.badge = "ok";
+    }
+
+    let rvsiz = {title:"RV size", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+    if(rvSize){
+      rvsiz.confidence += 1;
+      rvsiz.conclusion = (rvSize === "normal") ? "Normal" : rvSize.replace(/^\w/, c=>c.toUpperCase());
+      rvsiz.badge = (rvSize === "normal") ? "ok" : "warn";
+      rvsiz.reasons.push(`Qualitative: ${rvsiz.conclusion}`);
+    } else {
+      rvsiz.conclusion = "Not provided";
+      rvsiz.reasons.push("RV size not provided");
+    }
+
+    // PASP estimate (simplified): PASP ≈ 4*(TRV^2) + RAP
+    let pasp = {title:"Pulmonary pressure (PASP estimate)", conclusion:"Unable to estimate", badge:"warn", confidence:0, reasons:[]};
+    let rap = null;
+    if(ivc === "small") rap = 3;
+    if(ivc === "mid") rap = 8;
+    if(ivc === "large") rap = 15;
+    if(trv !== null && rap !== null){
+      pasp.confidence += 2;
+      const est = 4 * trv * trv + rap;
+      pasp.conclusion = `Estimated PASP ~ ${fmt(est,0)} mmHg`;
+      pasp.reasons.push(`TRV ${fmt(trv,2)} m/s; RAP ~${rap} mmHg`);
+      if(est < 35){ pasp.badge="ok"; }
+      else if(est < 50){ pasp.badge="warn"; }
+      else { pasp.badge="bad"; }
+    } else if(trv !== null && rap === null){
+      pasp.confidence += 1;
+      pasp.conclusion = "TR velocity available; RAP/IVC missing (cannot estimate PASP)";
+      pasp.reasons.push(`TRV ${fmt(trv,2)} m/s`);
+      pasp.badge = "warn";
+    } else {
+      pasp.reasons.push("TRV and/or IVC not provided");
+    }
+
+    return {rvf, rvsiz, pasp};
+  }
+
+  function interpretValves(){
+    // AS: numeric or qualitative
+    const asQual = getQualFromCheckbox("as");
+    const vmax = num("as_vmax");
+    const mg = num("as_mg");
+    const ava = num("as_ava");
+
+    let as = {title:"Aortic valve (stenosis)", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+    let severeBy = 0, moderateBy = 0, mildBy = 0, have = 0;
+
+    if(vmax !== null){ have++; as.confidence++; as.reasons.push(`Vmax ${fmt(vmax,2)} m/s`); if(vmax >= 4.0) severeBy++; else if(vmax >= 3.0) moderateBy++; else if(vmax >= 2.6) mildBy++; }
+    if(mg !== null){ have++; as.confidence++; as.reasons.push(`Mean grad ${fmt(mg,0)} mmHg`); if(mg >= 40) severeBy++; else if(mg >= 20) moderateBy++; else if(mg > 0) mildBy++; }
+    if(ava !== null){ have++; as.confidence++; as.reasons.push(`AVA ${fmt(ava,2)} cm²`); if(ava <= 1.0) severeBy++; else if(ava <= 1.5) moderateBy++; else mildBy++; }
+    if(asQual){ as.confidence++; as.reasons.push(`Qualitative: ${asQual}`); }
+
+    function pickAS(){
+      // Prefer numeric; if none, use qualitative
+      if(have === 0){
+        if(asQual){
+          as.conclusion = asQual === "none" ? "No significant AS" : `${asQual.charAt(0).toUpperCase()+asQual.slice(1)} AS (qualitative)`;
+          as.badge = (asQual === "none") ? "ok" : (asQual === "severe" ? "bad" : "warn");
+        } else {
+          as.conclusion = "AS not assessed";
+          as.badge = "warn";
+        }
+        return;
+      }
+      // Numeric synthesis
+      if(severeBy >= 2){ as.conclusion = "Severe AS likely"; as.badge="bad"; }
+      else if(severeBy === 1 && moderateBy >= 1){ as.conclusion = "At least moderate AS; possible severe (discordant criteria)"; as.badge="warn"; }
+      else if(moderateBy >= 2){ as.conclusion = "Moderate AS likely"; as.badge="warn"; }
+      else if(mildBy >= 1){ as.conclusion = "Mild AS possible"; as.badge="ok"; }
+      else { as.conclusion = "No significant AS by provided numbers"; as.badge="ok"; }
+
+      if(asQual){
+        // If qualitative conflicts, flag
+        const q = asQual;
+        if(q === "severe" && as.badge !== "bad") as.reasons.push("Note: qualitative severe but numeric criteria not clearly severe");
+        if(q === "none" && as.badge !== "ok") as.reasons.push("Note: qualitative none but numeric suggests stenosis");
+      }
+    }
+    pickAS();
+
+    // MR
+    const mrQual = getQualFromCheckbox("mr");
+    const eroa = num("mr_eroa");
+    const rvol = num("mr_rvol");
+    const vc = num("mr_vc");
+    let mr = {title:"Mitral valve (regurgitation)", conclusion:"Indeterminate", badge:"warn", confidence:0, reasons:[]};
+
+    let mrSev = 0, mrMod = 0, mrHave=0;
+    if(eroa !== null){ mrHave++; mr.confidence++; mr.reasons.push(`EROA ${fmt(eroa,2)} cm²`); if(eroa >= 0.40) mrSev++; else if(eroa >= 0.20) mrMod++; }
+    if(rvol !== null){ mrHave++; mr.confidence++; mr.reasons.push(`Regurg vol ${fmt(rvol,0)} mL`); if(rvol >= 60) mrSev++; else if(rvol >= 30) mrMod++; }
+    if(vc !== null){ mrHave++; mr.confidence++; mr.reasons.push(`Vena contracta ${fmt(vc,2)} cm`); if(vc >= 0.7) mrSev++; else if(vc >= 0.3) mrMod++; }
+    if(mrQual){ mr.confidence++; mr.reasons.push(`Qualitative: ${mrQual}`); }
+
+    if(mrHave === 0){
+      if(mrQual){
+        mr.conclusion = mrQual === "none" ? "No significant MR" : `${mrQual.charAt(0).toUpperCase()+mrQual.slice(1)} MR (qualitative)`;
+        mr.badge = (mrQual === "none") ? "ok" : (mrQual === "severe" ? "bad" : "warn");
+      } else {
+        mr.conclusion = "MR not assessed";
+        mr.badge = "warn";
+      }
+    } else {
+      if(mrSev >= 1 && mrHave >= 2){ mr.conclusion = "Severe MR possible/likely"; mr.badge="bad"; }
+      else if(mrMod >= 1){ mr.conclusion = "At least moderate MR"; mr.badge="warn"; }
+      else { mr.conclusion = "Mild or less MR by provided numbers"; mr.badge="ok"; }
+    }
+
+    // Other qualitative valves
+    function qualSel(id, title){
+      const q = val(id);
+      let o = {title, conclusion:"Not provided", badge:"warn", confidence:0, reasons:[]};
+      if(q){
+        o.confidence = 1;
+        o.conclusion = q === "none" ? "None/trace" : q.charAt(0).toUpperCase()+q.slice(1);
+        o.badge = (q === "none" || q === "mild") ? "ok" : (q === "severe" ? "bad" : "warn");
+        o.reasons.push(`Qualitative: ${o.conclusion}`);
+      } else {
+        o.reasons.push("Not provided");
+      }
+      return o;
+    }
+
+    const ar = qualSel("ar_qual","Aortic regurgitation");
+    const tr = qualSel("tr_qual","Tricuspid regurgitation");
+    const ms = qualSel("ms_qual","Mitral stenosis");
+
+    return {as, mr, ar, tr, ms};
+  }
+
+  function interpretPericardium(){
+    const eff = val("effusion");
+    const tamp = val("tamponade");
+    let p = {title:"Pericardium", conclusion:"Not provided", badge:"warn", confidence:0, reasons:[]};
+    if(!eff && !tamp){
+      p.conclusion = "No pericardial info provided";
+      p.reasons.push("Effusion/tamponade not provided");
+      return p;
+    }
+    p.confidence = 1;
+    let parts = [];
+    if(eff){
+      parts.push(eff === "none" ? "No effusion" : `${eff.charAt(0).toUpperCase()+eff.slice(1)} effusion`);
+      p.badge = (eff === "none") ? "ok" : (eff === "large" ? "bad" : "warn");
+      p.reasons.push(`Effusion: ${eff}`);
+    }
+    if(tamp){
+      parts.push(tamp === "yes" ? "Tamponade physiology noted" : "No tamponade physiology noted");
+      if(tamp === "yes") p.badge = "bad";
+      p.reasons.push(`Tamponade: ${tamp}`);
+    }
+    p.conclusion = parts.join("; ");
+    return p;
+  }
+
+  function badgeEl(kind, text){
+    const span = document.createElement("span");
+    span.className = "badge " + kind;
+    span.textContent = text;
+    return span;
+  }
+
+  function renderKV(items){
+    const kv = $("kv");
+    kv.innerHTML = "";
+    items.forEach(({k,v})=>{
+      const box = document.createElement("div");
+      box.className = "box";
+      box.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+      kv.appendChild(box);
+    });
+  }
+
+  function renderDetails(blocks){
+    const wrap = $("detailBlocks");
+    wrap.innerHTML = "";
+    blocks.forEach(b=>{
+      const div = document.createElement("div");
+      div.style.marginTop = "10px";
+      div.innerHTML = `<div style="font-weight:950;margin-bottom:4px">${b.title}: ${b.conclusion}</div>`;
+      const ul = document.createElement("ul");
+      b.reasons.forEach(r=>{
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="reason">${r}</span>`;
+        ul.appendChild(li);
+      });
+      div.appendChild(ul);
+      wrap.appendChild(div);
+    });
+    $("details").style.display = "block";
+  }
+
+  function buildOneLine(ctx){
+    const bits = [];
+    if(ctx.lvSystShort) bits.push(ctx.lvSystShort);
+    if(ctx.diastShort) bits.push(ctx.diastShort);
+    if(ctx.rvShort) bits.push(ctx.rvShort);
+    if(ctx.valveShort) bits.push(ctx.valveShort);
+    if(ctx.periShort) bits.push(ctx.periShort);
+    if(bits.length === 0) return "Insufficient data to generate an impression.";
+    return bits.join(", ") + ".";
+  }
+
+  function normalizeBadge(badges){
+    // determine overall badge: any bad -> bad, else any warn -> warn, else ok
+    if(badges.includes("bad")) return "bad";
+    if(badges.includes("warn")) return "warn";
+    return "ok";
+  }
+
+  function interpretAll(){
+    const ctx = {};
+    const badges = [];
+    let conf = 0; // 0-10ish
+
+    // LV
+    const lv = interpretLV();
+    conf += lv.syst.confidence + lv.size.confidence + lv.lvh.confidence;
+    badges.push(lv.syst.badge, lv.size.badge, lv.lvh.badge);
+
+    // Diast
+    const di = interpretDiastology();
+    conf += di.confidence;
+    badges.push(di.badge);
+
+    // RV
+    const rv = interpretRV();
+    conf += rv.rvf.confidence + rv.rvsiz.confidence + rv.pasp.confidence;
+    badges.push(rv.rvf.badge, rv.rvsiz.badge, rv.pasp.badge);
+
+    // Valves
+    const v = interpretValves();
+    conf += v.as.confidence + v.mr.confidence + v.ar.confidence + v.tr.confidence + v.ms.confidence;
+    badges.push(v.as.badge, v.mr.badge, v.ar.badge, v.tr.badge, v.ms.badge);
+
+    // Pericardium
+    const p = interpretPericardium();
+    conf += p.confidence;
+    badges.push(p.badge);
+
+    // Short phrases
+    const ef = num("lvef");
+    if(ef !== null){
+      if(ef < 40) ctx.lvSystShort = `Reduced LV systolic function (EF ~${fmt(ef,0)}%)`;
+      else if(ef < 50) ctx.lvSystShort = `Mildly reduced LV systolic function (EF ~${fmt(ef,0)}%)`;
+      else ctx.lvSystShort = `Normal LV systolic function (EF ~${fmt(ef,0)}%)`;
+    } else if(checked("rwma")) ctx.lvSystShort = "Possible LV systolic dysfunction (RWMA present; EF not provided)";
+
+    // Diast short
+    if(di.conclusion.includes("Elevated") || di.conclusion.includes("elevated")) ctx.diastShort = "Elevated filling pressures likely";
+    else if(di.conclusion.includes("Unable")) ctx.diastShort = "Diastology indeterminate";
+    else if(di.conclusion.includes("No strong")) ctx.diastShort = "No strong evidence of high filling pressures";
+    else if(di.conclusion.includes("possible")) ctx.diastShort = "Possible diastolic dysfunction";
+
+    // RV short
+    if(rv.rvf.badge === "warn") ctx.rvShort = "RV systolic function possibly reduced";
+    else if(rv.rvf.badge === "ok") ctx.rvShort = "RV systolic function preserved";
+    if(rv.pasp.badge === "bad") ctx.rvShort = (ctx.rvShort ? ctx.rvShort + "; " : "") + "PASP markedly elevated";
+    else if(rv.pasp.badge === "warn" && rv.pasp.conclusion.startsWith("Estimated")) ctx.rvShort = (ctx.rvShort ? ctx.rvShort + "; " : "") + "PASP mildly/moderately elevated";
+    else if(rv.pasp.badge === "ok" && rv.pasp.conclusion.startsWith("Estimated")) ctx.rvShort = (ctx.rvShort ? ctx.rvShort + "; " : "") + "PASP not elevated";
+
+    // Valve short
+    const valveBits = [];
+    if(v.as.badge === "bad") valveBits.push("Severe AS");
+    else if(v.as.badge === "warn" && (v.as.conclusion.includes("Moderate") || v.as.conclusion.includes("Severe"))) valveBits.push(v.as.conclusion.replace(" likely",""));
+    if(v.mr.badge === "bad") valveBits.push("Severe MR");
+    else if(v.mr.badge === "warn" && v.mr.conclusion.includes("moderate")) valveBits.push("≥Moderate MR");
+    if(val("ar_qual")==="severe") valveBits.push("Severe AR");
+    if(val("tr_qual")==="severe") valveBits.push("Severe TR");
+    if(valveBits.length) ctx.valveShort = valveBits.join(" + ");
+    else ctx.valveShort = "No major valvular lesion identified (limited data)";
+
+    // Peri short
+    const eff = val("effusion");
+    const tamp = val("tamponade");
+    if(tamp === "yes") ctx.periShort = "Concerning for tamponade physiology";
+    else if(eff && eff !== "none") ctx.periShort = `${eff.charAt(0).toUpperCase()+eff.slice(1)} pericardial effusion`;
+    else if(eff === "none") ctx.periShort = "No pericardial effusion";
+
+    // Confidence label
+    const confPct = Math.max(5, Math.min(95, Math.round((conf / 14) * 100)));
+    let confLabel = "Low confidence";
+    if(confPct >= 70) confLabel = "High confidence";
+    else if(confPct >= 40) confLabel = "Moderate confidence";
+
+    // Render badges summary
+    const overall = normalizeBadge(badges);
+    const badgeWrap = $("badges");
+    badgeWrap.innerHTML = "";
+    badgeWrap.appendChild(badgeEl(overall, overall === "ok" ? "No major red flags" : overall === "bad" ? "High-risk finding(s)" : "Some abnormal/uncertain findings"));
+    badgeWrap.appendChild(badgeEl(confLabel.includes("High") ? "ok" : confLabel.includes("Moderate") ? "warn" : "warn", `${confLabel} (${confPct}%)`));
+
+    // One-liner & meta
+    const oneLine = buildOneLine(ctx);
+    $("oneLine").textContent = oneLine;
+
+    // Meta line with context
+    const parts = [];
+    const ind = val("indication").trim();
+    if(ind) parts.push(`Indication: ${ind}`);
+    const notes = val("notes").trim();
+    if(notes) parts.push(`Notes: ${notes}`);
+    $("metaLine").textContent = parts.length ? parts.join(" • ") : "Structured findings and reasoning below.";
+
+    // KV boxes
+    renderKV([
+      {k:"LV systolic", v: lv.syst.conclusion + (num("lvef")!==null ? ` (EF ${fmt(num("lvef"),0)}%)` : "")},
+      {k:"LV size", v: lv.size.conclusion},
+      {k:"LVH", v: lv.lvh.conclusion},
+      {k:"Diastology", v: di.conclusion},
+      {k:"RV function", v: rv.rvf.conclusion},
+      {k:"PASP", v: rv.pasp.conclusion},
+      {k:"Aortic valve", v: v.as.conclusion},
+      {k:"Mitral valve", v: v.mr.conclusion},
+    ]);
+
+    // Details
+    renderDetails([
+      {...lv.syst}, {...lv.size}, {...lv.lvh},
+      {...di},
+      {...rv.rvf}, {...rv.rvsiz}, {...rv.pasp},
+      {...v.as}, {...v.mr}, {...v.ar}, {...v.tr}, {...v.ms},
+      {...p},
+    ]);
+
+    // Copy summary
+    const sex = val("sex");
+    const bsa = num("bsa");
+    const copy = [];
+    copy.push("TTE SUMMARY (tool-generated; verify clinically)");
+    if(sex || bsa !== null){
+      const ctxLine = [];
+      if(sex) ctxLine.push(`Sex: ${sex}`);
+      if(bsa !== null) ctxLine.push(`BSA: ${fmt(bsa,2)} m²`);
+      copy.push(ctxLine.join(" | "));
+    }
+    if(ind) copy.push(`Indication: ${ind}`);
+    copy.push("");
+    if(num("lvef")!==null) copy.push(`LV: EF ~${fmt(num("lvef"),0)}% (${lv.syst.conclusion}). LV size: ${lv.size.conclusion}. LVH: ${lv.lvh.conclusion}.`);
+    else copy.push(`LV: ${lv.syst.conclusion}. LV size: ${lv.size.conclusion}. LVH: ${lv.lvh.conclusion}.`);
+    copy.push(`Diastology: ${di.conclusion}.`);
+    copy.push(`RV: ${rv.rvf.conclusion}. RV size: ${rv.rvsiz.conclusion}. ${rv.pasp.conclusion}.`);
+    copy.push(`Valves: AS: ${v.as.conclusion}. MR: ${v.mr.conclusion}. AR: ${v.ar.conclusion}. TR: ${v.tr.conclusion}. MS: ${v.ms.conclusion}.`);
+    copy.push(`Pericardium: ${p.conclusion}.`);
+    if(notes) copy.push(`Notes: ${notes}`);
+    copy.push("");
+    copy.push(`Overall: ${oneLine}`);
+    copy.push(`Confidence: ${confLabel} (~${confPct}%). If insufficient/discordant data, consider complete diastology/valve quantification or cardiology review.`);
+
+    $("copyText").textContent = copy.join("\n");
+    $("copywrap").style.display = "block";
+
+    // Confidence chip
+    $("confidenceChip").textContent = `${confLabel} (${confPct}%)`;
+  }
+
+  // Copy button
+  $("btnCopy").addEventListener("click", async () => {
+    const text = $("copyText").textContent || "";
+    try{
+      await navigator.clipboard.writeText(text);
+      $("btnCopy").textContent = "✅ Copied";
+      setTimeout(()=> $("btnCopy").textContent = "📋 Copy", 1200);
+    }catch(e){
+      alert("Copy failed (browser permission). You can manually select and copy the text.");
+    }
+  });
+
+  // Interpret button
+  $("btnInterpret").addEventListener("click", interpretAll);
+
+  // Reset
+  $("btnReset").addEventListener("click", () => {
+    document.querySelectorAll("input, select, textarea").forEach(el=>{
+      if(el.type === "checkbox") el.checked = false;
+      else if(el.type === "file") el.value = "";
+      else el.value = "";
+    });
+    $("oneLine").innerHTML = 'Click <b>Interpret</b> to generate an echo-style read.';
+    $("metaLine").textContent = "Summary, key numbers, and reasoning will appear here.";
+    $("badges").innerHTML = "";
+    $("kv").innerHTML = "";
+    $("detailBlocks").innerHTML = "";
+    $("details").style.display = "none";
+    $("copywrap").style.display = "none";
+    $("confidenceChip").textContent = "No interpretation yet";
+  });
+
+  // Example fill
+  $("btnFillExample").addEventListener("click", () => {
+    $("sex").value = "M";
+    $("bsa").value = 1.95;
+    $("indication").value = "Dyspnea, r/o HF";
+    $("lvef").value = 45;
+    $("lvedd").value = 5.8;
+    $("ivsd").value = 1.2;
+    $("pwd").value = 1.1;
+    $("rwma").checked = true;
+
+    $("E").value = 90;
+    $("A").value = 70;
+    $("eprime_s").value = 5.5;
+    $("eprime_l").value = 8.5;
+    $("lavi").value = 40;
+    $("trv").value = 2.9;
+
+    $("tapse").value = 1.6;
+    $("rvs").value = 9.0;
+    $("rv_size").value = "mild";
+    $("ivc").value = "mid";
+
+    $("as_mod").checked = true;
+    $("mr_mild").checked = true;
+    $("ar_qual").value = "none";
+    $("tr_qual").value = "mild";
+    $("ms_qual").value = "none";
+
+    $("effusion").value = "none";
+    $("tamponade").value = "no";
+    $("notes").value = "Technically adequate study. No prior for comparison.";
+  });
+
+  // JSON export/import
+  function collect(){
+    const data = {};
+    document.querySelectorAll("input, select, textarea").forEach(el=>{
+      if(!el.id) return;
+      if(el.type === "checkbox") data[el.id] = el.checked;
+      else if(el.type === "file") {}
+      else data[el.id] = el.value;
+    });
+    return data;
+  }
+  function apply(data){
+    Object.keys(data||{}).forEach(id=>{
+      const el = $(id);
+      if(!el) return;
+      if(el.type === "checkbox") el.checked = !!data[id];
+      else el.value = data[id];
+    });
+  }
+
+  $("btnExportJson").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(collect(), null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "tte_interpreter_values.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $("btnImportJson").addEventListener("click", () => $("jsonFile").click());
+  $("jsonFile").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    try{
+      const txt = await f.text();
+      const data = JSON.parse(txt);
+      apply(data);
+      alert("Imported values. Click Interpret to generate output.");
+    }catch(err){
+      alert("Import failed: invalid JSON file.");
+    }finally{
+      $("jsonFile").value = "";
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
